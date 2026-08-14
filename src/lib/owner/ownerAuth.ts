@@ -19,6 +19,33 @@ interface OwnerCallbackResult {
 interface OwnerIdentityReader {
   handleAuthCallback: () => Promise<unknown>;
   getUser: () => Promise<unknown>;
+  callbackUrl?: OwnerCallbackUrl;
+}
+
+interface OwnerCallbackUrl {
+  hash: string;
+  pathname: string;
+  search: string;
+  replace: (url: string) => void;
+}
+
+const identityCallbackParameters = [
+  "access_token",
+  "confirmation_token",
+  "recovery_token",
+  "invite_token",
+  "email_change_token",
+] as const;
+
+export function scrubOwnerCallbackHash(callbackUrl: OwnerCallbackUrl | undefined): void {
+  if (!callbackUrl?.hash) return;
+  const parameters = new URLSearchParams(callbackUrl.hash.replace(/^#/, ""));
+  if (!identityCallbackParameters.some((parameter) => parameters.has(parameter))) return;
+  try {
+    callbackUrl.replace(`${callbackUrl.pathname}${callbackUrl.search}`);
+  } catch {
+    // URL cleanup must not replace a safe owner-facing authentication state.
+  }
 }
 
 const isUser = (value: unknown): value is OwnerIdentityUser =>
@@ -54,6 +81,8 @@ export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promis
     return isUser(user) ? { state: "authenticated", user } : { state: "login" };
   } catch {
     return { state: "callback_error" };
+  } finally {
+    scrubOwnerCallbackHash(identity.callbackUrl);
   }
 }
 

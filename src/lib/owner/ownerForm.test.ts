@@ -120,4 +120,70 @@ describe("owner form contract", () => {
     ] as const);
     expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z").success).toBe(true);
   });
+
+  it.each([
+    ["poolHeatFeeUsd", ""],
+    ["poolHeatFeeUsd", "   "],
+    ["poolHeatFeeUsd", "1.5"],
+    ["poolHeatFeeUsd", "+1"],
+    ["petFeeUsd", "-1"],
+    ["petFeeUsd", "1e2"],
+    ["maxPets", "0x2"],
+    ["maxPets", "2pets"],
+  ])("rejects malformed required integer syntax for %s: %j", (field, value) => {
+    const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
+    if (!ownerForm) return;
+    const entries = validEntries().map(([key, current]) =>
+      key === field ? [key, value] as const : [key, current] as const,
+    );
+
+    expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z")).toMatchObject({
+      success: false,
+      errors: [`${field}.invalid`],
+      fieldErrors: { [field]: ownerSettingDefinitions[field as keyof typeof ownerSettingDefinitions].allowed },
+    });
+  });
+
+  it("accepts trimmed digit-only values at every required integer boundary", () => {
+    const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
+    if (!ownerForm) return;
+
+    const lower = validEntries().map(([key, value]) => [key, {
+      poolHeatFeeUsd: " 0 ",
+      petFeeUsd: " 0 ",
+      maxPets: " 0 ",
+    }[key] ?? value] as const);
+    const upper = validEntries().map(([key, value]) => [key, {
+      poolHeatFeeUsd: " 2000 ",
+      petFeeUsd: " 1000 ",
+      maxPets: " 4 ",
+    }[key] ?? value] as const);
+
+    expect(ownerForm.serializeOwnerSettings(lower, "2026-08-14T15:00:00.000Z").success).toBe(true);
+    expect(ownerForm.serializeOwnerSettings(upper, "2026-08-14T15:00:00.000Z").success).toBe(true);
+  });
+
+  it("keeps only blank nullable integers null and validates their syntax and boundaries", () => {
+    const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
+    if (!ownerForm) return;
+
+    for (const [field, invalid] of [
+      ["startingWeeklyRateUsd", "5e2"],
+      ["minimumStayNights", "+7"],
+    ] as const) {
+      const entries = validEntries().map(([key, value]) =>
+        key === field ? [key, invalid] as const : [key, value] as const,
+      );
+      expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z")).toMatchObject({
+        success: false,
+        errors: [`${field}.invalid`],
+      });
+    }
+
+    const boundaries = validEntries().map(([key, value]) => [key, {
+      startingWeeklyRateUsd: "50000",
+      minimumStayNights: "1",
+    }[key] ?? value] as const);
+    expect(ownerForm.serializeOwnerSettings(boundaries, "2026-08-14T15:00:00.000Z").success).toBe(true);
+  });
 });

@@ -1,4 +1,8 @@
-import { validateOwnerSettings, type OwnerSettings } from "../ownerSettings";
+import {
+  isValidIsoTimestamp,
+  validateOwnerSettings,
+  type OwnerSettings,
+} from "../ownerSettings";
 
 export type OwnerApiErrorKind =
   | "validation"
@@ -93,7 +97,7 @@ function parseSnapshots(input: unknown): OwnerSnapshotsResponse {
       throw new OwnerApiError("service");
     }
     const match = snapshotPattern.exec(metadata.key);
-    if (!match || match[1] !== metadata.createdAt || Number.isNaN(Date.parse(metadata.createdAt))) {
+    if (!match || match[1] !== metadata.createdAt || !isValidIsoTimestamp(metadata.createdAt)) {
       throw new OwnerApiError("service");
     }
     return { key: metadata.key, createdAt: metadata.createdAt };

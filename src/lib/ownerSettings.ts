@@ -147,7 +147,7 @@ const isPlainText = (value: unknown) =>
 const isMonthDay = (value: unknown) =>
   typeof value === "string" && /^\d{2}-\d{2}$/.test(value) && isValidIsoDate(`2000-${value}`);
 
-const isIsoTimestamp = (value: unknown) => {
+export const isValidIsoTimestamp = (value: unknown) => {
   if (typeof value !== "string") return false;
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?Z$/.exec(value);
   if (!match) return false;
@@ -192,7 +192,7 @@ export function validateOwnerSettings(input: unknown): OwnerSettingsValidationRe
   if (!isIntegerInRange(input.maxPets, 0, 4)) errors.push("maxPets.invalid");
   if (!isMonthDay(input.poolOpenMonthDay)) errors.push("poolOpenMonthDay.invalid");
   if (!isMonthDay(input.poolCloseMonthDay)) errors.push("poolCloseMonthDay.invalid");
-  if (!isIsoTimestamp(input.updatedAt)) errors.push("updatedAt.invalid");
+  if (!isValidIsoTimestamp(input.updatedAt)) errors.push("updatedAt.invalid");
 
   if (errors.length > 0) return { success: false, errors };
 

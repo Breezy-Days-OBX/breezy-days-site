@@ -81,7 +81,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     const redirectToDashboard = () => window.location.replace("/owner/dashboard");
 
-    const entry = await loadOwnerEntryState({ handleAuthCallback, getUser });
+    const entry = await loadOwnerEntryState({
+      handleAuthCallback,
+      getUser,
+      callbackUrl: {
+        hash: window.location.hash,
+        pathname: window.location.pathname,
+        search: window.location.search,
+        replace: (url) => window.history.replaceState(window.history.state, "", url),
+      },
+    });
     if (entry.state === "authenticated") {
       showStatus("Access confirmed. Opening the dashboard…", "success");
       redirectToDashboard();

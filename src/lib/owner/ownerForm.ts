@@ -57,8 +57,11 @@ export function serializeOwnerSettings(
   const editable = Object.fromEntries(OWNER_EDITABLE_KEYS.map((key) => {
     const raw = formValues.get(key);
     if (typeof raw !== "string") return [key, raw];
-    if (nullableIntegerFields.has(key) && raw.trim() === "") return [key, null];
-    if (integerFields.has(key)) return [key, Number(raw)];
+    const normalized = raw.trim();
+    if (nullableIntegerFields.has(key) && normalized === "") return [key, null];
+    if (integerFields.has(key)) {
+      return [key, /^\d+$/.test(normalized) ? Number(normalized) : Number.NaN];
+    }
     return [key, raw];
   }));
 

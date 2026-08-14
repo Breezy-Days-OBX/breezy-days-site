@@ -117,4 +117,29 @@ describe("owner endpoint client", () => {
     expect(settingsError.kind).toBe("service");
     expect(snapshotsError.kind).toBe("service");
   });
+
+  it("accepts canonical snapshot timestamps and rejects normalized impossible dates", async () => {
+    const ownerApi = modules["./ownerApi.ts"] as OwnerApiModule | undefined;
+    if (!ownerApi) return;
+    const canonical = "2024-02-29T23:59:59.000Z";
+    const impossible = "2026-02-30T12:00:00.000Z";
+
+    await expect(ownerApi.fetchOwnerSnapshots(
+      vi.fn(async () => jsonResponse({ snapshots: [{
+        key: `snapshots/${canonical}-valid.json`,
+        createdAt: canonical,
+      }] })) as unknown as typeof fetch,
+    )).resolves.toEqual({ snapshots: [{
+      key: `snapshots/${canonical}-valid.json`,
+      createdAt: canonical,
+    }] });
+
+    const error = await captureApiError(ownerApi.fetchOwnerSnapshots(
+      vi.fn(async () => jsonResponse({ snapshots: [{
+        key: `snapshots/${impossible}-invalid.json`,
+        createdAt: impossible,
+      }] })) as unknown as typeof fetch,
+    ));
+    expect(error.kind).toBe("service");
+  });
 });
