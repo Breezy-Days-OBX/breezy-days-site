@@ -1,0 +1,144 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Owner access | Breezy Days OBX"
+  description="Private, invitation-only access for the Breezy Days OBX owners."
+  noindex
+>
+  <main class="owner-access-page" id="main-content">
+    <section class="owner-access-card" aria-labelledby="owner-access-title">
+      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
+      <p class="eyebrow">Private owner access</p>
+      <h1 id="owner-access-title">Welcome back.</h1>
+      <p class="owner-access-intro">
+        This area is for invited Breezy Days owners only. Access is invitation-only; public registration is not available.
+      </p>
+
+      <div class="owner-status" data-owner-status role="status" aria-live="polite">
+        Checking your access…
+      </div>
+
+      <form class="owner-auth-form" data-login-form hidden>
+        <div class="owner-field">
+          <label for="owner-email">Email address</label>
+          <input id="owner-email" name="email" type="email" autocomplete="username" required />
+        </div>
+        <div class="owner-field">
+          <label for="owner-password">Password</label>
+          <input id="owner-password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="button" type="submit" data-login-button>Sign in</button>
+      </form>
+
+      <form class="owner-auth-form" data-password-form hidden>
+        <div class="owner-field">
+          <label for="owner-new-password">Choose a password</label>
+          <input
+            id="owner-new-password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            required
+          />
+          <small>Use at least eight characters.</small>
+        </div>
+        <button class="button" type="submit" data-password-button>Save password</button>
+      </form>
+
+      <noscript>
+        <p class="owner-noscript">JavaScript is required for secure owner access.</p>
+      </noscript>
+      <a class="owner-return-link" href="/">Return to the public website</a>
+    </section>
+  </main>
+
+  <script>
+    import {
+      acceptInvite,
+      getUser,
+      handleAuthCallback,
+      login,
+      updateUser,
+    } from "@netlify/identity";
+    import { describeAuthError, loadOwnerEntryState } from "../../lib/owner/ownerAuth";
+
+    const status = document.querySelector<HTMLElement>("[data-owner-status]");
+    const loginForm = document.querySelector<HTMLFormElement>("[data-login-form]");
+    const passwordForm = document.querySelector<HTMLFormElement>("[data-password-form]");
+    const loginButton = document.querySelector<HTMLButtonElement>("[data-login-button]");
+    const passwordButton = document.querySelector<HTMLButtonElement>("[data-password-button]");
+    let callbackMode: "invite" | "recovery" | null = null;
+    let inviteToken: string | null = null;
+
+    const showStatus = (message: string, kind: "neutral" | "success" | "error" = "neutral") => {
+      if (!status) return;
+      status.textContent = message;
+      status.dataset.kind = kind;
+    };
+
+    const redirectToDashboard = () => window.location.replace("/owner/dashboard");
+
+    const entry = await loadOwnerEntryState({ handleAuthCallback, getUser });
+    if (entry.state === "authenticated") {
+      showStatus("Access confirmed. Opening the dashboard…", "success");
+      redirectToDashboard();
+    } else if (entry.state === "invite" || entry.state === "recovery") {
+      callbackMode = entry.state;
+      inviteToken = entry.state === "invite" ? entry.token : null;
+      showStatus(
+        entry.state === "invite"
+          ? "Invitation confirmed. Choose a password to finish setting up owner access."
+          : "Recovery link confirmed. Choose a new password to continue.",
+        "success",
+      );
+      if (passwordForm) passwordForm.hidden = false;
+    } else {
+      showStatus(
+        entry.state === "callback_error"
+          ? describeAuthError("callback")
+          : "Sign in with the email address that received an owner invitation.",
+        entry.state === "callback_error" ? "error" : "neutral",
+      );
+      if (loginForm) loginForm.hidden = false;
+    }
+
+    loginForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const values = new FormData(loginForm);
+      const email = values.get("email");
+      const password = values.get("password");
+      if (typeof email !== "string" || typeof password !== "string") return;
+      loginButton?.setAttribute("disabled", "");
+      showStatus("Signing in…");
+      try {
+        await login(email, password);
+        showStatus("Access confirmed. Opening the dashboard…", "success");
+        redirectToDashboard();
+      } catch {
+        showStatus(describeAuthError("login"), "error");
+        loginButton?.removeAttribute("disabled");
+      }
+    });
+
+    passwordForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const password = new FormData(passwordForm).get("password");
+      if (typeof password !== "string" || !callbackMode) return;
+      passwordButton?.setAttribute("disabled", "");
+      showStatus("Saving your password…");
+      try {
+        if (callbackMode === "invite" && inviteToken) await acceptInvite(inviteToken, password);
+        else if (callbackMode === "recovery") await updateUser({ password });
+        else throw new Error("Invalid callback state");
+        showStatus("Password saved. Opening the dashboard…", "success");
+        redirectToDashboard();
+      } catch {
+        showStatus(describeAuthError("password"), "error");
+        passwordButton?.removeAttribute("disabled");
+      }
+    });
+  </script>
+</BaseLayout>
