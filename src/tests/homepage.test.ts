@@ -75,6 +75,24 @@ describe("Breezy Days homepage", () => {
     expect(html).toContain('data-form-error-summary');
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain('aria-busy="false"');
+    expect(html).not.toMatch(/<form[^>]+novalidate/i);
+    expect(html).toContain('data-max-pets-select');
+  });
+
+  it("withholds marketplace proof until the centralized reverification gate is cleared", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+    const proof = siteContent.marketplaceProof;
+
+    expect(proof.requiresLaunchReverification).toBe(true);
+    expect(html).not.toContain(proof.quote.text);
+    expect(html).not.toContain(proof.quote.source);
+    expect(html).not.toContain(`${proof.airbnb.reviewCount} reviews`);
+    expect(html).not.toContain(`${proof.vrbo.reviewCount} reviews`);
+    expect(html).not.toContain(proof.airbnb.rating);
+    expect(html).not.toContain(proof.vrbo.rating);
+    expect(html).not.toMatch(/launch reverification|marketplace snapshot/i);
+    expect(html).toContain("Why this home");
   });
 
   it("ships repository defaults with allow-listed public-settings markers", async () => {

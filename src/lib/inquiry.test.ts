@@ -53,6 +53,16 @@ describe("minimum inquiry contract", () => {
     expect(categories(validateInquiry({ ...validInquiry, pets: "1" }, { today }))).toContain("pets:invalid_type");
   });
 
+  it("uses an accepted sanitized maximum-pet setting when one is supplied", () => {
+    expect(validateInquiry({ ...validInquiry, pets: 4 }, { today, maximumPets: 4 }).success).toBe(true);
+    expect(categories(validateInquiry({ ...validInquiry, pets: 5 }, { today, maximumPets: 4 }))).toContain(
+      "pets:out_of_range",
+    );
+    expect(categories(validateInquiry({ ...validInquiry, pets: 1 }, { today, maximumPets: 0 }))).toContain(
+      "pets:out_of_range",
+    );
+  });
+
   it("requires a real future arrival and a later departure", () => {
     expect(categories(validateInquiry({ ...validInquiry, arrival: today }, { today }))).toContain("arrival:not_future");
     expect(categories(validateInquiry({ ...validInquiry, arrival: "2026-08-13" }, { today }))).toContain("arrival:not_future");

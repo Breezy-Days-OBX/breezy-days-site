@@ -1,61 +1,44 @@
 <script>
-  import { parsePublicOwnerSettings, type PublicOwnerSettings } from "../lib/ownerSettings";
+  import {
+    enhancePublicSettings,
+    type PublicSettingsView,
+  } from "../lib/publicSettings";
 
-  const formatMonthDay = (value: string) => {
-    const [month, day] = value.split("-").map(Number);
-    return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
-      .format(new Date(Date.UTC(2000, month - 1, day)));
+  const view: PublicSettingsView = {
+    setText(key, value) {
+      for (const node of document.querySelectorAll<HTMLElement>(
+        `[data-public-setting="${key}"]`,
+      )) {
+        node.textContent = value;
+      }
+    },
+    setMaximumPets(maximum) {
+      for (const select of document.querySelectorAll<HTMLSelectElement>("[data-max-pets-select]")) {
+        const selected = Number(select.value);
+        const options = Array.from({ length: maximum + 1 }, (_, count) => {
+          const option = document.createElement("option");
+          option.value = String(count);
+          option.textContent = count === 0 ? "No pets" : `${count} ${count === 1 ? "pet" : "pets"}`;
+          return option;
+        });
+        select.replaceChildren(...options);
+        select.value = selected <= maximum ? String(selected) : "0";
+        select.dataset.maximumPets = String(maximum);
+      }
+    },
   };
-
-  type PublicSettingKey = keyof Omit<PublicOwnerSettings, "updatedAt">;
-  type PublicSettingFormatters = {
-    [Key in PublicSettingKey]: (value: PublicOwnerSettings[Key]) => string;
-  };
-
-  const formatters = {
-    startingWeeklyRateUsd: (value: number | null) => value === null
-      ? "Personalized quote for your dates"
-      : `From ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)} per week`,
-    minimumStayNights: (value: number | null) => value === null
-      ? "Stay requirements vary by dates"
-      : `${value}-night minimum stay`,
-    pricingNote: (value: string) => value,
-    poolHeatFeeUsd: (value: number) => `${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)} per stay`,
-    petFeeUsd: (value: number) => `${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)} per stay`,
-    maxPets: (value: number) => String(value),
-    poolOpenMonthDay: (value: string) => formatMonthDay(value),
-    poolCloseMonthDay: (value: string) => formatMonthDay(value),
-  } satisfies PublicSettingFormatters;
 
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 2500);
 
   try {
-    const response = await fetch("/.netlify/functions/public-settings", {
-      headers: { Accept: "application/json" },
-      signal: controller.signal,
-    });
-    if (response.ok) {
-      const settings = parsePublicOwnerSettings(await response.json());
-      if (settings) {
-        for (const node of document.querySelectorAll<HTMLElement>("[data-public-setting]")) {
-          const key = node.dataset.publicSetting as PublicSettingKey | undefined;
-          if (!key || !(key in formatters)) continue;
-          switch (key) {
-            case "startingWeeklyRateUsd": node.textContent = formatters[key](settings[key]); break;
-            case "minimumStayNights": node.textContent = formatters[key](settings[key]); break;
-            case "pricingNote": node.textContent = formatters[key](settings[key]); break;
-            case "poolHeatFeeUsd": node.textContent = formatters[key](settings[key]); break;
-            case "petFeeUsd": node.textContent = formatters[key](settings[key]); break;
-            case "maxPets": node.textContent = formatters[key](settings[key]); break;
-            case "poolOpenMonthDay": node.textContent = formatters[key](settings[key]); break;
-            case "poolCloseMonthDay": node.textContent = formatters[key](settings[key]); break;
-          }
-        }
-      }
-    }
-  } catch {
-    // Repository defaults remain visible when enhancement is unavailable.
+    await enhancePublicSettings(
+      () => fetch("/.netlify/functions/public-settings", {
+        headers: { Accept: "application/json" },
+        signal: controller.signal,
+      }),
+      view,
+    );
   } finally {
     window.clearTimeout(timeout);
   }

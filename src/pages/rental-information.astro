@@ -2,6 +2,7 @@
 import PublicSettingsEnhancement from "../components/PublicSettingsEnhancement.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import { property } from "../content/property";
+import { derivePublicPropertyFacts } from "../content/propertyPresentation";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { ownerSettingsDefaults } from "../lib/ownerSettings";
 
@@ -10,6 +11,7 @@ const poolOpen = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric
   .format(new Date(`2000-${ownerSettingsDefaults.poolOpenMonthDay}T00:00:00Z`));
 const poolClose = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
   .format(new Date(`2000-${ownerSettingsDefaults.poolCloseMonthDay}T00:00:00Z`));
+const publicFacts = derivePublicPropertyFacts(property);
 ---
 
 <BaseLayout
@@ -63,15 +65,14 @@ const poolClose = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeri
           <li><strong>Checkout:</strong> {property.arrival.checkout}</li>
           <li><strong>Primary renter:</strong> At least {property.rules.primaryRenterMinimumAge} years old</li>
           <li><strong>Pets:</strong> Up to <span data-public-setting="maxPets">{ownerSettingsDefaults.maxPets}</span>; <span data-public-setting="petFeeUsd">{money.format(ownerSettingsDefaults.petFeeUsd)} per stay</span> for additional cleaning</li>
-          <li><strong>Events or parties:</strong> Not allowed</li>
-          <li><strong>Smoking or vaping inside:</strong> Not allowed</li>
+          {publicFacts.rules.map((rule) => <li><strong>{rule.label}:</strong> {rule.value}</li>)}
         </ul>
       </section>
 
       <section aria-labelledby="rental-safety">
         <h2 id="rental-safety">Safety and monitoring</h2>
         <p>{property.safety.equipment.join(" · ")}.</p>
-        <p>There are no exterior cameras, no doorbell camera, and no noise-monitoring devices.</p>
+        <p>{publicFacts.monitoring}</p>
       </section>
 
       <section aria-labelledby="rental-price">

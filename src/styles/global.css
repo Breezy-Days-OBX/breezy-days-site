@@ -1594,6 +1594,12 @@ h3 {
   border-top: 1px solid rgba(20, 37, 31, 0.24);
 }
 
+.review-section:not(.has-proof) .owner-story {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .owner-story blockquote {
   margin: 0;
   font-family: var(--serif);

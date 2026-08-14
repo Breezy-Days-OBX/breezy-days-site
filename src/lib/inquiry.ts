@@ -72,7 +72,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 export function validateInquiry(
   input: unknown,
-  options: { today?: string } = {},
+  options: { today?: string; maximumPets?: number } = {},
 ): InquiryValidationResult {
   if (!isRecord(input)) {
     return { success: false, errors: [{ field: "form", category: "invalid_type" }] };
@@ -80,6 +80,7 @@ export function validateInquiry(
 
   const errors: InquiryError[] = [];
   const today = options.today ?? toLocalIsoDate(new Date());
+  const maximumPets = options.maximumPets ?? property.pets.maximum;
 
   if (Object.keys(input).some((key) => !inquiryFields.has(key as InquiryField))) {
     errors.push({ field: "form", category: "unknown_field" });
@@ -112,7 +113,7 @@ export function validateInquiry(
 
   if (!Number.isInteger(input.pets)) {
     errors.push({ field: "pets", category: "invalid_type" });
-  } else if (Number(input.pets) < 0 || Number(input.pets) > property.pets.maximum) {
+  } else if (Number(input.pets) < 0 || Number(input.pets) > maximumPets) {
     errors.push({ field: "pets", category: "out_of_range" });
   }
 

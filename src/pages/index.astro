@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 
 import AvailabilityForm from "../components/AvailabilityForm.astro";
+import MarketplaceProof from "../components/MarketplaceProof.astro";
 import PublicSettingsEnhancement from "../components/PublicSettingsEnhancement.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
@@ -12,11 +13,14 @@ import kitchen from "../assets/images/kitchen.jpeg";
 import livingDining from "../assets/images/living-dining.jpeg";
 import privatePool from "../assets/images/private-pool.jpeg";
 import { property } from "../content/property";
+import { derivePublicPropertyFacts } from "../content/propertyPresentation";
 import { siteContent } from "../content/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { ownerSettingsDefaults } from "../lib/ownerSettings";
 
 const proof = siteContent.marketplaceProof;
+const publishProof = !proof.requiresLaunchReverification;
+const publicFacts = derivePublicPropertyFacts(property);
 const poolOpen = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
   .format(new Date(`2000-${ownerSettingsDefaults.poolOpenMonthDay}T00:00:00Z`));
 const poolClose = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
@@ -60,14 +64,14 @@ const structuredData = {
   name: property.identity.publicName,
   description: property.fit.primaryPromise,
   image: new URL(heroDeck.src, Astro.site ?? Astro.url.origin).href,
-  address: property.identity.location,
+  address: publicFacts.location,
   numberOfBedrooms: property.sleeping.bedroomCount,
   numberOfBathroomsTotal: property.bathrooms.full + property.bathrooms.half / 2,
   occupancy: {
     "@type": "QuantitativeValue",
     maxValue: property.fit.maximumOvernightGuests,
   },
-  petsAllowed: true,
+  petsAllowed: publicFacts.petsAllowed,
   amenityFeature: [
     { "@type": "LocationFeatureSpecification", name: "Private pool", value: property.pool.private },
     { "@type": "LocationFeatureSpecification", name: "Private hot tub", value: property.hotTub.private },
@@ -114,7 +118,7 @@ const structuredData = {
             >{siteContent.primaryAction.label}</a>
             <span>{property.fit.maximumOvernightGuests} guests · {property.sleeping.bedroomCount} bedrooms · Private pool + hot tub</span>
           </div>
-          <div class="hero-proof" aria-label="Marketplace review summary">
+          {publishProof && <div class="hero-proof" aria-label="Marketplace review summary">
             <div class="proof-ratings">
               <span><strong>{proof.airbnb.rating}</strong> Airbnb · {proof.airbnb.label}</span>
               <span><strong>{proof.vrbo.rating}</strong> Vrbo</span>
@@ -123,7 +127,7 @@ const structuredData = {
               “{proof.quote.text}”
               <cite>{proof.quote.source}</cite>
             </blockquote>
-          </div>
+          </div>}
         </div>
         <a class="scroll-cue" href="#fit" aria-label="Continue to see whether Breezy Days fits your family">
           <span>Ocean to sound</span>
@@ -255,21 +259,9 @@ const structuredData = {
       </div>
     </section>
 
-    <section class="section review-section tide-section" id="reviews" aria-labelledby="reviews-title" data-launch-reverification={proof.requiresLaunchReverification ? "required" : "complete"}>
-      <div class="shell review-layout">
-        <div class="review-quote-wrap">
-          <p class="eyebrow">04 · Guest perspective</p>
-          <h2 class="visually-hidden" id="reviews-title">Guest reviews and owner story</h2>
-          <blockquote>“{proof.quote.text}”</blockquote>
-          <p class="quote-source">{proof.quote.source}</p>
-        </div>
-        <aside class="rating-panel" aria-label="Marketplace rating snapshot">
-          <p class="rating-label">Marketplace snapshot</p>
-          <div class="rating-row"><strong>{proof.airbnb.rating}</strong><span>Airbnb<br />{proof.airbnb.reviewCount} reviews</span></div>
-          <div class="rating-row"><strong>{proof.vrbo.rating.replace("/10", "")}</strong><span>Vrbo<br />{proof.vrbo.reviewCount} reviews</span></div>
-          <p class="rating-note">Checked {proof.checkedOnDisplay}; this centralized proof remains subject to the launch reverification gate.</p>
-        </aside>
-      </div>
+    <section class:list={["section", "review-section", "tide-section", { "has-proof": publishProof }]} id="reviews" aria-labelledby="reviews-title">
+      <h2 class="visually-hidden" id="reviews-title">Guest reviews and owner story</h2>
+      <MarketplaceProof proof={proof} />
       <div class="shell owner-story">
         <p class="eyebrow">Why this home</p>
         <blockquote>{property.ownerStory}</blockquote>
@@ -305,7 +297,7 @@ const structuredData = {
         <div class="location-copy">
           <p class="eyebrow">06 · Between ocean and sound</p>
           <h2 id="location-title">Close enough to hear the Atlantic. Private enough to arrive calmly.</h2>
-          <p>{property.identity.location}. {property.access.beach}. The home is next to the historic pier, with pier passes included.</p>
+          <p>{publicFacts.location}. {publicFacts.proximity}</p>
           <p>For privacy, the exact address and arrival instructions are shared only with confirmed guests.</p>
           <a class="text-link" href="#availability" data-analytics-event="primary_request_click" data-analytics-category="inline">{siteContent.primaryAction.label} <span aria-hidden="true">→</span></a>
         </div>

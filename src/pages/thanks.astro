@@ -29,6 +29,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <SiteFooter />
   <script>
     import { trackPublicEvent } from "../lib/analytics";
-    trackPublicEvent("form_success", "availability_form");
+    import { trackFormSuccessIfSubmitted } from "../lib/submissionProvenance";
+
+    trackFormSuccessIfSubmitted(window.sessionStorage, trackPublicEvent);
   </script>
 </BaseLayout>
