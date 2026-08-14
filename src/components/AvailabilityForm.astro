@@ -1,0 +1,71 @@
+---
+import { siteContent } from "../content/site";
+---
+
+<form
+  class="availability-form"
+  name="availability-request"
+  method="POST"
+  action="/thanks"
+  data-netlify="true"
+  netlify-honeypot="company-website"
+>
+  <input type="hidden" name="form-name" value="availability-request" />
+  <p class="honeypot" hidden>
+    <label>Leave this field empty <input name="company-website" /></label>
+  </p>
+
+  <div class="form-field">
+    <label for="arrival">Arrival</label>
+    <input id="arrival" name="arrival" type="date" required />
+  </div>
+
+  <div class="form-field">
+    <label for="departure">Departure</label>
+    <input id="departure" name="departure" type="date" required />
+  </div>
+
+  <div class="form-field form-field-guests">
+    <label for="guests">Guests</label>
+    <input id="guests" name="guests" type="number" min="1" inputmode="numeric" placeholder="Group size" required />
+  </div>
+
+  <div class="form-field form-field-email">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+  </div>
+
+  <button class="button form-submit" type="submit">{siteContent.primaryAction.label}</button>
+  <p class="date-error" id="date-error" role="status" aria-live="polite"></p>
+  <p class="form-help">
+    {siteContent.booking.disclaimer} We use these details only to review and reply to your request.
+    <a href="/privacy">Privacy details</a>.
+  </p>
+</form>
+
+<script>
+  import { addDays, getDateRangeError, toLocalIsoDate } from "../lib/dateRules";
+
+  for (const form of document.querySelectorAll<HTMLFormElement>(".availability-form")) {
+    const arrival = form.querySelector<HTMLInputElement>("#arrival");
+    const departure = form.querySelector<HTMLInputElement>("#departure");
+    const dateError = form.querySelector<HTMLElement>("#date-error");
+
+    if (!arrival || !departure || !dateError) continue;
+
+    const today = toLocalIsoDate(new Date());
+    arrival.min = today;
+    departure.min = today;
+
+    const validateRange = () => {
+      departure.min = arrival.value ? addDays(arrival.value, 1) : today;
+      const message = getDateRangeError(arrival.value, departure.value);
+      departure.setCustomValidity(message);
+      dateError.textContent = message;
+    };
+
+    arrival.addEventListener("input", validateRange);
+    departure.addEventListener("input", validateRange);
+    form.addEventListener("submit", validateRange);
+  }
+</script>

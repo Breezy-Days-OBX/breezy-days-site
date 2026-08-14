@@ -1,0 +1,20 @@
+---
+import { siteContent } from "../content/site";
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="#hero" aria-label="Breezy Days OBX home">
+      Breezy Days <span>OBX</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#fit">Is it a fit?</a>
+      <a href="#home">The home</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQs</a>
+    </nav>
+    <a class="button button-small" href={siteContent.primaryAction.href}>
+      {siteContent.primaryAction.label}
+    </a>
+  </div>
+</header>

@@ -1,0 +1,322 @@
+---
+import { Image } from "astro:assets";
+
+import AvailabilityForm from "../components/AvailabilityForm.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import aerialHome from "../assets/images/aerial-home.jpeg";
+import bedroom from "../assets/images/bedroom.jpeg";
+import heroDeck from "../assets/images/hero-deck.jpeg";
+import kitchen from "../assets/images/kitchen.jpeg";
+import livingDining from "../assets/images/living-dining.jpeg";
+import privatePool from "../assets/images/private-pool.jpeg";
+import { siteContent } from "../content/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const faqs = [
+  {
+    question: "Does checking availability reserve the home?",
+    answer:
+      "No. Your dates begin a request. The owner confirms availability, the full price, and the booking terms before anything is reserved.",
+  },
+  {
+    question: "Will we see the total price before booking?",
+    answer:
+      "Yes. The owner confirms the stay total and applicable terms before you decide whether to complete the reservation.",
+  },
+  {
+    question: "Where is Breezy Days?",
+    answer:
+      "Breezy Days is in Rodanthe, North Carolina. Exact arrival details are shared with confirmed guests.",
+  },
+  {
+    question: "What details are still being verified?",
+    answer:
+      "The room-by-room sleeping inventory, current policies, fees, and seasonal stay rules are being confirmed with the owner before requests open publicly.",
+  },
+];
+
+const proof = siteContent.marketplaceProof;
+---
+
+<BaseLayout
+  title="Breezy Days OBX | A Family Beach Home in Rodanthe"
+  description="Make room for a memorable Outer Banks week at Breezy Days, a welcoming family beach home with a private pool in Rodanthe, North Carolina."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <Image
+        class="hero-image"
+        src={heroDeck}
+        alt="View from the Breezy Days deck toward neighboring Outer Banks homes"
+        widths={[720, 1080, 1600, 2200]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        quality={82}
+        format="webp"
+      />
+      <div class="hero-wash" aria-hidden="true"></div>
+      <div class="shell hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow eyebrow-light">One Outer Banks home · One clear family week</p>
+          <h1 id="hero-title">Make room for the week everyone remembers.</h1>
+          <p class="hero-lede">
+            A welcoming Rodanthe home for families who want space to gather, a private pool,
+            and beach days close at hand.
+          </p>
+          <div class="hero-proof" aria-label="Marketplace review summary">
+            <div class="proof-ratings">
+              <span><strong>{proof.airbnb.rating}</strong> Airbnb · {proof.airbnb.label}</span>
+              <span><strong>{proof.vrbo.rating}</strong> Vrbo</span>
+            </div>
+            <blockquote>
+              “{proof.quote.text}”
+              <cite>{proof.quote.source}</cite>
+            </blockquote>
+          </div>
+        </div>
+        <a class="scroll-cue" href="#availability" aria-label="Continue to check availability">
+          <span>Start with your dates</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="availability" id="availability" aria-label="Check availability">
+      <div class="shell">
+        <AvailabilityForm />
+      </div>
+    </section>
+
+    <section class="section section-intro" id="fit" aria-labelledby="fit-title">
+      <div class="shell">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">01 · Know the fit</p>
+            <h2 id="fit-title">A beach week that makes room for everyone.</h2>
+          </div>
+          <p class="section-lede">
+            Breezy Days is built around the moments that matter: gathering after the beach,
+            cooling off by the pool, and having a comfortable place to land together.
+          </p>
+        </div>
+        <div class="fit-grid">
+          <article class="feature-card feature-card-dark">
+            <span class="card-number">01</span>
+            <h3>Together when it counts</h3>
+            <p>Open living and dining space gives the family a natural home base for the week.</p>
+          </article>
+          <article class="feature-card feature-card-pool">
+            <span class="card-number">02</span>
+            <h3>Your own outdoor reset</h3>
+            <p>A private pool makes it easy to keep the good part of the day going at home.</p>
+          </article>
+          <article class="feature-card feature-card-sand">
+            <span class="card-number">03</span>
+            <h3>A clear path to booking</h3>
+            <p>Start with dates and group size. The owner confirms availability, price, and terms.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section gallery-section" id="home" aria-labelledby="home-title">
+      <div class="shell">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">02 · Picture the week</p>
+            <h2 id="home-title">The spaces your family will actually use.</h2>
+          </div>
+          <p class="section-lede">
+            A purposeful look at the places where the week comes together—from coffee with an
+            ocean view to the last swim of the afternoon.
+          </p>
+        </div>
+
+        <div class="photo-grid">
+          <figure class="photo photo-large">
+            <Image
+              src={livingDining}
+              alt="Open living and dining room inside Breezy Days"
+              widths={[640, 960, 1400]}
+              sizes="(max-width: 760px) 100vw, 60vw"
+              loading="lazy"
+              quality={80}
+              format="webp"
+            />
+            <figcaption>The gathering space</figcaption>
+          </figure>
+          <figure class="photo">
+            <Image
+              src={privatePool}
+              alt="Private outdoor pool at Breezy Days"
+              widths={[480, 760, 1000]}
+              sizes="(max-width: 760px) 100vw, 38vw"
+              loading="lazy"
+              quality={80}
+              format="webp"
+            />
+            <figcaption>The private pool</figcaption>
+          </figure>
+          <figure class="photo">
+            <Image
+              src={bedroom}
+              alt="Prepared bedroom with fresh linens at Breezy Days"
+              widths={[480, 760, 1000]}
+              sizes="(max-width: 760px) 100vw, 38vw"
+              loading="lazy"
+              quality={80}
+              format="webp"
+            />
+            <figcaption>A quiet place to reset</figcaption>
+          </figure>
+          <figure class="photo photo-wide">
+            <Image
+              src={kitchen}
+              alt="Bright kitchen with island seating at Breezy Days"
+              widths={[640, 960, 1400]}
+              sizes="(max-width: 760px) 100vw, 60vw"
+              loading="lazy"
+              quality={80}
+              format="webp"
+            />
+            <figcaption>The kitchen at the center of it</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section essentials-section" id="essentials" aria-labelledby="essentials-title">
+      <div class="shell essentials-layout">
+        <div class="section-heading essentials-heading">
+          <p class="eyebrow eyebrow-light">03 · Practical fit</p>
+          <h2 id="essentials-title">The essentials, without the scavenger hunt.</h2>
+          <p>
+            We’re verifying the final room inventory and policies now. The public booking path
+            will open only after these details match every live channel.
+          </p>
+        </div>
+        <div class="essentials-list">
+          <div><span>01</span><strong>Private pool</strong><small>At the home</small></div>
+          <div><span>02</span><strong>Full kitchen</strong><small>With island and dining space</small></div>
+          <div><span>03</span><strong>Shared living space</strong><small>For the whole week’s rhythm</small></div>
+          <div><span>04</span><strong>Ocean-view decks</strong><small>Outdoor space on multiple levels</small></div>
+          <div><span>05</span><strong>Sleeping layout</strong><small>Room-by-room details being verified</small></div>
+          <div><span>06</span><strong>Stay policies</strong><small>One owner-confirmed source before launch</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section review-section" id="reviews" aria-labelledby="reviews-title">
+      <div class="shell review-layout">
+        <div class="review-quote-wrap">
+          <p class="eyebrow">04 · Guest perspective</p>
+          <h2 class="visually-hidden" id="reviews-title">Guest reviews</h2>
+          <blockquote>
+            “{proof.quote.text}”
+          </blockquote>
+          <p class="quote-source">{proof.quote.source}</p>
+        </div>
+        <aside class="rating-panel" aria-label="Current marketplace ratings">
+          <p class="rating-label">Marketplace proof</p>
+          <div class="rating-row">
+            <strong>{proof.airbnb.rating}</strong>
+            <span>Airbnb<br />{proof.airbnb.reviewCount} reviews</span>
+          </div>
+          <div class="rating-row">
+            <strong>{proof.vrbo.rating.replace("/10", "")}</strong>
+            <span>Vrbo<br />{proof.vrbo.reviewCount} reviews</span>
+          </div>
+          <p class="rating-note">
+            Checked {proof.checkedOnDisplay}. Ratings, counts, and excerpt permission must be
+            reverified before launch.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section process-section" id="process" aria-labelledby="process-title">
+      <div class="shell">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">05 · What happens next</p>
+            <h2 id="process-title">From your dates to a clear answer.</h2>
+          </div>
+          <p class="section-lede">
+            Direct does not mean uncertain. Each step says exactly what is happening—and what is
+            not yet a confirmed reservation.
+          </p>
+        </div>
+        <ol class="process-list">
+          <li><span>01</span><div><h3>Share the basics</h3><p>Send your dates, group size, and best email.</p></div></li>
+          <li><span>02</span><div><h3>The owner reviews</h3><p>Availability, fit, total price, and stay terms are checked.</p></div></li>
+          <li><span>03</span><div><h3>You receive confirmation</h3><p>Choose whether to complete the agreement and payment steps.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section location-section" id="location" aria-labelledby="location-title">
+      <div class="shell location-layout">
+        <div class="location-photo">
+          <Image
+            src={aerialHome}
+            alt="Aerial view of Breezy Days, its pool, and the nearby Atlantic Ocean"
+            widths={[576, 960]}
+            sizes="(max-width: 820px) 100vw, 50vw"
+            loading="lazy"
+            quality={88}
+            format="webp"
+          />
+          <span>Rodanthe, North Carolina</span>
+        </div>
+        <div class="location-copy">
+          <p class="eyebrow">06 · Find your bearings</p>
+          <h2 id="location-title">The Outer Banks outside. Your home base inside.</h2>
+          <p>
+            Breezy Days sits in Rodanthe with the Atlantic visible from the house. We’ll publish
+            measured access details and nearby essentials after the owner verifies them.
+          </p>
+          <a class="text-link" href="#availability">Start with your dates <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section" id="faq" aria-labelledby="faq-title">
+      <div class="shell faq-layout">
+        <div class="faq-heading">
+          <p class="eyebrow">07 · Before you request</p>
+          <h2 id="faq-title">A few clear answers.</h2>
+          <p>Still deciding? Email <a href="mailto:breezydaysobx@gmail.com">breezydaysobx@gmail.com</a>.</p>
+        </div>
+        <div class="faq-list">
+          {faqs.map((faq, index) => (
+            <details open={index === 0}>
+              <summary>{faq.question}<span aria-hidden="true">+</span></summary>
+              <p>{faq.answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="section final-section" id="final-action" aria-labelledby="final-title">
+      <div class="shell final-layout">
+        <div>
+          <p class="eyebrow eyebrow-light">One home · One clear next step</p>
+          <h2 id="final-title">See whether your week is open.</h2>
+        </div>
+        <div>
+          <p>Share the basics. The owner confirms the dates, total, and terms before you reserve.</p>
+          <a class="button button-light" href={siteContent.primaryAction.href}>{siteContent.primaryAction.label}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+
+  <a class="mobile-booking-bar" href="#availability">{siteContent.primaryAction.label}</a>
+</BaseLayout>
