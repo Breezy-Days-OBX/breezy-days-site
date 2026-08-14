@@ -126,7 +126,11 @@ export function validateInquiry(
   const email = typeof input.email === "string" ? input.email.trim() : null;
   if (email === null) {
     errors.push({ field: "email", category: "invalid_type" });
-  } else if (!practicalEmail.test(email)) {
+  } else if (
+    email.length > 254 ||
+    email.slice(0, email.indexOf("@")).length > 64 ||
+    !practicalEmail.test(email)
+  ) {
     errors.push({ field: "email", category: "invalid_email" });
   }
 

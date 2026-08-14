@@ -84,6 +84,21 @@ describe("minimum inquiry contract", () => {
     }
   });
 
+  it("enforces the RFC local-part and practical total-address length boundaries", () => {
+    const local64 = "l".repeat(64);
+    const domainAt254Total = `${"a".repeat(63)}.${"b".repeat(63)}.${"c".repeat(61)}`;
+    const domainAt255Total = `${"a".repeat(63)}.${"b".repeat(63)}.${"c".repeat(62)}`;
+
+    expect(validateInquiry({ ...validInquiry, email: `${local64}@example.com` }, { today }).success).toBe(true);
+    expect(categories(validateInquiry({ ...validInquiry, email: `${"l".repeat(65)}@example.com` }, { today }))).toContain(
+      "email:invalid_email",
+    );
+    expect(validateInquiry({ ...validInquiry, email: `${local64}@${domainAt254Total}` }, { today }).success).toBe(true);
+    expect(categories(validateInquiry({ ...validInquiry, email: `${local64}@${domainAt255Total}` }, { today }))).toContain(
+      "email:invalid_email",
+    );
+  });
+
   it("requires 7-20 allowed phone characters with at least seven digits", () => {
     for (const phone of ["123456", "1".repeat(21), "919-CALL", "+++++++"]) {
       expect(categories(validateInquiry({ ...validInquiry, phone }, { today })), phone).toContain("phone:invalid_phone");
