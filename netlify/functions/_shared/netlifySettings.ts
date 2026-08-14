@@ -1,9 +1,20 @@
 import { getStore } from "@netlify/blobs";
 import { getUser, verifyRequestOrigin } from "@netlify/identity";
 
-import { createSettingsHandlers } from "./settingsService";
+import { createSettingsHandlers, type BlobStore } from "./settingsService";
 
-const store = getStore({ name: "owner-settings", consistency: "strong" });
+const netlifyStore = getStore({ name: "owner-settings", consistency: "strong" });
+const store: BlobStore = {
+  get: (key) => netlifyStore.get(key, { type: "text" }),
+  getWithMetadata: async (key) => {
+    const entry = await netlifyStore.getWithMetadata(key);
+    if (!entry) return null;
+    if (!entry.etag) throw new Error("Blob read did not return an ETag");
+    return { data: entry.data, etag: entry.etag };
+  },
+  set: (key, value, options) => netlifyStore.set(key, value, options),
+  list: (options) => netlifyStore.list(options),
+};
 
 export const netlifySettingsHandlers = createSettingsHandlers({
   store,

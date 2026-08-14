@@ -24,19 +24,46 @@ const storedSettings: OwnerSettings = {
 
 class MemoryBlobStore implements BlobStore {
   readonly values = new Map<string, string>();
+  private readonly versions = new Map<string, number>();
   failReads = false;
   failWrites = false;
+  afterRead?: (key: string) => Promise<void>;
+  afterSet?: (key: string) => Promise<void>;
+
+  private etag(key: string) {
+    return `etag-${this.versions.get(key) ?? 0}`;
+  }
 
   async get(key: string) {
     if (this.failReads) throw new Error("private storage failure");
-    return this.values.get(key) ?? null;
+    const value = this.values.get(key) ?? null;
+    await this.afterRead?.(key);
+    return value;
   }
 
-  async set(key: string, value: string, options?: { onlyIfNew?: boolean }) {
+  async getWithMetadata(key: string) {
+    if (this.failReads) throw new Error("private storage failure");
+    const value = this.values.get(key);
+    const result = value === undefined ? null : { data: value, etag: this.etag(key) };
+    await this.afterRead?.(key);
+    return result;
+  }
+
+  async set(
+    key: string,
+    value: string,
+    options?: { onlyIfNew?: boolean; onlyIfMatch?: string },
+  ) {
     if (this.failWrites) throw new Error("private storage failure");
     if (options?.onlyIfNew && this.values.has(key)) return { modified: false };
+    if (options?.onlyIfMatch && options.onlyIfMatch !== this.etag(key)) {
+      return { modified: false };
+    }
     this.values.set(key, value);
-    return { modified: true };
+    this.versions.set(key, (this.versions.get(key) ?? 0) + 1);
+    const result = { modified: true, etag: this.etag(key) };
+    await this.afterSet?.(key);
+    return result;
   }
 
   async list({ prefix }: { prefix: string }) {
@@ -46,7 +73,33 @@ class MemoryBlobStore implements BlobStore {
         .map((key) => ({ key })),
     };
   }
+
+  forceSet(key: string, value: string) {
+    this.values.set(key, value);
+    this.versions.set(key, (this.versions.get(key) ?? 0) + 1);
+  }
 }
+
+const pauseCapturedReads = (store: MemoryBlobStore, key: string, count: number) => {
+  let arrivals = 0;
+  let release!: () => void;
+  let allCaptured!: () => void;
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const captured = new Promise<void>((resolve) => {
+    allCaptured = resolve;
+  });
+
+  store.afterRead = async (readKey) => {
+    if (readKey !== key || arrivals >= count) return;
+    arrivals += 1;
+    if (arrivals === count) allCaptured();
+    await released;
+  };
+
+  return { captured, release };
+};
 
 const request = (method: string, body?: unknown, origin = "https://breezydays.test") =>
   new Request("https://breezydays.test/.netlify/functions/settings", {
@@ -229,6 +282,71 @@ describe("settings Function handlers", () => {
     expect([...store.values.values()].join(" ")).not.toContain("owner-user");
   });
 
+  it("allows only one of two saves captured from the same live version to succeed", async () => {
+    store.values.set("current.json", JSON.stringify(storedSettings));
+    let id = 0;
+    dependencies.createId = () => `overlap-${++id}`;
+    const { ownerSettings } = createSettingsHandlers(dependencies);
+    const first = { ...storedSettings, pricingNote: "First concurrent save." };
+    const second = { ...storedSettings, pricingNote: "Second concurrent save." };
+    const barrier = pauseCapturedReads(store, "current.json", 2);
+
+    const firstResponsePromise = ownerSettings(request("PUT", first));
+    const secondResponsePromise = ownerSettings(request("PUT", second));
+    await barrier.captured;
+    barrier.release();
+    const responses = await Promise.all([
+      firstResponsePromise.then(responseJson),
+      secondResponsePromise.then(responseJson),
+    ]);
+
+    expect(responses.map(({ status }) => status).sort()).toEqual([200, 409]);
+    const success = responses.find(({ status }) => status === 200)!;
+    const conflict = responses.find(({ status }) => status === 409)!;
+    expect(conflict.body).toEqual({ error: "settings_conflict" });
+    expect(success.body).toEqual(JSON.parse(store.values.get("current.json")!));
+    expect([first.pricingNote, second.pricingNote]).toContain(success.body.pricingNote);
+
+    const capturedPriorValues = [...store.values.entries()]
+      .filter(([key]) => key.startsWith("snapshots/"))
+      .map(([, value]) => JSON.parse(value));
+    expect(capturedPriorValues.length).toBeGreaterThanOrEqual(1);
+    expect(capturedPriorValues).toEqual(
+      capturedPriorValues.map(() => storedSettings),
+    );
+  });
+
+  it("never returns another writer's value when live storage changes before readback", async () => {
+    store.values.set("current.json", JSON.stringify(storedSettings));
+    const concurrentValue = {
+      ...storedSettings,
+      pricingNote: "A later writer's committed value.",
+      updatedAt: "2026-08-14T17:00:00.000Z",
+    };
+    let replaced = false;
+    store.afterSet = async (key) => {
+      if (key === "current.json" && !replaced) {
+        replaced = true;
+        store.forceSet(key, JSON.stringify(concurrentValue));
+      }
+    };
+    const { ownerSettings } = createSettingsHandlers(dependencies);
+
+    const response = await responseJson(
+      await ownerSettings(
+        request("PUT", { ...storedSettings, pricingNote: "This request's value." }),
+      ),
+    );
+
+    expect(response).toEqual({
+      status: 409,
+      cacheControl: "no-store",
+      body: { error: "settings_conflict" },
+    });
+    expect(response.body).not.toEqual(concurrentValue);
+    expect(JSON.parse(store.values.get("current.json")!)).toEqual(concurrentValue);
+  });
+
   it("fails closed if a generated snapshot key would not be safe", async () => {
     store.values.set("current.json", JSON.stringify(storedSettings));
     nextId = "../current";
@@ -311,6 +429,38 @@ describe("settings Function handlers", () => {
     expect(JSON.parse(store.values.get("current.json")!)).toEqual(expectedRestored);
     expect(JSON.parse(store.values.get(`snapshots/${secondSavedAt}-restore-1.json`)!)).toEqual(
       storedSettings,
+    );
+  });
+
+  it("protects restore from a save captured from the same live version", async () => {
+    const restoreTarget = { ...storedSettings, pricingNote: "Restore target." };
+    const snapshotKey = `snapshots/${firstSavedAt}-restore-target.json`;
+    store.values.set("current.json", JSON.stringify(storedSettings));
+    store.values.set(snapshotKey, JSON.stringify(restoreTarget));
+    let id = 0;
+    dependencies.createId = () => `mixed-${++id}`;
+    const handlers = createSettingsHandlers(dependencies);
+    const saveValue = { ...storedSettings, pricingNote: "Concurrent new save." };
+    const barrier = pauseCapturedReads(store, "current.json", 2);
+
+    const saveResponsePromise = handlers.ownerSettings(request("PUT", saveValue));
+    const restoreResponsePromise = handlers.restoreSettings(
+      request("POST", { key: snapshotKey }),
+    );
+    await barrier.captured;
+    barrier.release();
+    const responses = await Promise.all([
+      saveResponsePromise.then(responseJson),
+      restoreResponsePromise.then(responseJson),
+    ]);
+
+    expect(responses.map(({ status }) => status).sort()).toEqual([200, 409]);
+    const success = responses.find(({ status }) => status === 200)!;
+    const conflict = responses.find(({ status }) => status === 409)!;
+    expect(conflict.body).toEqual({ error: "settings_conflict" });
+    expect(success.body).toEqual(JSON.parse(store.values.get("current.json")!));
+    expect([saveValue.pricingNote, restoreTarget.pricingNote]).toContain(
+      success.body.pricingNote,
     );
   });
 

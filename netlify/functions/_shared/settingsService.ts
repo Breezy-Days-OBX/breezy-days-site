@@ -17,11 +17,14 @@ const SNAPSHOT_KEY_PATTERN =
 
 export interface BlobStore {
   get(key: string): Promise<string | null>;
+  getWithMetadata(key: string): Promise<{ data: string; etag: string } | null>;
   set(
     key: string,
     value: string,
-    options?: { onlyIfNew?: boolean },
-  ): Promise<{ modified: boolean }>;
+    options?:
+      | { onlyIfNew: true; onlyIfMatch?: never }
+      | { onlyIfMatch: string; onlyIfNew?: never },
+  ): Promise<{ modified: boolean; etag?: string }>;
   list(options: { prefix: string }): Promise<{ blobs: Array<{ key: string }> }>;
 }
 
@@ -50,6 +53,8 @@ interface SnapshotMetadata {
   key: string;
   createdAt: string;
 }
+
+class SettingsConflictError extends Error {}
 
 const jsonResponse = (
   body: unknown,
@@ -143,6 +148,38 @@ const readRequiredSettings = async (store: BlobStore, key: string) => {
   return settings;
 };
 
+const readVersionedSettings = async (store: BlobStore, key: string) => {
+  const entry = await store.getWithMetadata(key);
+  if (!entry) return null;
+
+  const settings = parseStoredSettings(entry.data);
+  if (!settings) throw new Error("Settings unavailable");
+  return { settings, etag: entry.etag };
+};
+
+const replaceCurrentSettings = async (
+  store: BlobStore,
+  settings: OwnerSettings,
+  priorEtag: string | null,
+) => {
+  const write = await store.set(
+    CURRENT_SETTINGS_KEY,
+    JSON.stringify(settings),
+    priorEtag === null ? { onlyIfNew: true } : { onlyIfMatch: priorEtag },
+  );
+  if (!write.modified) throw new SettingsConflictError();
+  if (!write.etag) throw new Error("Live write did not return an ETag");
+
+  const readback = await readVersionedSettings(store, CURRENT_SETTINGS_KEY);
+  if (!readback || readback.etag !== write.etag) throw new SettingsConflictError();
+  return readback.settings;
+};
+
+const mutationFailure = (error: unknown) =>
+  error instanceof SettingsConflictError
+    ? protectedError("settings_conflict", 409)
+    : protectedError("service_unavailable", 503);
+
 const verifyMutationOrigin = async (
   request: Request,
   verifyOrigin: SettingsServiceDependencies["verifyOrigin"],
@@ -211,21 +248,22 @@ export function createSettingsHandlers(
       });
       if (!savedValidation.success) throw new Error("Clock produced invalid timestamp");
 
-      const currentRaw = await dependencies.store.get(CURRENT_SETTINGS_KEY);
-      if (currentRaw !== null) {
-        const current = parseStoredSettings(currentRaw);
-        if (!current) throw new Error("Current settings are invalid");
-        await writeSnapshot(dependencies.store, snapshot.key, current);
+      const current = await readVersionedSettings(
+        dependencies.store,
+        CURRENT_SETTINGS_KEY,
+      );
+      if (current) {
+        await writeSnapshot(dependencies.store, snapshot.key, current.settings);
       }
 
-      await dependencies.store.set(
-        CURRENT_SETTINGS_KEY,
-        JSON.stringify(savedValidation.data),
+      const readback = await replaceCurrentSettings(
+        dependencies.store,
+        savedValidation.data,
+        current?.etag ?? null,
       );
-      const readback = await readRequiredSettings(dependencies.store, CURRENT_SETTINGS_KEY);
       return protectedResponse(readback);
-    } catch {
-      return protectedError("service_unavailable", 503);
+    } catch (error) {
+      return mutationFailure(error);
     }
   };
 
@@ -273,9 +311,10 @@ export function createSettingsHandlers(
       }
 
       const selected = await readRequiredSettings(dependencies.store, payload.key);
-      const currentRaw = await dependencies.store.get(CURRENT_SETTINGS_KEY);
-      const current = currentRaw === null ? null : parseStoredSettings(currentRaw);
-      if (currentRaw !== null && !current) throw new Error("Current settings are invalid");
+      const current = await readVersionedSettings(
+        dependencies.store,
+        CURRENT_SETTINGS_KEY,
+      );
 
       const snapshot = safeSnapshotKey(dependencies);
       const restoredValidation = validateOwnerSettings({
@@ -285,15 +324,17 @@ export function createSettingsHandlers(
       });
       if (!restoredValidation.success) throw new Error("Clock produced invalid timestamp");
 
-      if (current) await writeSnapshot(dependencies.store, snapshot.key, current);
-      await dependencies.store.set(
-        CURRENT_SETTINGS_KEY,
-        JSON.stringify(restoredValidation.data),
+      if (current) {
+        await writeSnapshot(dependencies.store, snapshot.key, current.settings);
+      }
+      const readback = await replaceCurrentSettings(
+        dependencies.store,
+        restoredValidation.data,
+        current?.etag ?? null,
       );
-      const readback = await readRequiredSettings(dependencies.store, CURRENT_SETTINGS_KEY);
       return protectedResponse(readback);
-    } catch {
-      return protectedError("service_unavailable", 503);
+    } catch (error) {
+      return mutationFailure(error);
     }
   };
 
