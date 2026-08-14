@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, getDateRangeError, toLocalIsoDate } from "./dateRules";
+import { addDays, getDateRangeError, isValidIsoDate, toLocalIsoDate } from "./dateRules";
 
 describe("availability date rules", () => {
   it("formats the visitor's local calendar date without a UTC shift", () => {
@@ -22,5 +22,11 @@ describe("availability date rules", () => {
     expect(getDateRangeError("", "")).toBe("");
     expect(getDateRangeError("2026-08-14", "")).toBe("");
   });
-});
 
+  it("recognizes only real ISO calendar dates", () => {
+    expect(isValidIsoDate("2028-02-29")).toBe(true);
+    expect(isValidIsoDate("2026-02-29")).toBe(false);
+    expect(isValidIsoDate("2026-02-30")).toBe(false);
+    expect(isValidIsoDate("08/14/2026")).toBe(false);
+  });
+});
