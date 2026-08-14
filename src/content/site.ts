@@ -22,5 +22,6 @@ export const siteContent = {
     "faq",
     "final-action",
   ],
+  indexableRoutes: ["/", "/rental-information/", "/privacy/"],
   marketplaceProof,
 } as const;

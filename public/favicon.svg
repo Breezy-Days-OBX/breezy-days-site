@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Breezy Days OBX">
+  <rect width="64" height="64" rx="12" fill="#173c32"/>
+  <path d="M10 37c8-7 15-7 23 0s15 7 21 1" fill="none" stroke="#f8f5ee" stroke-width="4" stroke-linecap="round"/>
+  <path d="M10 26c8-7 15-7 23 0s15 7 21 1" fill="none" stroke="#d9c8aa" stroke-width="4" stroke-linecap="round"/>
+</svg>

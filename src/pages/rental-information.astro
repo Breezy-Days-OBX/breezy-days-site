@@ -1,0 +1,99 @@
+---
+import PublicSettingsEnhancement from "../components/PublicSettingsEnhancement.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { property } from "../content/property";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { ownerSettingsDefaults } from "../lib/ownerSettings";
+
+const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const poolOpen = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
+  .format(new Date(`2000-${ownerSettingsDefaults.poolOpenMonthDay}T00:00:00Z`));
+const poolClose = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" })
+  .format(new Date(`2000-${ownerSettingsDefaults.poolCloseMonthDay}T00:00:00Z`));
+---
+
+<BaseLayout
+  title="Rental information | Breezy Days OBX"
+  description="Owner-approved practical details for a stay at Breezy Days OBX, including sleeping layout, access, amenities, fees, arrival, rules, and booking process."
+>
+  <main class="policy-page rental-page" id="main-content">
+    <article class="policy-card rental-card">
+      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
+      <p class="eyebrow">Rental information</p>
+      <h1>Know the house before you request it.</h1>
+      <p class="policy-lede">These are owner-approved property and process facts. This page is not a rental agreement or legal advice. Cancellation language and other binding terms are provided in the owner-approved agreement before a reservation is completed.</p>
+
+      <section aria-labelledby="rental-fit">
+        <h2 id="rental-fit">Capacity and sleeping</h2>
+        <p>{property.identity.propertyType}. Up to {property.fit.maximumOvernightGuests} overnight guests, with {property.sleeping.bedroomCount} bedrooms and {property.sleeping.bedCount} beds.</p>
+        <ul class="policy-list">
+          {property.sleeping.rooms.map((room) => <li><strong>{room.name}:</strong> {room.beds.map((bed) => `${bed.count} ${bed.size}${bed.size === "twin bunk" ? " beds" : " bed"}`).join(", ")}</li>)}
+        </ul>
+        <p>{property.bathrooms.full} full bathrooms and {property.bathrooms.half} half bathroom.</p>
+      </section>
+
+      <section aria-labelledby="rental-access">
+        <h2 id="rental-access">Access and location</h2>
+        <p>{property.access.entry}. Parking is available for {property.access.parkingVehicles} vehicles.</p>
+        <p>{property.access.beach}. {property.access.pier}. The exact address and arrival instructions are shared only with confirmed guests.</p>
+      </section>
+
+      <section aria-labelledby="rental-water">
+        <h2 id="rental-water">Pool and hot tub</h2>
+        <p>The private pool’s recurring season is <span data-public-setting="poolOpenMonthDay">{poolOpen}</span> through <span data-public-setting="poolCloseMonthDay">{poolClose}</span>. Optional pool heat is <span data-public-setting="poolHeatFeeUsd">{money.format(ownerSettingsDefaults.poolHeatFeeUsd)} per stay</span> and requires {property.pool.heatNoticeHours} hours’ notice.</p>
+        <p>The private {property.hotTub.capacity}-person hot tub is available {property.hotTub.available}. {property.safety.postedRules}.</p>
+      </section>
+
+      <section aria-labelledby="rental-amenities">
+        <h2 id="rental-amenities">What is—and is not—provided</h2>
+        <h3>Provided</h3>
+        <p>{property.amenities.provided.join(" · ")}</p>
+        <h3>Not provided</h3>
+        <p>{property.amenities.notProvided.join(" · ")}. {property.amenities.localRentalNote}.</p>
+        <h3>At the pool and outdoors</h3>
+        <p>{property.outdoor.poolAreaFacilities.join(" · ")} · {property.outdoor.spacesAndViews.join(" · ")} · Fish-cleaning table.</p>
+        <h3>Entertainment</h3>
+        <p>{property.entertainment.televisions}. {property.entertainment.streaming}. {property.entertainment.video}. {property.entertainment.other.join(" · ")}.</p>
+      </section>
+
+      <section aria-labelledby="rental-rules">
+        <h2 id="rental-rules">Arrival, pets, and house rules</h2>
+        <ul class="policy-list">
+          <li><strong>Check-in:</strong> {property.arrival.checkIn}</li>
+          <li><strong>Checkout:</strong> {property.arrival.checkout}</li>
+          <li><strong>Primary renter:</strong> At least {property.rules.primaryRenterMinimumAge} years old</li>
+          <li><strong>Pets:</strong> Up to <span data-public-setting="maxPets">{ownerSettingsDefaults.maxPets}</span>; <span data-public-setting="petFeeUsd">{money.format(ownerSettingsDefaults.petFeeUsd)} per stay</span> for additional cleaning</li>
+          <li><strong>Events or parties:</strong> Not allowed</li>
+          <li><strong>Smoking or vaping inside:</strong> Not allowed</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="rental-safety">
+        <h2 id="rental-safety">Safety and monitoring</h2>
+        <p>{property.safety.equipment.join(" · ")}.</p>
+        <p>There are no exterior cameras, no doorbell camera, and no noise-monitoring devices.</p>
+      </section>
+
+      <section aria-labelledby="rental-price">
+        <h2 id="rental-price">Pricing, payment, and weather</h2>
+        <p data-public-setting="pricingNote">{ownerSettingsDefaults.pricingNote}</p>
+        <p><span data-public-setting="startingWeeklyRateUsd">Personalized quote for your dates</span>. <span data-public-setting="minimumStayNights">Stay requirements vary by dates</span>.</p>
+        <p>After approval, the initial deposit is {money.format(property.payment.initialDepositUsd)}. The remaining balance and additional fees are due {property.payment.remainingBalanceDueDaysBeforeCheckIn} days before check-in. Accepted methods are {property.payment.acceptedMethods.join(", ")}.</p>
+        <p>Travel insurance is {property.weather.travelInsurance.toLowerCase()}. The owner-approved weather interruption policy states: {property.weather.interruptionRefunds.toLowerCase()}.</p>
+      </section>
+
+      <section aria-labelledby="rental-process">
+        <h2 id="rental-process">How a direct request works</h2>
+        <p>{property.booking.guestRequest}. {property.booking.ownerReview}. {property.booking.confirmation}.</p>
+        <p><strong>{property.booking.reservationStatus}.</strong> A submitted request is not a guaranteed price.</p>
+      </section>
+
+      <div class="policy-actions">
+        <a class="button" href="/#availability" data-analytics-event="primary_request_click" data-analytics-category="inline">Check availability</a>
+        <a class="text-link" href="/">Back to the home <span aria-hidden="true">→</span></a>
+      </div>
+    </article>
+  </main>
+  <SiteFooter />
+  <PublicSettingsEnhancement />
+</BaseLayout>

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /owner
+
+Sitemap: https://breezydaysobx.com/sitemap.xml

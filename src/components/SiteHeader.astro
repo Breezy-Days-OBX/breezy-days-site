@@ -10,10 +10,15 @@ import { siteContent } from "../content/site";
     <nav class="main-nav" aria-label="Main navigation">
       <a href="#fit">Is it a fit?</a>
       <a href="#home">The home</a>
-      <a href="#reviews">Reviews</a>
+      <a href="#essentials">Stay details</a>
       <a href="#faq">FAQs</a>
     </nav>
-    <a class="button button-small" href={siteContent.primaryAction.href}>
+    <a
+      class="button button-small"
+      href={siteContent.primaryAction.href}
+      data-analytics-event="primary_request_click"
+      data-analytics-category="header"
+    >
       {siteContent.primaryAction.label}
     </a>
   </div>

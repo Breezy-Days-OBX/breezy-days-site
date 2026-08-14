@@ -226,3 +226,21 @@ export function projectPublicOwnerSettings(settings: OwnerSettings): PublicOwner
     updatedAt: settings.updatedAt,
   };
 }
+
+export function parsePublicOwnerSettings(input: unknown): PublicOwnerSettings | null {
+  if (!isRecord(input)) return null;
+
+  const publicKeys = new Set([...Object.keys(ownerSettingDefinitions), "updatedAt"]);
+  if (
+    Object.keys(input).length !== publicKeys.size ||
+    Object.keys(input).some((key) => !publicKeys.has(key))
+  ) {
+    return null;
+  }
+
+  const result = validateOwnerSettings({
+    ...input,
+    schemaVersion: OWNER_SETTINGS_SCHEMA_VERSION,
+  });
+  return result.success ? projectPublicOwnerSettings(result.data) : null;
+}

@@ -1,23 +1,37 @@
 ---
 import "../styles/global.css";
+import heroDeck from "../assets/images/hero-deck.jpeg";
 
 interface Props {
   title: string;
   description: string;
+  noindex?: boolean;
+  structuredData?: Record<string, unknown>;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false, structuredData } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const socialImage = new URL(heroDeck.src, Astro.site ?? Astro.url.origin);
+const isOwnerRoute = Astro.url.pathname === "/owner" || Astro.url.pathname.startsWith("/owner/");
+const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID?.trim();
+const clarityId = import.meta.env.PUBLIC_CLARITY_PROJECT_ID?.trim();
+const analyticsEnabled = !isOwnerRoute && Boolean(ga4Id || clarityId);
+const jsonLd = structuredData
+  ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
+  : null;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#173c32" />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
     <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link
       rel="preload"
       href="/fonts/InstrumentSerif-Regular.ttf"
@@ -25,10 +39,59 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
       type="font/ttf"
       crossorigin="anonymous"
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Breezy Days OBX" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="Ocean view from the deck at Breezy Days OBX" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
     <title>{title}</title>
+    {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd}></script>}
+    {ga4Id && !isOwnerRoute && (
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id)}`}></script>
+    )}
+    {ga4Id && !isOwnerRoute && (
+      <script is:inline define:vars={{ ga4Id }}>
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag("js", new Date());
+        window.gtag("config", ga4Id, { send_page_view: true });
+      </script>
+    )}
+    {clarityId && !isOwnerRoute && (
+      <script is:inline define:vars={{ clarityId }}>
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+          t = l.createElement(r);
+          t.async = 1;
+          t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0];
+          y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", clarityId);
+      </script>
+    )}
   </head>
-  <body>
+  <body data-analytics-enabled={analyticsEnabled ? "true" : "false"}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <slot />
+    {!isOwnerRoute && (
+      <script>
+        import { trackPublicEvent } from "../lib/analytics";
+
+        for (const element of document.querySelectorAll<HTMLElement>("[data-analytics-event]")) {
+          element.addEventListener("click", () => {
+            trackPublicEvent(
+              element.dataset.analyticsEvent,
+              element.dataset.analyticsCategory,
+            );
+          });
+        }
+      </script>
+    )}
   </body>
 </html>

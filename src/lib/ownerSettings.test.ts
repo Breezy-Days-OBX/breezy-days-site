@@ -8,6 +8,7 @@ import {
   projectPublicOwnerSettings,
   validateOwnerSettings,
 } from "./ownerSettings";
+import * as ownerSettingsModule from "./ownerSettings";
 
 const validSettings: OwnerSettings = {
   schemaVersion: 1,
@@ -137,5 +138,35 @@ describe("owner settings contract", () => {
     expect(publicSettings).not.toHaveProperty("schemaVersion");
     expect(publicSettings).not.toHaveProperty("internalNote");
     expect(publicSettings).not.toHaveProperty("ownerEmail");
+  });
+
+  it("accepts only a complete sanitized live public-settings response", () => {
+    const parsePublicOwnerSettings = (
+      ownerSettingsModule as typeof ownerSettingsModule & {
+        parsePublicOwnerSettings?: (input: unknown) => unknown;
+      }
+    ).parsePublicOwnerSettings;
+    expect(parsePublicOwnerSettings).toBeTypeOf("function");
+    if (!parsePublicOwnerSettings) return;
+
+    expect(parsePublicOwnerSettings({
+      ...ownerSettingsDefaults,
+      updatedAt: validSettings.updatedAt,
+    })).toEqual({
+      ...ownerSettingsDefaults,
+      updatedAt: validSettings.updatedAt,
+    });
+
+    expect(parsePublicOwnerSettings({ ...ownerSettingsDefaults, source: "default" })).toBeNull();
+    expect(parsePublicOwnerSettings({
+      ...ownerSettingsDefaults,
+      updatedAt: validSettings.updatedAt,
+      ownerEmail: "private@example.com",
+    })).toBeNull();
+    expect(parsePublicOwnerSettings({
+      ...ownerSettingsDefaults,
+      maxPets: 99,
+      updatedAt: validSettings.updatedAt,
+    })).toBeNull();
   });
 });

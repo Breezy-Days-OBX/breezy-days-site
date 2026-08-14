@@ -1,0 +1,17 @@
+{
+  "name": "Breezy Days OBX",
+  "short_name": "Breezy Days",
+  "description": "A family beach home in Rodanthe, North Carolina.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f5ee",
+  "theme_color": "#173c32",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -22,6 +22,80 @@ describe("Breezy Days homepage", () => {
     expect(html).toMatch(/<p[^>]+class="honeypot"[^>]+hidden/);
   });
 
+  it("qualifies family fit and answers practical objections with approved facts", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+
+    expect(html).toContain("Multi-generational families and family groups sharing a beach week");
+    expect(html).toContain("Sleeps up to 10 guests");
+    expect(html).toContain("4 bedrooms");
+    expect(html).toContain("2 full bathrooms and 1 half bathroom");
+    expect(html).toContain("full flight of stairs is required");
+    expect(html).toContain("Beach/pool towels");
+    expect(html).toContain("An inquiry is not a confirmed reservation");
+    expect(html).toContain("Hosted by Danny &amp; Michelle Day");
+  });
+
+  it("uses one dominant CTA path and does not leak owner routes", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+    const primaryActions = [...html.matchAll(/<(?:a|button)[^>]*(?:button|mobile-booking-bar)[^>]*>([\s\S]*?)<\/(?:a|button)>/g)]
+      .map((match) => match[1].replace(/<[^>]+>/g, "").trim())
+      .filter(Boolean);
+
+    expect(primaryActions).toContain("Check availability");
+    expect(primaryActions).not.toContain("Book now");
+    expect(primaryActions).not.toContain("Reserve now");
+    expect(html).not.toContain('href="/owner');
+  });
+
+  it("renders the complete static Netlify inquiry contract and accessible states", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+
+    for (const name of [
+      "arrival",
+      "departure",
+      "guests",
+      "pets",
+      "name",
+      "email",
+      "phone",
+      "message",
+      "acknowledgesRequestNotReservation",
+      "acknowledgesPrivacy",
+    ]) {
+      expect(html, name).toContain(`name="${name}"`);
+    }
+    expect(html).toContain('name="availability-request"');
+    expect(html).toContain('method="POST"');
+    expect(html).toContain('action="/thanks"');
+    expect(html).toContain('data-netlify="true"');
+    expect(html).toContain('netlify-honeypot="company-website"');
+    expect(html).toContain('data-form-error-summary');
+    expect(html).toContain('aria-live="polite"');
+    expect(html).toContain('aria-busy="false"');
+  });
+
+  it("ships repository defaults with allow-listed public-settings markers", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+
+    for (const key of [
+      "startingWeeklyRateUsd",
+      "minimumStayNights",
+      "pricingNote",
+      "poolHeatFeeUsd",
+      "petFeeUsd",
+      "maxPets",
+      "poolOpenMonthDay",
+      "poolCloseMonthDay",
+    ]) {
+      expect(html, key).toContain(`data-public-setting="${key}"`);
+    }
+    expect(html).toContain("Rates vary by dates and are confirmed in your personalized quote.");
+  });
+
   it("keeps the decision sections in the approved funnel order", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HomePage);
@@ -40,5 +114,6 @@ describe("Breezy Days homepage", () => {
     expect(html).toContain("View from the Breezy Days deck toward neighboring Outer Banks homes");
     expect(html).not.toContain("Hero-Reference");
     expect(html).not.toContain("prototype only");
+    expect(html).not.toMatch(/prelaunch|being verified|still being verified|TBD|TODO/i);
   });
 });

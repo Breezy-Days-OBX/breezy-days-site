@@ -1,20 +1,34 @@
 ---
+import SiteFooter from "../components/SiteFooter.astro";
+import { property } from "../content/property";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
   title="Request received | Breezy Days OBX"
-  description="Your Breezy Days availability request has been received."
+  description="Your Breezy Days availability request has been received for owner review."
+  noindex
 >
   <main class="thanks-page" id="main-content">
     <div class="thanks-card">
+      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
       <p class="eyebrow">Request received</p>
-      <h1>Thanks for sharing your dates.</h1>
-      <p>
-        The owner will review availability, price, and stay details before anything is reserved.
+      <h1>Thanks for sharing your week.</h1>
+      <p class="thanks-lede">
+        Your request is with the owners for review. It is not a reservation or a guaranteed price.
       </p>
+      <ol class="thanks-steps">
+        <li><span>01</span><p>The owners check the synced Airbnb and Vrbo calendars, guest fit, and date-specific price.</p></li>
+        <li><span>02</span><p>They reply by {property.booking.preferredContactAfterInquiry.toLowerCase()} with availability, the total price, and next steps.</p></li>
+        <li><span>03</span><p>A reservation is complete only after owner approval, the agreement, and the required payment steps.</p></li>
+      </ol>
+      <p class="thanks-contact">Need to add context? Email <a href={`mailto:${property.identity.email}`}>{property.identity.email}</a>.</p>
       <a class="button" href="/">Back to Breezy Days</a>
     </div>
   </main>
+  <SiteFooter />
+  <script>
+    import { trackPublicEvent } from "../lib/analytics";
+    trackPublicEvent("form_success", "availability_form");
+  </script>
 </BaseLayout>
-

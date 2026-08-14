@@ -1,4 +1,6 @@
 ---
+import SiteFooter from "../components/SiteFooter.astro";
+import { property } from "../content/property";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
@@ -8,39 +10,38 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 >
   <main class="policy-page" id="main-content">
     <article class="policy-card">
-      <a class="wordmark" href="/#hero">Breezy Days <span>OBX</span></a>
-      <p class="eyebrow">Prelaunch privacy notice</p>
+      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
+      <p class="eyebrow">Privacy notice</p>
       <h1>Privacy, in plain language.</h1>
       <p class="policy-updated">Last updated August 14, 2026</p>
 
+      <p class="policy-lede">
+        This notice describes the current availability-request process. It is not a rental agreement or legal advice; binding stay terms are supplied separately in the owner-approved rental agreement.
+      </p>
+
       <h2>What an availability request includes</h2>
-      <p>Arrival and departure dates, group size, and the email address where you want a reply.</p>
+      <p>Your requested arrival and departure dates, overnight guest and pet counts, name, email, phone number, an optional message, and the two acknowledgements shown on the form.</p>
 
-      <h2>Why we ask for it</h2>
-      <p>
-        These details are used to review the requested stay, reply about availability and fit,
-        and explain the price and booking terms before you decide whether to reserve.
-      </p>
+      <h2>Why the owners use it</h2>
+      <p>Those details are used to review availability and guest fit, reply to your request, and explain the date-specific price, agreement, and payment steps before you decide whether to reserve.</p>
 
-      <h2>Processing and retention</h2>
-      <p>
-        The final form provider, storage location, retention period, and deletion process will be
-        named here before public inquiries open. Breezy Days does not sell availability-request
-        information.
-      </p>
+      <h2>How the form is handled</h2>
+      <p>Netlify Forms receives the submission so the owners can review and respond. The form does not collect payment information, create an instant booking, or place inquiry data in the public owner-settings store.</p>
+
+      <h2>Analytics and session tools</h2>
+      <p>Google Analytics 4 and Microsoft Clarity load only when their public project identifiers are configured. They are limited to public pages. Form values, dates, contact details, and messages are never sent in the site’s custom analytics events, and analytics does not run on owner pages.</p>
+
+      <h2>Retention, deletion, and binding terms</h2>
+      <p>Final retention and deletion periods remain subject to owner approval and any applicable recordkeeping requirements. They are not rental terms. Email the owners to ask what you submitted or request deletion, subject to obligations that may require a record to be kept.</p>
 
       <h2>Questions about your information</h2>
-      <p>
-        Email <a href="mailto:breezydaysobx@gmail.com">breezydaysobx@gmail.com</a> to ask what was
-        submitted or request deletion, subject to any recordkeeping obligations that apply.
-      </p>
+      <p>Email <a href={`mailto:${property.identity.email}`}>{property.identity.email}</a>.</p>
 
-      <p class="policy-status">
-        This notice is part of the local prelaunch build and must be finalized with the owner after
-        the form provider and operating workflow are configured.
-      </p>
-      <a class="button" href="/#availability">Back to availability</a>
+      <div class="policy-actions">
+        <a class="button" href="/#availability">Check availability</a>
+        <a class="text-link" href="/rental-information">Rental information <span aria-hidden="true">→</span></a>
+      </div>
     </article>
   </main>
+  <SiteFooter />
 </BaseLayout>
-
