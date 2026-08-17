@@ -22,6 +22,19 @@ describe("Breezy Days homepage", () => {
     expect(html).toMatch(/<p[^>]+class="honeypot"[^>]+hidden/);
   });
 
+  it("starts with a compact availability entry and keeps the full request after the process", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+
+    expect(html).toContain("data-availability-entry");
+    expect(html).toContain('id="hero-arrival"');
+    expect(html).toContain('id="hero-departure"');
+    expect(html).toContain('id="hero-guests"');
+    expect(html).toContain('href="#availability"');
+    expect(html.indexOf('id="process"')).toBeLessThan(html.indexOf('id="availability"'));
+    expect(html).not.toContain('class="mobile-booking-bar"');
+  });
+
   it("qualifies family fit and answers practical objections with approved facts", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HomePage, { partial: false });

@@ -20,13 +20,13 @@ describe("Breezy Days public-site contract", () => {
   it("orders the homepage around a guest's booking decision", () => {
     expect(siteContent.homepageSections).toEqual([
       "hero",
-      "availability",
       "fit",
       "home",
+      "location",
       "essentials",
       "reviews",
       "process",
-      "location",
+      "availability",
       "faq",
       "final-action",
     ]);
