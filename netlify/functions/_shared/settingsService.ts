@@ -10,6 +10,7 @@ const CURRENT_SETTINGS_KEY = "current.json";
 const SNAPSHOT_PREFIX = "snapshots/";
 const PUBLIC_CACHE_CONTROL = "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
 const PROTECTED_CACHE_CONTROL = "no-store";
+const PROTECTED_ROBOTS = "noindex, nofollow, noarchive";
 const SAFE_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 const SNAPSHOT_KEY_PATTERN =
   /^snapshots\/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)-([A-Za-z0-9_-]{1,64})\.json$/;
@@ -60,7 +61,13 @@ const jsonResponse = (body: unknown, status: number, cacheControl: string) =>
   });
 
 const protectedResponse = (body: unknown, status = 200) =>
-  jsonResponse(body, status, PROTECTED_CACHE_CONTROL);
+  Response.json(body, {
+    status,
+    headers: {
+      "Cache-Control": PROTECTED_CACHE_CONTROL,
+      "X-Robots-Tag": PROTECTED_ROBOTS,
+    },
+  });
 
 const protectedError = (error: string, status: number) => protectedResponse({ error }, status);
 

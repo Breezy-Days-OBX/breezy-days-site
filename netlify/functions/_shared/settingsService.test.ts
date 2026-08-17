@@ -204,6 +204,15 @@ describe("settings Function handlers", () => {
     },
   );
 
+  it("marks anonymous protected responses as non-indexable", async () => {
+    user = null;
+    const { ownerSettings } = createSettingsHandlers(dependencies);
+
+    const response = await ownerSettings(request("GET"));
+
+    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow, noarchive");
+  });
+
   it("rejects authenticated users without the owner role", async () => {
     user = { id: "guest-user", roles: ["guest"], email: "guest@example.test" };
     const { ownerSettings } = createSettingsHandlers(dependencies);

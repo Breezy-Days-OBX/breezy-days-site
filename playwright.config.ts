@@ -12,9 +12,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: "node node_modules/astro/bin/astro.mjs preview --host 127.0.0.1 --port 4321",
-    // Astro otherwise detects Playwright as an agent and detaches its preview process on Windows.
-    env: { ASTRO_PREVIEW_BACKGROUND: "1" },
+    command: "node scripts/playwright-server.mjs",
     url: "http://127.0.0.1:4321",
     reuseExistingServer: false,
     timeout: 120_000,

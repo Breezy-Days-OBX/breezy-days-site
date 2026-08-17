@@ -86,17 +86,9 @@ test("owner login remains public while the dashboard falls back without a sessio
   await expect(page.locator("[data-login-form]")).toBeVisible();
 });
 
-test("an unauthenticated protected Function response is deterministic without Netlify accounts", async ({
+test("the local Function boundary invokes the protected handler for anonymous requests", async ({
   page,
 }) => {
-  await page.route("**/.netlify/functions/owner-settings", (route) =>
-    route.fulfill({
-      status: 401,
-      headers: { "cache-control": "no-store" },
-      contentType: "application/json",
-      body: '{"error":"unauthorized"}',
-    }),
-  );
   await page.goto("/owner");
 
   const response = await page.evaluate(async () => {
@@ -104,6 +96,7 @@ test("an unauthenticated protected Function response is deterministic without Ne
     return {
       status: result.status,
       cacheControl: result.headers.get("cache-control"),
+      robots: result.headers.get("x-robots-tag"),
       body: await result.json(),
     };
   });
@@ -111,6 +104,7 @@ test("an unauthenticated protected Function response is deterministic without Ne
   expect(response).toEqual({
     status: 401,
     cacheControl: "no-store",
+    robots: "noindex, nofollow, noarchive",
     body: { error: "unauthorized" },
   });
 });
