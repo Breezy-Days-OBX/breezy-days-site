@@ -1,17 +1,21 @@
 ---
 import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import { property } from "../content/property";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/supporting.css";
 ---
 
 <BaseLayout
   title="Request received | Breezy Days OBX"
   description="Your Breezy Days availability request has been received for owner review."
   noindex
+  bodyClass="supporting-page supporting-action-page"
 >
+  <SiteHeader />
   <main class="thanks-page" id="main-content">
     <div class="thanks-card">
-      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
+      <span class="supporting-card-mark" aria-hidden="true">✓</span>
       <p class="eyebrow">Request received</p>
       <h1>Thanks for sharing your week.</h1>
       <p class="thanks-lede">

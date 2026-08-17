@@ -135,6 +135,67 @@ test("unknown routes use the branded 404 page", async ({ page }) => {
   );
 });
 
+for (const [name, route, cardSelector] of [
+  ["rental information", "/rental-information", ".policy-intro"],
+  ["privacy", "/privacy", ".policy-intro"],
+  ["request success", "/thanks", ".thanks-card"],
+  ["not found", "/not-a-real-breezy-days-page", ".not-found-card"],
+] as const) {
+  test(`${name} carries the approved editorial visual system`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(route);
+
+    await expect(page.locator("body")).toHaveClass(/supporting-page/);
+    await expect(page.locator(".site-header")).toBeVisible();
+    await expect(page.locator("body")).toHaveCSS("font-family", /Manrope/);
+
+    const card = page.locator(cardSelector);
+    await expect(card).toBeVisible();
+    const radius = await card.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).borderTopLeftRadius),
+    );
+    expect(radius).toBeGreaterThanOrEqual(20);
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
+  });
+}
+
+test("private owner access carries the refined system without public navigation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/owner");
+
+  await expect(page.locator("body")).toHaveClass(/owner-page/);
+  await expect(page.locator(".main-nav")).toHaveCount(0);
+  await expect(page.locator("body")).toHaveCSS("font-family", /Manrope/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-family", /Newsreader/);
+
+  const card = page.locator(".owner-access-card");
+  const radius = await card.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).borderTopLeftRadius),
+  );
+  expect(radius).toBeGreaterThanOrEqual(20);
+});
+
+test("rental details avoid orphaned half-width rows on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/rental-information");
+
+  const grid = await page.locator(".policy-section-grid").boundingBox();
+  const water = await page.locator('[aria-labelledby="rental-water"]').boundingBox();
+  const safety = await page.locator('[aria-labelledby="rental-safety"]').boundingBox();
+
+  expect(grid).not.toBeNull();
+  expect(water).not.toBeNull();
+  expect(safety).not.toBeNull();
+  expect(water!.width).toBeGreaterThan(grid!.width * 0.9);
+  expect(safety!.width).toBeGreaterThan(grid!.width * 0.9);
+});
+
 test("the rounded hero entry stays visible within the mobile hero", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");

@@ -1,0 +1,576 @@
+.supporting-page,
+.owner-page {
+  --ink: #181a18;
+  --green: #496453;
+  --green-bright: #385043;
+  --cream: #f7f3ec;
+  --sand: #ddd5c8;
+  --sky: #dce7e2;
+  --muted: #626761;
+  --line: rgba(24, 26, 24, 0.13);
+  --serif: "Newsreader Variable", Georgia, serif;
+  --sans: "Manrope Variable", "Segoe UI", sans-serif;
+  --shell: min(1344px, calc(100vw - 96px));
+  min-width: 0;
+  padding-bottom: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+.supporting-page h1,
+.supporting-page h2,
+.supporting-page h3,
+.owner-page h1,
+.owner-page h2,
+.owner-page h3 {
+  font-family: var(--serif);
+  font-weight: 520;
+  letter-spacing: -0.035em;
+}
+
+.supporting-page .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border: 0;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 0 rgba(24, 26, 24, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.supporting-page .header-inner {
+  min-height: 92px;
+}
+
+.supporting-page .wordmark,
+.owner-page .wordmark {
+  gap: 5px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1.95rem;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.supporting-page .wordmark span,
+.owner-page .wordmark span {
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  letter-spacing: 0.17em;
+}
+
+.supporting-page .main-nav a {
+  font-size: 0.78rem;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+}
+
+.supporting-page .button,
+.owner-page .button,
+.owner-page .owner-logout,
+.owner-page .owner-snapshot-list button {
+  border-radius: 11px;
+}
+
+.supporting-page .site-header .button,
+.owner-page .button {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(56, 80, 67, 0.14);
+}
+
+.supporting-page .site-header .button:hover,
+.supporting-page .site-header .button:focus-visible,
+.owner-page .button:hover,
+.owner-page .button:focus-visible {
+  border-color: var(--green-bright);
+  background: var(--green-bright);
+}
+
+.supporting-page .policy-page {
+  min-height: auto;
+  padding: clamp(48px, 7vw, 104px) 0 clamp(72px, 9vw, 132px);
+  background:
+    radial-gradient(circle at 8% 2%, rgba(73, 100, 83, 0.09), transparent 25%), var(--cream);
+}
+
+.supporting-page .policy-card {
+  width: min(1180px, calc(100vw - 96px));
+  padding: 0;
+  background: transparent;
+}
+
+.supporting-page .policy-intro {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(42px, 7vw, 88px);
+  border: 1px solid rgba(24, 26, 24, 0.06);
+  border-radius: 30px;
+  background: #e9e1d4;
+  box-shadow: 0 24px 70px rgba(38, 42, 38, 0.08);
+}
+
+.supporting-page .policy-intro::after {
+  position: absolute;
+  right: -72px;
+  bottom: -108px;
+  width: 330px;
+  height: 220px;
+  border: 1px solid rgba(73, 100, 83, 0.12);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px rgba(73, 100, 83, 0.04),
+    0 0 0 58px rgba(73, 100, 83, 0.025);
+  content: "";
+}
+
+.supporting-page .policy-intro > * {
+  position: relative;
+  z-index: 1;
+}
+
+.supporting-page .policy-intro .eyebrow {
+  color: #60655f;
+}
+
+.supporting-page .policy-intro h1 {
+  max-width: 850px;
+  margin-bottom: 26px;
+  color: var(--ink);
+  font-size: clamp(3.55rem, 7vw, 6.8rem);
+  line-height: 0.93;
+}
+
+.supporting-page .policy-lede {
+  max-width: 720px;
+  margin-bottom: 0;
+  color: #555b55;
+  font-size: clamp(0.95rem, 1.35vw, 1.1rem);
+  line-height: 1.72;
+}
+
+.supporting-page .policy-updated {
+  margin: -10px 0 28px;
+  color: var(--green-bright);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.supporting-page .policy-section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.supporting-page .policy-section-grid > section {
+  min-width: 0;
+  padding: clamp(28px, 4vw, 46px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 46px rgba(38, 42, 38, 0.045);
+}
+
+.supporting-page .rental-card [aria-labelledby="rental-water"],
+.supporting-page .rental-card [aria-labelledby="rental-amenities"],
+.supporting-page .rental-card [aria-labelledby="rental-rules"],
+.supporting-page .rental-card [aria-labelledby="rental-safety"],
+.supporting-page .rental-card [aria-labelledby="rental-price"],
+.supporting-page .rental-card [aria-labelledby="rental-process"] {
+  grid-column: 1 / -1;
+}
+
+.supporting-page .rental-card [aria-labelledby="rental-water"],
+.supporting-page .rental-card [aria-labelledby="rental-safety"] {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
+  column-gap: clamp(36px, 6vw, 86px);
+}
+
+.supporting-page .rental-card [aria-labelledby="rental-water"] h2,
+.supporting-page .rental-card [aria-labelledby="rental-safety"] h2 {
+  grid-column: 1 / -1;
+}
+
+.supporting-page .policy-card h2 {
+  max-width: 500px;
+  margin: 0 0 16px;
+  color: var(--ink);
+  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  line-height: 1.02;
+}
+
+.supporting-page .policy-card h3 {
+  margin: 26px 0 8px;
+  color: var(--green-bright);
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.supporting-page .policy-section-grid p,
+.supporting-page .policy-section-grid li {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.72;
+}
+
+.supporting-page .policy-section-grid p:last-child,
+.supporting-page .policy-section-grid ul:last-child {
+  margin-bottom: 0;
+}
+
+.supporting-page .policy-list {
+  display: grid;
+  gap: 11px;
+  padding-left: 18px;
+}
+
+.supporting-page .policy-list strong,
+.supporting-page .policy-section-grid strong {
+  color: var(--ink);
+}
+
+.supporting-page .policy-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 22px;
+  padding: clamp(28px, 4vw, 44px);
+  border-radius: 22px;
+  background: #18231f;
+  color: #fff;
+}
+
+.supporting-page .policy-actions .button {
+  margin: 0;
+  border-color: #fff;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.supporting-page .policy-actions .button:hover,
+.supporting-page .policy-actions .button:focus-visible {
+  border-color: #e9e1d4;
+  background: #e9e1d4;
+}
+
+.supporting-page .policy-actions .text-link {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.supporting-action-page .thanks-page,
+.supporting-action-page .not-found-page {
+  min-height: 74vh;
+  padding: clamp(42px, 8vw, 110px) 24px;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(73, 100, 83, 0.12), transparent 27%),
+    linear-gradient(150deg, #f7f3ec 0%, #e8e0d3 100%);
+}
+
+.supporting-action-page .thanks-card,
+.supporting-action-page .not-found-card {
+  position: relative;
+  overflow: hidden;
+  width: min(760px, 100%);
+  padding: clamp(42px, 7vw, 80px);
+  border: 1px solid rgba(24, 26, 24, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 30px 90px rgba(35, 43, 37, 0.12);
+  text-align: left;
+}
+
+.supporting-action-page .supporting-card-mark {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  margin-bottom: 40px;
+  border: 1px solid rgba(73, 100, 83, 0.2);
+  border-radius: 50%;
+  background: #e9e1d4;
+  color: var(--green-bright);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.supporting-action-page .thanks-card h1,
+.supporting-action-page .not-found-card h1 {
+  max-width: 660px;
+  color: var(--ink);
+  font-size: clamp(3.2rem, 7vw, 5.7rem);
+  line-height: 0.95;
+}
+
+.supporting-action-page .thanks-lede,
+.supporting-action-page .not-found-card > p:not(.eyebrow) {
+  max-width: 580px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.supporting-action-page .thanks-steps {
+  overflow: hidden;
+  margin: 36px 0 30px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.supporting-action-page .thanks-steps li {
+  grid-template-columns: 42px 1fr;
+  gap: 18px;
+  padding: 20px 22px;
+  border-bottom-color: var(--line);
+}
+
+.supporting-action-page .thanks-steps li:last-child {
+  border-bottom: 0;
+}
+
+.supporting-action-page .thanks-card > .button,
+.supporting-action-page .not-found-card > .button {
+  margin-top: 26px;
+  border-radius: 11px;
+}
+
+.supporting-page .site-footer {
+  padding-block: 74px 30px;
+  border-radius: 32px 32px 0 0;
+  background: #0c1914;
+}
+
+.supporting-page .site-footer .wordmark {
+  color: #fff;
+}
+
+.owner-page .owner-access-page,
+.owner-page .owner-dashboard {
+  background:
+    radial-gradient(circle at 10% 4%, rgba(73, 100, 83, 0.16), transparent 27%),
+    linear-gradient(145deg, #f7f3ec 0%, #e6ded1 100%);
+}
+
+.owner-page .owner-access-card {
+  overflow: hidden;
+  border: 1px solid rgba(24, 26, 24, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 30px 90px rgba(35, 43, 37, 0.13);
+}
+
+.owner-page .owner-access-card > .wordmark {
+  margin-bottom: 68px;
+}
+
+.owner-page .owner-access-card h1,
+.owner-page .owner-dashboard h1 {
+  font-family: var(--serif);
+  font-weight: 520;
+}
+
+.owner-page .owner-access-card h1 {
+  font-size: clamp(3.5rem, 8vw, 5.8rem);
+  line-height: 0.94;
+}
+
+.owner-page .owner-status {
+  border: 1px solid rgba(73, 100, 83, 0.14);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: #e7eee9;
+}
+
+.owner-page .owner-field input,
+.owner-page .owner-setting-control input,
+.owner-page .owner-setting-control textarea {
+  border-color: rgba(24, 26, 24, 0.24);
+  border-radius: 11px;
+  background: #fff;
+}
+
+.owner-page .owner-field input:focus,
+.owner-page .owner-setting-control input:focus,
+.owner-page .owner-setting-control textarea:focus {
+  border-color: var(--green-bright);
+  outline: 3px solid rgba(73, 100, 83, 0.16);
+  outline-offset: 1px;
+}
+
+.owner-page .owner-dashboard-header {
+  align-items: center;
+  margin-bottom: 34px;
+  padding: clamp(26px, 4vw, 44px);
+  border: 1px solid rgba(24, 26, 24, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 18px 60px rgba(35, 43, 37, 0.07);
+}
+
+.owner-page .owner-dashboard-header .wordmark {
+  margin-bottom: 46px;
+}
+
+.owner-page .owner-logout,
+.owner-page .owner-snapshot-list button {
+  border-color: var(--green);
+  color: var(--green-bright);
+}
+
+.owner-page .owner-settings-panel,
+.owner-page .owner-history-panel {
+  overflow: hidden;
+  border: 1px solid rgba(24, 26, 24, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 60px rgba(35, 43, 37, 0.07);
+}
+
+.owner-page .owner-setting-row:last-child {
+  border-bottom: 0;
+}
+
+.owner-page .owner-history-panel [data-snapshot-empty] {
+  border-radius: 12px;
+  background: #eee8df;
+}
+
+@media (max-width: 980px) {
+  .supporting-page,
+  .owner-page {
+    --shell: min(100% - 36px, 900px);
+  }
+
+  .supporting-page .policy-card {
+    width: min(900px, calc(100vw - 36px));
+  }
+}
+
+@media (max-width: 720px) {
+  .supporting-page,
+  .owner-page {
+    --shell: calc(100% - 28px);
+    padding-bottom: 0;
+  }
+
+  .supporting-page .header-inner {
+    min-height: 68px;
+  }
+
+  .supporting-page .wordmark,
+  .owner-page .wordmark {
+    font-size: 1.22rem;
+  }
+
+  .supporting-page .site-header .button {
+    min-height: 42px;
+    padding-inline: 11px;
+    font-size: 0.61rem;
+  }
+
+  .supporting-page .policy-page {
+    padding: 18px 0 72px;
+  }
+
+  .supporting-page .policy-card {
+    width: calc(100vw - 28px);
+  }
+
+  .supporting-page .policy-intro {
+    padding: 38px 24px 42px;
+    border-radius: 22px;
+  }
+
+  .supporting-page .policy-intro h1 {
+    font-size: clamp(3rem, 15vw, 4.4rem);
+  }
+
+  .supporting-page .policy-section-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .supporting-page .policy-section-grid > section,
+  .supporting-page .rental-card [aria-labelledby="rental-water"],
+  .supporting-page .rental-card [aria-labelledby="rental-amenities"],
+  .supporting-page .rental-card [aria-labelledby="rental-rules"],
+  .supporting-page .rental-card [aria-labelledby="rental-safety"],
+  .supporting-page .rental-card [aria-labelledby="rental-price"],
+  .supporting-page .rental-card [aria-labelledby="rental-process"] {
+    grid-column: 1;
+  }
+
+  .supporting-page .rental-card [aria-labelledby="rental-water"],
+  .supporting-page .rental-card [aria-labelledby="rental-safety"] {
+    grid-template-columns: 1fr;
+  }
+
+  .supporting-page .rental-card [aria-labelledby="rental-water"] h2,
+  .supporting-page .rental-card [aria-labelledby="rental-safety"] h2 {
+    grid-column: 1;
+  }
+
+  .supporting-page .policy-section-grid > section {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+
+  .supporting-page .policy-actions {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 24px;
+    border-radius: 18px;
+  }
+
+  .supporting-page .policy-actions .button {
+    width: 100%;
+  }
+
+  .supporting-action-page .thanks-page,
+  .supporting-action-page .not-found-page {
+    min-height: auto;
+    padding: 18px 14px 70px;
+  }
+
+  .supporting-action-page .thanks-card,
+  .supporting-action-page .not-found-card {
+    padding: 38px 24px;
+    border-radius: 22px;
+  }
+
+  .supporting-action-page .thanks-card h1,
+  .supporting-action-page .not-found-card h1 {
+    font-size: clamp(3rem, 15vw, 4.4rem);
+  }
+
+  .supporting-page .site-footer {
+    border-radius: 24px 24px 0 0;
+  }
+
+  .owner-page .owner-access-page,
+  .owner-page .owner-dashboard {
+    padding: 14px;
+  }
+
+  .owner-page .owner-access-card,
+  .owner-page .owner-dashboard-header,
+  .owner-page .owner-settings-panel,
+  .owner-page .owner-history-panel {
+    border-radius: 20px;
+  }
+}

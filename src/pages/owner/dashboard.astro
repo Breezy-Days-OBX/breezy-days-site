@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { ownerSettingDefinitions } from "../../lib/ownerSettings";
+import "../../styles/supporting.css";
 
 const settingsEntries = Object.entries(ownerSettingDefinitions);
 const displayFallback = (value: unknown) =>
@@ -11,6 +12,7 @@ const displayFallback = (value: unknown) =>
   title="Owner dashboard | Breezy Days OBX"
   description="Private owner settings for Breezy Days OBX."
   noindex
+  bodyClass="owner-page owner-dashboard-body"
 >
   <main class="owner-dashboard" id="main-content">
     <header class="owner-dashboard-header">

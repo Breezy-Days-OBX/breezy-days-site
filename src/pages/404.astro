@@ -1,16 +1,20 @@
 ---
 import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/supporting.css";
 ---
 
 <BaseLayout
   title="Page not found | Breezy Days OBX"
   description="The page you requested could not be found. Return to Breezy Days OBX."
   noindex
+  bodyClass="supporting-page supporting-action-page"
 >
+  <SiteHeader />
   <main class="not-found-page" id="main-content">
     <div class="not-found-card">
-      <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
+      <span class="supporting-card-mark" aria-hidden="true">404</span>
       <p class="eyebrow">404 · Off course</p>
       <h1>This page drifted out with the tide.</h1>
       <p>The family beach house is still right where you left it.</p>
