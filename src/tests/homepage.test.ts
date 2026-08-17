@@ -151,4 +151,16 @@ describe("Breezy Days homepage", () => {
     expect(html).not.toContain("prototype only");
     expect(html).not.toMatch(/prelaunch|being verified|still being verified|TBD|TODO/i);
   });
+
+  it("uses an editorial property journey instead of repeated square-card grids", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage);
+
+    expect(html).toContain('class="fit-strip"');
+    expect(html).toContain('class="editorial-gallery"');
+    expect(html).toContain('class="location-story"');
+    expect(html).toContain('class="stay-details-panel"');
+    expect(html).toContain('data-gallery-feature="living"');
+    expect(html).toContain('data-gallery-feature="pool"');
+  });
 });
