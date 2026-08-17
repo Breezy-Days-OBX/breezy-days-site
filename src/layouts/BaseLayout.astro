@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import heroDeck from "../assets/images/hero-deck.jpeg";
+import PublicTracking from "../components/PublicTracking.astro";
 
 interface Props {
   title: string;
@@ -13,12 +14,10 @@ const { title, description, noindex = false, structuredData } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 const socialImage = new URL(heroDeck.src, Astro.site ?? Astro.url.origin);
 const isOwnerRoute = Astro.url.pathname === "/owner" || Astro.url.pathname.startsWith("/owner/");
-const ga4Id = import.meta.env.PUBLIC_GA4_MEASUREMENT_ID?.trim();
-const clarityId = import.meta.env.PUBLIC_CLARITY_PROJECT_ID?.trim();
+const ga4Id = import.meta.env.PUBLIC_GA4_ID?.trim();
+const clarityId = import.meta.env.PUBLIC_CLARITY_ID?.trim();
 const analyticsEnabled = !isOwnerRoute && Boolean(ga4Id || clarityId);
-const jsonLd = structuredData
-  ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
-  : null;
+const jsonLd = structuredData ? JSON.stringify(structuredData).replace(/</g, "\\u003c") : null;
 ---
 
 <!doctype html>
@@ -51,47 +50,22 @@ const jsonLd = structuredData
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <title>{title}</title>
-    {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd}></script>}
-    {ga4Id && !isOwnerRoute && (
-      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id)}`}></script>
-    )}
-    {ga4Id && !isOwnerRoute && (
-      <script is:inline define:vars={{ ga4Id }}>
-        window.dataLayer = window.dataLayer || [];
-        window.gtag = function () { window.dataLayer.push(arguments); };
-        window.gtag("js", new Date());
-        window.gtag("config", ga4Id, { send_page_view: true });
-      </script>
-    )}
-    {clarityId && !isOwnerRoute && (
-      <script is:inline define:vars={{ clarityId }}>
-        (function (c, l, a, r, i, t, y) {
-          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
-          t = l.createElement(r);
-          t.async = 1;
-          t.src = "https://www.clarity.ms/tag/" + i;
-          y = l.getElementsByTagName(r)[0];
-          y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", clarityId);
-      </script>
-    )}
+    {jsonLd && <script is:inline type="application/ld+json" set:html={jsonLd} />}
+    {
+      !isOwnerRoute && (ga4Id || clarityId) && (
+        <script
+          is:inline
+          defer
+          src="/analytics.js"
+          data-ga4-id={ga4Id}
+          data-clarity-id={clarityId}
+        />
+      )
+    }
   </head>
   <body data-analytics-enabled={analyticsEnabled ? "true" : "false"}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <slot />
-    {!isOwnerRoute && (
-      <script>
-        import { trackPublicEvent } from "../lib/analytics";
-
-        for (const element of document.querySelectorAll<HTMLElement>("[data-analytics-event]")) {
-          element.addEventListener("click", () => {
-            trackPublicEvent(
-              element.dataset.analyticsEvent,
-              element.dataset.analyticsCategory,
-            );
-          });
-        }
-      </script>
-    )}
+    {!isOwnerRoute && <PublicTracking />}
   </body>
 </html>

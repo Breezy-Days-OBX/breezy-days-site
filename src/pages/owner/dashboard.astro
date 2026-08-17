@@ -3,7 +3,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { ownerSettingDefinitions } from "../../lib/ownerSettings";
 
 const settingsEntries = Object.entries(ownerSettingDefinitions);
-const displayFallback = (value: unknown) => value === null ? "Not currently published" : String(value);
+const displayFallback = (value: unknown) =>
+  value === null ? "Not currently published" : String(value);
 ---
 
 <BaseLayout
@@ -21,7 +22,13 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
       <button class="owner-logout" type="button" data-owner-logout>Log out</button>
     </header>
 
-    <div class="owner-status" data-dashboard-status data-kind="neutral" role="status" aria-live="polite">
+    <div
+      class="owner-status"
+      data-dashboard-status
+      data-kind="neutral"
+      role="status"
+      aria-live="polite"
+    >
       Loading current settings…
     </div>
 
@@ -41,49 +48,77 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
           </div>
 
           <div class="owner-settings-list">
-            {settingsEntries.map(([key, definition]) => (
-              <section class="owner-setting-row" data-owner-setting-field>
-                <div class="owner-setting-copy">
-                  <label for={`owner-setting-${key}`}>{definition.name}</label>
-                  <p>{definition.purpose}</p>
-                  <dl>
-                    <div><dt>Allowed</dt><dd>{definition.allowed}</dd></div>
-                    <div><dt>Public location</dt><dd>{definition.publicDestination}</dd></div>
-                    <div><dt>Fallback</dt><dd>{displayFallback(definition.fallback)}</dd></div>
-                  </dl>
-                </div>
-                <div class="owner-setting-control">
-                  {definition.type === "plain text" ? (
-                    <textarea
-                      id={`owner-setting-${key}`}
-                      name={key}
-                      maxlength="160"
-                      rows="3"
-                      aria-describedby={`owner-help-${key} owner-error-${key}`}
-                      required
-                    >{String(definition.fallback)}</textarea>
-                  ) : (
-                    <input
-                      id={`owner-setting-${key}`}
-                      name={key}
-                      type={definition.type === "month-day" ? "text" : "number"}
-                      inputmode={definition.type === "month-day" ? "numeric" : "decimal"}
-                      pattern={definition.type === "month-day" ? "[0-9]{2}-[0-9]{2}" : undefined}
-                      step={definition.type.includes("integer") ? "1" : undefined}
-                      value={definition.fallback ?? ""}
-                      aria-describedby={`owner-help-${key} owner-error-${key}`}
-                      required={!definition.type.startsWith("nullable")}
+            {
+              settingsEntries.map(([key, definition]) => (
+                <section class="owner-setting-row" data-owner-setting-field>
+                  <div class="owner-setting-copy">
+                    <label for={`owner-setting-${key}`}>{definition.name}</label>
+                    <p>{definition.purpose}</p>
+                    <dl>
+                      <div>
+                        <>
+                          <dt>Allowed</dt>
+                          <dd>{definition.allowed}</dd>
+                        </>
+                      </div>
+                      <div>
+                        <>
+                          <dt>Public location</dt>
+                          <dd>{definition.publicDestination}</dd>
+                        </>
+                      </div>
+                      <div>
+                        <>
+                          <dt>Fallback</dt>
+                          <dd>{displayFallback(definition.fallback)}</dd>
+                        </>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="owner-setting-control">
+                    {definition.type === "plain text" ? (
+                      <textarea
+                        id={`owner-setting-${key}`}
+                        name={key}
+                        maxlength="160"
+                        rows="3"
+                        aria-describedby={`owner-help-${key} owner-error-${key}`}
+                        required
+                      >
+                        {String(definition.fallback)}
+                      </textarea>
+                    ) : (
+                      <input
+                        id={`owner-setting-${key}`}
+                        name={key}
+                        type={definition.type === "month-day" ? "text" : "number"}
+                        inputmode={definition.type === "month-day" ? "numeric" : "decimal"}
+                        pattern={definition.type === "month-day" ? "[0-9]{2}-[0-9]{2}" : undefined}
+                        step={definition.type.includes("integer") ? "1" : undefined}
+                        value={definition.fallback ?? ""}
+                        aria-describedby={`owner-help-${key} owner-error-${key}`}
+                        required={!definition.type.startsWith("nullable")}
+                      />
+                    )}
+                    <small id={`owner-help-${key}`} class="owner-field-help">
+                      {definition.ownerHelpText}
+                    </small>
+                    <small
+                      id={`owner-error-${key}`}
+                      class="owner-field-error"
+                      data-field-error={key}
                     />
-                  )}
-                  <small id={`owner-help-${key}`} class="owner-field-help">{definition.ownerHelpText}</small>
-                  <small id={`owner-error-${key}`} class="owner-field-error" data-field-error={key}></small>
-                </div>
-              </section>
-            ))}
+                  </div>
+                </section>
+              ))
+            }
           </div>
 
           <div class="owner-save-bar">
-            <p>Saving publishes the complete validated settings object; partial changes are never sent.</p>
+            <p>
+              Saving publishes the complete validated settings object; partial changes are never
+              sent.
+            </p>
             <button class="button" type="submit" data-owner-save>Save all settings</button>
           </div>
         </form>
@@ -92,7 +127,10 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
       <aside class="owner-history-panel" aria-labelledby="history-title">
         <p class="eyebrow">Recovery points</p>
         <h2 id="history-title">Saved versions</h2>
-        <p>Only save time and restore controls are shown. Saved field contents remain private until restored.</p>
+        <p>
+          Only save time and restore controls are shown. Saved field contents remain private until
+          restored.
+        </p>
         <div data-snapshot-empty>No earlier versions are available yet.</div>
         <ol class="owner-snapshot-list" data-snapshot-list></ol>
       </aside>
@@ -134,7 +172,8 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
       restoring: "Restoring the selected saved version…",
       success: "Settings saved and live values refreshed.",
       validation: "Some settings need attention before they can be saved.",
-      conflict: "The settings changed in another session. Reload this page to review the latest values.",
+      conflict:
+        "The settings changed in another session. Reload this page to review the latest values.",
       auth: "Your owner session has expired. Return to owner access and sign in again.",
       forbidden: "This account does not have permission to manage owner settings.",
       method: "That owner action is not currently available.",
@@ -151,18 +190,25 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
 
     const transition = (state: string) => {
       if (status) {
-        status.textContent = state === "success" && currentAction === "restore"
-          ? "Saved version restored and live values refreshed."
-          : messages[state] ?? messages.service;
-        status.dataset.kind = state === "success" ? "success" : ["saving", "restoring", "loading"].includes(state) ? "neutral" : "error";
+        status.textContent =
+          state === "success" && currentAction === "restore"
+            ? "Saved version restored and live values refreshed."
+            : (messages[state] ?? messages.service);
+        status.dataset.kind =
+          state === "success"
+            ? "success"
+            : ["saving", "restoring", "loading"].includes(state)
+              ? "neutral"
+              : "error";
       }
       setBusy(state === "saving" || state === "restoring");
     };
 
-    const formatDate = (value: string) => new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(value));
+    const formatDate = (value: string) =>
+      new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(value));
 
     const clearFieldErrors = () => {
       if (errorSummary) errorSummary.hidden = true;
@@ -235,7 +281,10 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
       currentAction = "restore";
       const result = await runOwnerRestore({
         key: snapshot.key,
-        confirm: () => window.confirm(`Restore the version saved ${formatDate(snapshot.createdAt)}? Current settings will be saved as a recovery point first.`),
+        confirm: () =>
+          window.confirm(
+            `Restore the version saved ${formatDate(snapshot.createdAt)}? Current settings will be saved as a recovery point first.`,
+          ),
         restore: restoreOwnerSettings,
         refresh: refreshDashboard,
         transition,
@@ -250,12 +299,14 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
       clearFieldErrors();
       currentAction = "save";
       const result = await runOwnerSave({
-        serialize: () => serializeOwnerSettings(new FormData(form).entries(), currentSettings!.updatedAt),
+        serialize: () =>
+          serializeOwnerSettings(new FormData(form).entries(), currentSettings!.updatedAt),
         save: saveOwnerSettings,
         refresh: refreshDashboard,
         transition,
       });
-      if (result.state === "validation" && "fieldErrors" in result) showFieldErrors(result.fieldErrors ?? {});
+      if (result.state === "validation" && "fieldErrors" in result)
+        showFieldErrors(result.fieldErrors ?? {});
       setBusy(false);
     });
 
@@ -280,7 +331,11 @@ const displayFallback = (value: unknown) => value === null ? "Not currently publ
         if (status) status.textContent = "Current settings loaded.";
       }
     } catch (error) {
-      transition(typeof error === "object" && error !== null && "kind" in error ? String(error.kind) : "service");
+      transition(
+        typeof error === "object" && error !== null && "kind" in error
+          ? String(error.kind)
+          : "service",
+      );
     }
   </script>
 </BaseLayout>

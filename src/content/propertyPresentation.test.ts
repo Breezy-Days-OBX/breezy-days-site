@@ -22,7 +22,11 @@ describe("public property presentation", () => {
     const changed = {
       ...property,
       identity: { ...property.identity, location: "Test location" },
-      access: { ...property.access, beach: "Alternate beach access", pier: "Alternate pier access" },
+      access: {
+        ...property.access,
+        beach: "Alternate beach access",
+        pier: "Alternate pier access",
+      },
       pets: { ...property.pets, maximum: 0 },
       rules: {
         ...property.rules,
@@ -49,7 +53,8 @@ describe("public property presentation", () => {
         { label: "Events or parties", value: "Allowed" },
         { label: "Smoking or vaping inside", value: "Allowed" },
       ],
-      monitoring: "Exterior cameras: present. Doorbell camera: not present. Noise-monitoring devices: present.",
+      monitoring:
+        "Exterior cameras: present. Doorbell camera: not present. Noise-monitoring devices: present.",
     });
   });
 });

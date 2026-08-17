@@ -17,8 +17,8 @@ interface PropertyFactsSource {
 }
 
 const sentence = (value: string) => `${value.replace(/[.\s]+$/, "")}.`;
-const allowed = (value: boolean) => value ? "Allowed" : "Not allowed";
-const present = (value: boolean) => value ? "present" : "not present";
+const allowed = (value: boolean) => (value ? "Allowed" : "Not allowed");
+const present = (value: boolean) => (value ? "present" : "not present");
 
 export function derivePublicPropertyFacts(property: PropertyFactsSource) {
   return {
@@ -27,7 +27,10 @@ export function derivePublicPropertyFacts(property: PropertyFactsSource) {
     proximity: `${sentence(property.access.beach)} ${sentence(property.access.pier)}`,
     rules: [
       { label: "Children", value: allowed(property.rules.childrenAllowed) },
-      { label: "Events or parties", value: allowed(property.rules.eventsOrPartiesAllowed) },
+      {
+        label: "Events or parties",
+        value: allowed(property.rules.eventsOrPartiesAllowed),
+      },
       {
         label: "Smoking or vaping inside",
         value: allowed(property.rules.smokingOrVapingInsideAllowed),

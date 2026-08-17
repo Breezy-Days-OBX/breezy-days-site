@@ -87,7 +87,9 @@ export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promis
 }
 
 export function describeAuthError(operation: "login" | "callback" | "password"): string {
-  if (operation === "login") return "We could not sign you in. Check your email and password, then try again.";
-  if (operation === "password") return "We could not save that password. The link may have expired; request a new owner invitation or recovery email.";
+  if (operation === "login")
+    return "We could not sign you in. Check your email and password, then try again.";
+  if (operation === "password")
+    return "We could not save that password. The link may have expired; request a new owner invitation or recovery email.";
   return "We could not complete that owner access link. It may be invalid or expired.";
 }

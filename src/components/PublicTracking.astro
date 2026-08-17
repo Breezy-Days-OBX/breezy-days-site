@@ -1,0 +1,9 @@
+<script>
+  import { trackPublicEvent } from "../lib/analytics";
+
+  for (const element of document.querySelectorAll<HTMLElement>("[data-analytics-event]")) {
+    element.addEventListener("click", () => {
+      trackPublicEvent(element.dataset.analyticsEvent, element.dataset.analyticsCategory);
+    });
+  }
+</script>

@@ -11,4 +11,3 @@ if (proof.requiresLaunchReverification) {
 } else {
   console.log(`Launch proof gate passed. Marketplace proof checked ${proof.checkedOn}.`);
 }
-

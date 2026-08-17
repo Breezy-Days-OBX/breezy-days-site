@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
-const modules = import.meta.glob("./availabilityFormController.ts", { eager: true });
+const modules = import.meta.glob("./availabilityFormController.ts", {
+  eager: true,
+});
 
 interface ErrorPresentation {
   field: string;
@@ -63,15 +65,34 @@ const createView = (submission: Record<string, unknown> = validSubmission): Form
   summaryFocused: false,
   pending: false,
   nativeSubmits: 0,
-  enableCustomValidation() { this.nativeValidationEnabled = false; },
-  readSubmission() { return this.submission; },
-  readMaximumPets() { return this.maximumPets; },
-  resetValidation() { this.errors = []; this.summaryFocused = false; },
-  fieldId(field) { return field === "form" ? null : `${field}-control`; },
-  showErrors(errors) { this.errors = [...errors]; },
-  focusErrorSummary() { this.summaryFocused = true; },
-  setPending() { this.pending = true; },
-  submitNative() { this.nativeSubmits += 1; },
+  enableCustomValidation() {
+    this.nativeValidationEnabled = false;
+  },
+  readSubmission() {
+    return this.submission;
+  },
+  readMaximumPets() {
+    return this.maximumPets;
+  },
+  resetValidation() {
+    this.errors = [];
+    this.summaryFocused = false;
+  },
+  fieldId(field) {
+    return field === "form" ? null : `${field}-control`;
+  },
+  showErrors(errors) {
+    this.errors = [...errors];
+  },
+  focusErrorSummary() {
+    this.summaryFocused = true;
+  },
+  setPending() {
+    this.pending = true;
+  },
+  submitNative() {
+    this.nativeSubmits += 1;
+  },
 });
 
 describe("availability form controller", () => {
@@ -94,7 +115,11 @@ describe("availability form controller", () => {
   it("links invalid fields from the summary and moves focus there", () => {
     const module = modules["./availabilityFormController.ts"] as FormControllerModule | undefined;
     if (!module) return;
-    const view = createView({ ...validSubmission, arrival: "", email: "broken" });
+    const view = createView({
+      ...validSubmission,
+      arrival: "",
+      email: "broken",
+    });
     const controller = module.createAvailabilityFormController(view, {
       today: () => "2026-08-14",
       track: vi.fn(),
@@ -104,10 +129,12 @@ describe("availability form controller", () => {
 
     expect(controller.submit()).toBe("invalid");
     expect(view.summaryFocused).toBe(true);
-    expect(view.errors).toEqual(expect.arrayContaining([
-      expect.objectContaining({ field: "arrival", href: "#arrival-control" }),
-      expect.objectContaining({ field: "email", href: "#email-control" }),
-    ]));
+    expect(view.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: "arrival", href: "#arrival-control" }),
+        expect.objectContaining({ field: "email", href: "#email-control" }),
+      ]),
+    );
     expect(view.nativeSubmits).toBe(0);
   });
 

@@ -8,8 +8,7 @@ import {
 
 const CURRENT_SETTINGS_KEY = "current.json";
 const SNAPSHOT_PREFIX = "snapshots/";
-const PUBLIC_CACHE_CONTROL =
-  "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
+const PUBLIC_CACHE_CONTROL = "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
 const PROTECTED_CACHE_CONTROL = "no-store";
 const SAFE_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 const SNAPSHOT_KEY_PATTERN =
@@ -21,9 +20,7 @@ export interface BlobStore {
   set(
     key: string,
     value: string,
-    options?:
-      | { onlyIfNew: true; onlyIfMatch?: never }
-      | { onlyIfMatch: string; onlyIfNew?: never },
+    options?: { onlyIfNew: true; onlyIfMatch?: never } | { onlyIfMatch: string; onlyIfNew?: never },
   ): Promise<{ modified: boolean; etag?: string }>;
   list(options: { prefix: string }): Promise<{ blobs: Array<{ key: string }> }>;
 }
@@ -56,11 +53,7 @@ interface SnapshotMetadata {
 
 class SettingsConflictError extends Error {}
 
-const jsonResponse = (
-  body: unknown,
-  status: number,
-  cacheControl: string,
-) =>
+const jsonResponse = (body: unknown, status: number, cacheControl: string) =>
   Response.json(body, {
     status,
     headers: { "Cache-Control": cacheControl },
@@ -69,8 +62,7 @@ const jsonResponse = (
 const protectedResponse = (body: unknown, status = 200) =>
   jsonResponse(body, status, PROTECTED_CACHE_CONTROL);
 
-const protectedError = (error: string, status: number) =>
-  protectedResponse({ error }, status);
+const protectedError = (error: string, status: number) => protectedResponse({ error }, status);
 
 const publicError = (error: string, status: number) =>
   jsonResponse({ error }, status, PROTECTED_CACHE_CONTROL);
@@ -133,12 +125,10 @@ const safeSnapshotKey = (
   return { key, updatedAt };
 };
 
-const writeSnapshot = async (
-  store: BlobStore,
-  key: string,
-  settings: OwnerSettings,
-) => {
-  const result = await store.set(key, JSON.stringify(settings), { onlyIfNew: true });
+const writeSnapshot = async (store: BlobStore, key: string, settings: OwnerSettings) => {
+  const result = await store.set(key, JSON.stringify(settings), {
+    onlyIfNew: true,
+  });
   if (!result.modified) throw new Error("Snapshot key collision");
 };
 
@@ -201,21 +191,13 @@ export function createSettingsHandlers(
     try {
       const settings = parseStoredSettings(await dependencies.store.get(CURRENT_SETTINGS_KEY));
       if (settings) {
-        return jsonResponse(
-          projectPublicOwnerSettings(settings),
-          200,
-          PUBLIC_CACHE_CONTROL,
-        );
+        return jsonResponse(projectPublicOwnerSettings(settings), 200, PUBLIC_CACHE_CONTROL);
       }
     } catch {
       // Public reads intentionally degrade to approved repository defaults.
     }
 
-    return jsonResponse(
-      { ...ownerSettingsDefaults, source: "default" },
-      200,
-      PUBLIC_CACHE_CONTROL,
-    );
+    return jsonResponse({ ...ownerSettingsDefaults, source: "default" }, 200, PUBLIC_CACHE_CONTROL);
   };
 
   const ownerSettings = async (request: Request) => {
@@ -248,10 +230,7 @@ export function createSettingsHandlers(
       });
       if (!savedValidation.success) throw new Error("Clock produced invalid timestamp");
 
-      const current = await readVersionedSettings(
-        dependencies.store,
-        CURRENT_SETTINGS_KEY,
-      );
+      const current = await readVersionedSettings(dependencies.store, CURRENT_SETTINGS_KEY);
       if (current) {
         await writeSnapshot(dependencies.store, snapshot.key, current.settings);
       }
@@ -311,10 +290,7 @@ export function createSettingsHandlers(
       }
 
       const selected = await readRequiredSettings(dependencies.store, payload.key);
-      const current = await readVersionedSettings(
-        dependencies.store,
-        CURRENT_SETTINGS_KEY,
-      );
+      const current = await readVersionedSettings(dependencies.store, CURRENT_SETTINGS_KEY);
 
       const snapshot = safeSnapshotKey(dependencies);
       const restoredValidation = validateOwnerSettings({

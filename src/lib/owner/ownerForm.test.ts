@@ -15,19 +15,24 @@ type OwnerFormModule = {
     updatedAt: string,
   ) =>
     | { success: true; data: Record<string, unknown> }
-    | { success: false; errors: readonly string[]; fieldErrors: Record<string, string> };
+    | {
+        success: false;
+        errors: readonly string[];
+        fieldErrors: Record<string, string>;
+      };
 };
 
-const validEntries = () => Object.entries({
-  startingWeeklyRateUsd: "3500",
-  minimumStayNights: "7",
-  pricingNote: "Owner-approved rates are confirmed for requested dates.",
-  poolHeatFeeUsd: "250",
-  petFeeUsd: "150",
-  maxPets: "2",
-  poolOpenMonthDay: "04-15",
-  poolCloseMonthDay: "10-15",
-});
+const validEntries = () =>
+  Object.entries({
+    startingWeeklyRateUsd: "3500",
+    minimumStayNights: "7",
+    pricingNote: "Owner-approved rates are confirmed for requested dates.",
+    poolHeatFeeUsd: "250",
+    petFeeUsd: "150",
+    maxPets: "2",
+    poolOpenMonthDay: "04-15",
+    poolCloseMonthDay: "10-15",
+  });
 
 describe("owner form contract", () => {
   it("exports the serializer using the exact Task 1 field order", () => {
@@ -74,20 +79,23 @@ describe("owner form contract", () => {
     if (!ownerForm) return;
 
     const blanks = validEntries().map(([key, value]) =>
-      key === "startingWeeklyRateUsd" || key === "minimumStayNights" ? [key, ""] as const : [key, value] as const,
+      key === "startingWeeklyRateUsd" || key === "minimumStayNights"
+        ? ([key, ""] as const)
+        : ([key, value] as const),
     );
     const serialized = ownerForm.serializeOwnerSettings(blanks, "2026-08-14T15:00:00.000Z");
     expect(serialized.success && serialized.data.startingWeeklyRateUsd).toBeNull();
     expect(serialized.success && serialized.data.minimumStayNights).toBeNull();
 
-    expect(ownerForm.serializeOwnerSettings(
-      [...validEntries(), ["ownerEmail", "private@example.test"]],
-      "2026-08-14T15:00:00.000Z",
-    )).toMatchObject({ success: false, errors: ["settings.unknown_key"] });
-    expect(ownerForm.serializeOwnerSettings(
-      validEntries().slice(1),
-      "2026-08-14T15:00:00.000Z",
-    )).toMatchObject({ success: false, errors: ["settings.missing_key"] });
+    expect(
+      ownerForm.serializeOwnerSettings(
+        [...validEntries(), ["ownerEmail", "private@example.test"]],
+        "2026-08-14T15:00:00.000Z",
+      ),
+    ).toMatchObject({ success: false, errors: ["settings.unknown_key"] });
+    expect(
+      ownerForm.serializeOwnerSettings(validEntries().slice(1), "2026-08-14T15:00:00.000Z"),
+    ).toMatchObject({ success: false, errors: ["settings.missing_key"] });
   });
 
   it("maps shared validation codes to field-specific, non-sensitive owner guidance", () => {
@@ -95,12 +103,9 @@ describe("owner form contract", () => {
     if (!ownerForm) return;
 
     const invalidEntries = validEntries().map(([key, value]) =>
-      key === "maxPets" ? [key, "5"] as const : [key, value] as const,
+      key === "maxPets" ? ([key, "5"] as const) : ([key, value] as const),
     );
-    const result = ownerForm.serializeOwnerSettings(
-      invalidEntries,
-      "2026-08-14T15:00:00.000Z",
-    );
+    const result = ownerForm.serializeOwnerSettings(invalidEntries, "2026-08-14T15:00:00.000Z");
 
     expect(result).toMatchObject({
       success: false,
@@ -114,11 +119,12 @@ describe("owner form contract", () => {
     const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
     if (!ownerForm) return;
 
-    const entries = Object.entries(ownerSettingsDefaults).map(([key, value]) => [
-      key,
-      value === null ? "" : String(value),
-    ] as const);
-    expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z").success).toBe(true);
+    const entries = Object.entries(ownerSettingsDefaults).map(
+      ([key, value]) => [key, value === null ? "" : String(value)] as const,
+    );
+    expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z").success).toBe(
+      true,
+    );
   });
 
   it.each([
@@ -134,13 +140,15 @@ describe("owner form contract", () => {
     const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
     if (!ownerForm) return;
     const entries = validEntries().map(([key, current]) =>
-      key === field ? [key, value] as const : [key, current] as const,
+      key === field ? ([key, value] as const) : ([key, current] as const),
     );
 
     expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z")).toMatchObject({
       success: false,
       errors: [`${field}.invalid`],
-      fieldErrors: { [field]: ownerSettingDefinitions[field as keyof typeof ownerSettingDefinitions].allowed },
+      fieldErrors: {
+        [field]: ownerSettingDefinitions[field as keyof typeof ownerSettingDefinitions].allowed,
+      },
     });
   });
 
@@ -148,16 +156,28 @@ describe("owner form contract", () => {
     const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
     if (!ownerForm) return;
 
-    const lower = validEntries().map(([key, value]) => [key, {
-      poolHeatFeeUsd: " 0 ",
-      petFeeUsd: " 0 ",
-      maxPets: " 0 ",
-    }[key] ?? value] as const);
-    const upper = validEntries().map(([key, value]) => [key, {
-      poolHeatFeeUsd: " 2000 ",
-      petFeeUsd: " 1000 ",
-      maxPets: " 4 ",
-    }[key] ?? value] as const);
+    const lower = validEntries().map(
+      ([key, value]) =>
+        [
+          key,
+          {
+            poolHeatFeeUsd: " 0 ",
+            petFeeUsd: " 0 ",
+            maxPets: " 0 ",
+          }[key] ?? value,
+        ] as const,
+    );
+    const upper = validEntries().map(
+      ([key, value]) =>
+        [
+          key,
+          {
+            poolHeatFeeUsd: " 2000 ",
+            petFeeUsd: " 1000 ",
+            maxPets: " 4 ",
+          }[key] ?? value,
+        ] as const,
+    );
 
     expect(ownerForm.serializeOwnerSettings(lower, "2026-08-14T15:00:00.000Z").success).toBe(true);
     expect(ownerForm.serializeOwnerSettings(upper, "2026-08-14T15:00:00.000Z").success).toBe(true);
@@ -172,7 +192,7 @@ describe("owner form contract", () => {
       ["minimumStayNights", "+7"],
     ] as const) {
       const entries = validEntries().map(([key, value]) =>
-        key === field ? [key, invalid] as const : [key, value] as const,
+        key === field ? ([key, invalid] as const) : ([key, value] as const),
       );
       expect(ownerForm.serializeOwnerSettings(entries, "2026-08-14T15:00:00.000Z")).toMatchObject({
         success: false,
@@ -180,10 +200,18 @@ describe("owner form contract", () => {
       });
     }
 
-    const boundaries = validEntries().map(([key, value]) => [key, {
-      startingWeeklyRateUsd: "50000",
-      minimumStayNights: "1",
-    }[key] ?? value] as const);
-    expect(ownerForm.serializeOwnerSettings(boundaries, "2026-08-14T15:00:00.000Z").success).toBe(true);
+    const boundaries = validEntries().map(
+      ([key, value]) =>
+        [
+          key,
+          {
+            startingWeeklyRateUsd: "50000",
+            minimumStayNights: "1",
+          }[key] ?? value,
+        ] as const,
+    );
+    expect(ownerForm.serializeOwnerSettings(boundaries, "2026-08-14T15:00:00.000Z").success).toBe(
+      true,
+    );
   });
 });

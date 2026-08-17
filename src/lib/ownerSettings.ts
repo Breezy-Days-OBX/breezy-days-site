@@ -61,7 +61,8 @@ export const ownerSettingDefinitions: {
     allowed: "A whole number from 1 through 30, or blank.",
     publicDestination: "Public pricing summary and availability guidance",
     fallback: ownerSettingsDefaults.minimumStayNights,
-    ownerHelpText: "Leave blank when the minimum stay varies or has not been approved for publication.",
+    ownerHelpText:
+      "Leave blank when the minimum stay varies or has not been approved for publication.",
   },
   pricingNote: {
     name: "Pricing note",
@@ -120,8 +121,7 @@ export const ownerSettingDefinitions: {
 };
 
 export type OwnerSettingsValidationResult =
-  | { success: true; data: OwnerSettings }
-  | { success: false; errors: readonly string[] };
+  { success: true; data: OwnerSettings } | { success: false; errors: readonly string[] };
 
 const allowedKeys = new Set([
   "schemaVersion",
@@ -138,11 +138,13 @@ const isIntegerInRange = (value: unknown, minimum: number, maximum: number) =>
 const isNullableIntegerInRange = (value: unknown, minimum: number, maximum: number) =>
   value === null || isIntegerInRange(value, minimum, maximum);
 
-const isPlainText = (value: unknown) =>
-  typeof value === "string" &&
-  value.length >= 1 &&
-  value.length <= 160 &&
-  !/[<>\u0000-\u001f\u007f]/.test(value);
+const isPlainText = (value: unknown) => {
+  if (typeof value !== "string" || value.length < 1 || value.length > 160) return false;
+  return !Array.from(value).some((character) => {
+    const code = character.charCodeAt(0);
+    return character === "<" || character === ">" || code <= 31 || code === 127;
+  });
+};
 
 const isMonthDay = (value: unknown) =>
   typeof value === "string" && /^\d{2}-\d{2}$/.test(value) && isValidIsoDate(`2000-${value}`);

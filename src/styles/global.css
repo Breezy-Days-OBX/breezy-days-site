@@ -199,7 +199,10 @@ h3 {
   letter-spacing: 0.04em;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 .button:hover,
@@ -1184,9 +1187,7 @@ h3 {
 .owner-access-page,
 .owner-dashboard {
   min-height: 100vh;
-  background:
-    linear-gradient(120deg, rgba(220, 233, 232, 0.8), transparent 42%),
-    var(--cream);
+  background: linear-gradient(120deg, rgba(220, 233, 232, 0.8), transparent 42%), var(--cream);
 }
 
 .owner-access-page {
@@ -1792,7 +1793,13 @@ h3 {
   inset: 0 0 auto;
   height: 11px;
   opacity: 0.38;
-  background: radial-gradient(28px 8px at 50% 0, transparent 92%, var(--green-bright) 96%, transparent 100%) 0 0 / 56px 11px repeat-x;
+  background: radial-gradient(
+      28px 8px at 50% 0,
+      transparent 92%,
+      var(--green-bright) 96%,
+      transparent 100%
+    )
+    0 0 / 56px 11px repeat-x;
 }
 
 .fit-callout {
@@ -1929,6 +1936,10 @@ h3 {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.78rem;
+}
+
+.essentials-section .detail-kicker {
+  color: var(--sky);
 }
 
 .season-note {

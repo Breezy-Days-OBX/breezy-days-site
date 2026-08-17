@@ -4,16 +4,30 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.19.0"
+    "node": ">=22.19.0 <23"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
     "check:launch": "node scripts/check-launch-readiness.mjs",
+    "check:links": "npm run build && npm run check:links:built",
+    "check:links:built": "node scripts/check-built-site.mjs dist",
+    "check:secrets": "node scripts/check-secrets.mjs .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
     "preview": "astro preview",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest run src",
+    "test:integration": "vitest run netlify",
+    "test:checkers": "node --test scripts/check-built-site.test.mjs scripts/check-secrets.test.mjs",
+    "test:e2e": "npm run build && playwright test --grep-invert @axe",
+    "test:a11y": "npm run build && playwright test --grep @axe",
+    "audit:prod": "npm audit --omit=dev",
+    "ci": "npm run format:check && npm run lint && npm run check && npm run test:unit && npm run test:integration && npm run test:checkers && npm run build && npm run check:links:built && npm run test:e2e && npm run test:a11y && npm run check:secrets && npm run audit:prod"
   },
   "dependencies": {
     "@netlify/blobs": "^10.7.13",
@@ -23,7 +37,17 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "eslint": "^10.8.1",
+    "eslint-plugin-astro": "^1.7.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.10"
   }
 }

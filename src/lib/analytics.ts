@@ -50,6 +50,8 @@ export function trackPublicEvent(
     gtag?: (...args: unknown[]) => void;
     clarity?: (...args: unknown[]) => void;
   };
-  analyticsWindow.gtag?.("event", event.name, { event_category: event.category });
+  analyticsWindow.gtag?.("event", event.name, {
+    event_category: event.category,
+  });
   analyticsWindow.clarity?.("event", event.name);
 }

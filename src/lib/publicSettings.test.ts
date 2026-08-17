@@ -21,25 +21,43 @@ const createView = () => {
   };
   return {
     state,
-    setText(key: string, value: string) { state.text[key] = value; },
-    setMaximumPets(maximum: number) { state.petOptions = Array.from({ length: maximum + 1 }, (_, index) => index); },
+    setText(key: string, value: string) {
+      state.text[key] = value;
+    },
+    setMaximumPets(maximum: number) {
+      state.petOptions = Array.from({ length: maximum + 1 }, (_, index) => index);
+    },
   };
 };
 
 describe("public settings enhancement", () => {
   it.each([
-    ["failed", async () => { throw new Error("offline"); }],
-    ["partial", async () => ({ ok: true, json: async () => ({ pricingNote: "Partial" }) })],
-  ])("preserves the complete static DOM after a %s settings read", async (_label, fetchSettings) => {
-    const module = modules["./publicSettings.ts"] as PublicSettingsModule | undefined;
-    expect(module).toBeDefined();
-    if (!module) return;
-    const view = createView();
-    const before = structuredClone(view.state);
+    [
+      "failed",
+      async () => {
+        throw new Error("offline");
+      },
+    ],
+    [
+      "partial",
+      async () => ({
+        ok: true,
+        json: async () => ({ pricingNote: "Partial" }),
+      }),
+    ],
+  ])(
+    "preserves the complete static DOM after a %s settings read",
+    async (_label, fetchSettings) => {
+      const module = modules["./publicSettings.ts"] as PublicSettingsModule | undefined;
+      expect(module).toBeDefined();
+      if (!module) return;
+      const view = createView();
+      const before = structuredClone(view.state);
 
-    expect(await module.enhancePublicSettings(fetchSettings, view)).toBe(false);
-    expect(view.state).toEqual(before);
-  });
+      expect(await module.enhancePublicSettings(fetchSettings, view)).toBe(false);
+      expect(view.state).toEqual(before);
+    },
+  );
 
   it("updates marked text and pet choices together only after a complete sanitized response", async () => {
     const module = modules["./publicSettings.ts"] as PublicSettingsModule | undefined;

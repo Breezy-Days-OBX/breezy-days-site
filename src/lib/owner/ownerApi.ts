@@ -1,16 +1,7 @@
-import {
-  isValidIsoTimestamp,
-  validateOwnerSettings,
-  type OwnerSettings,
-} from "../ownerSettings";
+import { isValidIsoTimestamp, validateOwnerSettings, type OwnerSettings } from "../ownerSettings";
 
 export type OwnerApiErrorKind =
-  | "validation"
-  | "auth"
-  | "forbidden"
-  | "conflict"
-  | "method"
-  | "service";
+  "validation" | "auth" | "forbidden" | "conflict" | "method" | "service";
 
 const statusKinds: Partial<Record<number, OwnerApiErrorKind>> = {
   400: "validation",
@@ -25,7 +16,8 @@ const messages: Record<OwnerApiErrorKind, string> = {
   validation: "The server could not accept these settings. Review the fields and try again.",
   auth: "Your owner session has expired. Sign in again to continue.",
   forbidden: "This account does not have owner access.",
-  conflict: "The settings changed in another session. Reload the latest values before saving again.",
+  conflict:
+    "The settings changed in another session. Reload the latest values before saving again.",
   method: "That owner action is not available.",
   service: "The owner settings service is temporarily unavailable. Try again shortly.",
 };
@@ -40,7 +32,8 @@ export class OwnerApiError extends Error {
   }
 }
 
-const snapshotPattern = /^snapshots\/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)-[A-Za-z0-9_-]{1,64}\.json$/;
+const snapshotPattern =
+  /^snapshots\/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)-[A-Za-z0-9_-]{1,64}\.json$/;
 
 export interface OwnerSnapshot {
   key: string;
@@ -106,10 +99,12 @@ function parseSnapshots(input: unknown): OwnerSnapshotsResponse {
 }
 
 export async function fetchOwnerSettings(fetcher: typeof fetch = fetch): Promise<OwnerSettings> {
-  return parseOwnerSettings(await requestJson(fetcher, "/.netlify/functions/owner-settings", {
-    credentials: "same-origin",
-    method: "GET",
-  }));
+  return parseOwnerSettings(
+    await requestJson(fetcher, "/.netlify/functions/owner-settings", {
+      credentials: "same-origin",
+      method: "GET",
+    }),
+  );
 }
 
 export async function saveOwnerSettings(
@@ -118,19 +113,25 @@ export async function saveOwnerSettings(
 ): Promise<OwnerSettings> {
   const validated = validateOwnerSettings(settings);
   if (!validated.success) throw new OwnerApiError("validation");
-  return parseOwnerSettings(await requestJson(fetcher, "/.netlify/functions/owner-settings", {
-    method: "PUT",
-    credentials: "same-origin",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(validated.data),
-  }));
+  return parseOwnerSettings(
+    await requestJson(fetcher, "/.netlify/functions/owner-settings", {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(validated.data),
+    }),
+  );
 }
 
-export async function fetchOwnerSnapshots(fetcher: typeof fetch = fetch): Promise<OwnerSnapshotsResponse> {
-  return parseSnapshots(await requestJson(fetcher, "/.netlify/functions/settings-snapshots", {
-    credentials: "same-origin",
-    method: "GET",
-  }));
+export async function fetchOwnerSnapshots(
+  fetcher: typeof fetch = fetch,
+): Promise<OwnerSnapshotsResponse> {
+  return parseSnapshots(
+    await requestJson(fetcher, "/.netlify/functions/settings-snapshots", {
+      credentials: "same-origin",
+      method: "GET",
+    }),
+  );
 }
 
 export async function restoreOwnerSettings(
@@ -138,10 +139,12 @@ export async function restoreOwnerSettings(
   fetcher: typeof fetch = fetch,
 ): Promise<OwnerSettings> {
   if (!snapshotPattern.test(key)) throw new OwnerApiError("validation");
-  return parseOwnerSettings(await requestJson(fetcher, "/.netlify/functions/restore-settings", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ key }),
-  }));
+  return parseOwnerSettings(
+    await requestJson(fetcher, "/.netlify/functions/restore-settings", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ key }),
+    }),
+  );
 }

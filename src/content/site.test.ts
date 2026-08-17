@@ -37,4 +37,3 @@ describe("Breezy Days public-site contract", () => {
     expect(siteContent.marketplaceProof.requiresLaunchReverification).toBe(true);
   });
 });
-

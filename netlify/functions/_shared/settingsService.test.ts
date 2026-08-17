@@ -49,11 +49,7 @@ class MemoryBlobStore implements BlobStore {
     return result;
   }
 
-  async set(
-    key: string,
-    value: string,
-    options?: { onlyIfNew?: boolean; onlyIfMatch?: string },
-  ) {
+  async set(key: string, value: string, options?: { onlyIfNew?: boolean; onlyIfMatch?: string }) {
     if (this.failWrites) throw new Error("private storage failure");
     if (options?.onlyIfNew && this.values.has(key)) return { modified: false };
     if (options?.onlyIfMatch && options.onlyIfMatch !== this.etag(key)) {
@@ -119,9 +115,9 @@ const responseJson = async (response: Response) => ({
 
 describe("settings Function handlers", () => {
   let store: MemoryBlobStore;
-  let user: SettingsServiceDependencies["getUser"] extends (
-    ...args: never[]
-  ) => Promise<infer User> ? User : never;
+  let user: SettingsServiceDependencies["getUser"] extends (...args: never[]) => Promise<infer User>
+    ? User
+    : never;
   let originAllowed: boolean;
   let nextId: string;
   let dependencies: SettingsServiceDependencies;
@@ -143,10 +139,7 @@ describe("settings Function handlers", () => {
   });
 
   it("serves only a sanitized public projection from valid storage", async () => {
-    store.values.set(
-      "current.json",
-      JSON.stringify({ ...storedSettings }),
-    );
+    store.values.set("current.json", JSON.stringify({ ...storedSettings }));
     const { publicSettings } = createSettingsHandlers(dependencies);
 
     const response = await responseJson(await publicSettings(request("GET")));
@@ -227,7 +220,11 @@ describe("settings Function handlers", () => {
     const { ownerSettings } = createSettingsHandlers(dependencies);
     const malformedRequest = new Request(
       "https://breezydays.test/.netlify/functions/owner-settings",
-      { method: "PUT", headers: { origin: "https://attacker.test" }, body: "{" },
+      {
+        method: "PUT",
+        headers: { origin: "https://attacker.test" },
+        body: "{",
+      },
     );
 
     const response = await responseJson(await ownerSettings(malformedRequest));
@@ -248,7 +245,10 @@ describe("settings Function handlers", () => {
       "https://breezydays.test/.netlify/functions/owner-settings",
       {
         method: "PUT",
-        headers: { origin: "https://breezydays.test", "content-type": "application/json" },
+        headers: {
+          origin: "https://breezydays.test",
+          "content-type": "application/json",
+        },
         body,
       },
     );
@@ -264,7 +264,10 @@ describe("settings Function handlers", () => {
   it("persists a valid save, snapshots the prior value immutably, and reads it back", async () => {
     store.values.set("current.json", JSON.stringify(storedSettings));
     const { ownerSettings } = createSettingsHandlers(dependencies);
-    const changed = { ...storedSettings, pricingNote: "Owner-approved August pricing note." };
+    const changed = {
+      ...storedSettings,
+      pricingNote: "Owner-approved August pricing note.",
+    };
 
     const response = await responseJson(await ownerSettings(request("PUT", changed)));
 
@@ -288,7 +291,10 @@ describe("settings Function handlers", () => {
     dependencies.createId = () => `overlap-${++id}`;
     const { ownerSettings } = createSettingsHandlers(dependencies);
     const first = { ...storedSettings, pricingNote: "First concurrent save." };
-    const second = { ...storedSettings, pricingNote: "Second concurrent save." };
+    const second = {
+      ...storedSettings,
+      pricingNote: "Second concurrent save.",
+    };
     const barrier = pauseCapturedReads(store, "current.json", 2);
 
     const firstResponsePromise = ownerSettings(request("PUT", first));
@@ -311,9 +317,7 @@ describe("settings Function handlers", () => {
       .filter(([key]) => key.startsWith("snapshots/"))
       .map(([, value]) => JSON.parse(value));
     expect(capturedPriorValues.length).toBeGreaterThanOrEqual(1);
-    expect(capturedPriorValues).toEqual(
-      capturedPriorValues.map(() => storedSettings),
-    );
+    expect(capturedPriorValues).toEqual(capturedPriorValues.map(() => storedSettings));
   });
 
   it("never returns another writer's value when live storage changes before readback", async () => {
@@ -334,7 +338,10 @@ describe("settings Function handlers", () => {
 
     const response = await responseJson(
       await ownerSettings(
-        request("PUT", { ...storedSettings, pricingNote: "This request's value." }),
+        request("PUT", {
+          ...storedSettings,
+          pricingNote: "This request's value.",
+        }),
       ),
     );
 
@@ -385,8 +392,14 @@ describe("settings Function handlers", () => {
       cacheControl: "no-store",
       body: {
         snapshots: [
-          { key: `snapshots/${secondSavedAt}-second.json`, createdAt: secondSavedAt },
-          { key: `snapshots/${firstSavedAt}-first.json`, createdAt: firstSavedAt },
+          {
+            key: `snapshots/${secondSavedAt}-second.json`,
+            createdAt: secondSavedAt,
+          },
+          {
+            key: `snapshots/${firstSavedAt}-first.json`,
+            createdAt: firstSavedAt,
+          },
         ],
       },
     });
@@ -409,7 +422,10 @@ describe("settings Function handlers", () => {
   });
 
   it("restores a returned valid snapshot after snapshotting the current value", async () => {
-    const restoredSettings = { ...storedSettings, pricingNote: "Earlier approved note." };
+    const restoredSettings = {
+      ...storedSettings,
+      pricingNote: "Earlier approved note.",
+    };
     const snapshotKey = `snapshots/${firstSavedAt}-restore-me.json`;
     store.values.set("current.json", JSON.stringify(storedSettings));
     store.values.set(snapshotKey, JSON.stringify(restoredSettings));
@@ -440,13 +456,14 @@ describe("settings Function handlers", () => {
     let id = 0;
     dependencies.createId = () => `mixed-${++id}`;
     const handlers = createSettingsHandlers(dependencies);
-    const saveValue = { ...storedSettings, pricingNote: "Concurrent new save." };
+    const saveValue = {
+      ...storedSettings,
+      pricingNote: "Concurrent new save.",
+    };
     const barrier = pauseCapturedReads(store, "current.json", 2);
 
     const saveResponsePromise = handlers.ownerSettings(request("PUT", saveValue));
-    const restoreResponsePromise = handlers.restoreSettings(
-      request("POST", { key: snapshotKey }),
-    );
+    const restoreResponsePromise = handlers.restoreSettings(request("POST", { key: snapshotKey }));
     await barrier.captured;
     barrier.release();
     const responses = await Promise.all([
@@ -459,9 +476,7 @@ describe("settings Function handlers", () => {
     const conflict = responses.find(({ status }) => status === 409)!;
     expect(conflict.body).toEqual({ error: "settings_conflict" });
     expect(success.body).toEqual(JSON.parse(store.values.get("current.json")!));
-    expect([saveValue.pricingNote, restoreTarget.pricingNote]).toContain(
-      success.body.pricingNote,
-    );
+    expect([saveValue.pricingNote, restoreTarget.pricingNote]).toContain(success.body.pricingNote);
   });
 
   it("maps protected storage failures to a stable non-sensitive response", async () => {

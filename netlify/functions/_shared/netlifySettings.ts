@@ -3,7 +3,10 @@ import { getUser, verifyRequestOrigin } from "@netlify/identity";
 
 import { createSettingsHandlers, type BlobStore } from "./settingsService";
 
-const netlifyStore = getStore({ name: "owner-settings", consistency: "strong" });
+const netlifyStore = getStore({
+  name: "owner-settings",
+  consistency: "strong",
+});
 const store: BlobStore = {
   get: (key) => netlifyStore.get(key, { type: "text" }),
   getWithMetadata: async (key) => {
@@ -20,9 +23,7 @@ export const netlifySettingsHandlers = createSettingsHandlers({
   store,
   getUser: async () => {
     const user = await getUser();
-    return user
-      ? { id: user.id, roles: user.roles, email: user.email }
-      : null;
+    return user ? { id: user.id, roles: user.roles, email: user.email } : null;
   },
   verifyOrigin: verifyRequestOrigin,
   now: () => new Date(),

@@ -17,10 +17,22 @@ export const property = {
     bedroomCount: 4,
     bedCount: 7,
     rooms: [
-      { name: "First-floor primary bedroom", beds: [{ size: "king", count: 1 }] },
-      { name: "First-floor bunk bedroom", beds: [{ size: "twin bunk", count: 4 }] },
-      { name: "First-floor queen bedroom", beds: [{ size: "queen", count: 1 }] },
-      { name: "Second-floor primary bedroom", beds: [{ size: "king", count: 1 }] },
+      {
+        name: "First-floor primary bedroom",
+        beds: [{ size: "king", count: 1 }],
+      },
+      {
+        name: "First-floor bunk bedroom",
+        beds: [{ size: "twin bunk", count: 4 }],
+      },
+      {
+        name: "First-floor queen bedroom",
+        beds: [{ size: "queen", count: 1 }],
+      },
+      {
+        name: "Second-floor primary bedroom",
+        beds: [{ size: "king", count: 1 }],
+      },
     ],
   },
   bathrooms: {
@@ -57,12 +69,7 @@ export const property = {
   },
   outdoor: {
     poolAreaFacilities: ["Outdoor shower", "Changing room"],
-    spacesAndViews: [
-      "Multiple decks",
-      "Ship's watch",
-      "Ocean views",
-      "Sound-side sunset views",
-    ],
+    spacesAndViews: ["Multiple decks", "Ship's watch", "Ocean views", "Sound-side sunset views"],
     fishCleaningTable: true,
   },
   entertainment: {

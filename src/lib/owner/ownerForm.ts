@@ -13,7 +13,11 @@ export type OwnerFieldErrors = Partial<Record<keyof typeof ownerSettingDefinitio
 
 export type OwnerFormResult =
   | { success: true; data: OwnerSettings }
-  | { success: false; errors: readonly string[]; fieldErrors: OwnerFieldErrors };
+  | {
+      success: false;
+      errors: readonly string[];
+      fieldErrors: OwnerFieldErrors;
+    };
 
 const nullableIntegerFields = new Set<keyof typeof ownerSettingDefinitions>([
   "startingWeeklyRateUsd",
@@ -47,23 +51,36 @@ export function serializeOwnerSettings(
   const allowed = new Set<string>(OWNER_EDITABLE_KEYS);
 
   if (keys.some((key) => !allowed.has(key)) || new Set(keys).size !== keys.length) {
-    return { success: false, errors: ["settings.unknown_key"], fieldErrors: {} };
+    return {
+      success: false,
+      errors: ["settings.unknown_key"],
+      fieldErrors: {},
+    };
   }
-  if (keys.length !== OWNER_EDITABLE_KEYS.length || OWNER_EDITABLE_KEYS.some((key) => !keys.includes(key))) {
-    return { success: false, errors: ["settings.missing_key"], fieldErrors: {} };
+  if (
+    keys.length !== OWNER_EDITABLE_KEYS.length ||
+    OWNER_EDITABLE_KEYS.some((key) => !keys.includes(key))
+  ) {
+    return {
+      success: false,
+      errors: ["settings.missing_key"],
+      fieldErrors: {},
+    };
   }
 
   const formValues = new Map(values);
-  const editable = Object.fromEntries(OWNER_EDITABLE_KEYS.map((key) => {
-    const raw = formValues.get(key);
-    if (typeof raw !== "string") return [key, raw];
-    const normalized = raw.trim();
-    if (nullableIntegerFields.has(key) && normalized === "") return [key, null];
-    if (integerFields.has(key)) {
-      return [key, /^\d+$/.test(normalized) ? Number(normalized) : Number.NaN];
-    }
-    return [key, raw];
-  }));
+  const editable = Object.fromEntries(
+    OWNER_EDITABLE_KEYS.map((key) => {
+      const raw = formValues.get(key);
+      if (typeof raw !== "string") return [key, raw];
+      const normalized = raw.trim();
+      if (nullableIntegerFields.has(key) && normalized === "") return [key, null];
+      if (integerFields.has(key)) {
+        return [key, /^\d+$/.test(normalized) ? Number(normalized) : Number.NaN];
+      }
+      return [key, raw];
+    }),
+  );
 
   const validation = validateOwnerSettings({
     schemaVersion: OWNER_SETTINGS_SCHEMA_VERSION,

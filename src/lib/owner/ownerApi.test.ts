@@ -8,7 +8,9 @@ type ApiError = Error & { kind: string };
 type OwnerApiModule = {
   fetchOwnerSettings: (fetcher?: typeof fetch) => Promise<OwnerSettings>;
   saveOwnerSettings: (settings: OwnerSettings, fetcher?: typeof fetch) => Promise<OwnerSettings>;
-  fetchOwnerSnapshots: (fetcher?: typeof fetch) => Promise<{ snapshots: Array<{ key: string; createdAt: string }> }>;
+  fetchOwnerSnapshots: (
+    fetcher?: typeof fetch,
+  ) => Promise<{ snapshots: Array<{ key: string; createdAt: string }> }>;
   restoreOwnerSettings: (key: string, fetcher?: typeof fetch) => Promise<OwnerSettings>;
 };
 
@@ -56,21 +58,28 @@ describe("owner endpoint client", () => {
   it("uses the exact GET routes and accepts only validated settings and snapshot metadata", async () => {
     const ownerApi = modules["./ownerApi.ts"] as OwnerApiModule | undefined;
     if (!ownerApi) return;
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(jsonResponse(settings))
-      .mockResolvedValueOnce(jsonResponse({
-        snapshots: [{
-          key: "snapshots/2026-08-14T15:00:00.000Z-save-1.json",
-          createdAt: "2026-08-14T15:00:00.000Z",
-        }],
-      }));
+      .mockResolvedValueOnce(
+        jsonResponse({
+          snapshots: [
+            {
+              key: "snapshots/2026-08-14T15:00:00.000Z-save-1.json",
+              createdAt: "2026-08-14T15:00:00.000Z",
+            },
+          ],
+        }),
+      );
 
     await expect(ownerApi.fetchOwnerSettings(fetcher as typeof fetch)).resolves.toEqual(settings);
     await expect(ownerApi.fetchOwnerSnapshots(fetcher as typeof fetch)).resolves.toEqual({
-      snapshots: [{
-        key: "snapshots/2026-08-14T15:00:00.000Z-save-1.json",
-        createdAt: "2026-08-14T15:00:00.000Z",
-      }],
+      snapshots: [
+        {
+          key: "snapshots/2026-08-14T15:00:00.000Z-save-1.json",
+          createdAt: "2026-08-14T15:00:00.000Z",
+        },
+      ],
     });
     expect(fetcher.mock.calls).toEqual([
       ["/.netlify/functions/owner-settings", { credentials: "same-origin", method: "GET" }],
@@ -88,18 +97,24 @@ describe("owner endpoint client", () => {
     await ownerApi.restoreOwnerSettings(snapshotKey, fetcher as typeof fetch);
 
     expect(fetcher.mock.calls).toEqual([
-      ["/.netlify/functions/owner-settings", {
-        method: "PUT",
-        credentials: "same-origin",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(settings),
-      }],
-      ["/.netlify/functions/restore-settings", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ key: snapshotKey }),
-      }],
+      [
+        "/.netlify/functions/owner-settings",
+        {
+          method: "PUT",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(settings),
+        },
+      ],
+      [
+        "/.netlify/functions/restore-settings",
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ key: snapshotKey }),
+        },
+      ],
     ]);
   });
 
@@ -107,12 +122,22 @@ describe("owner endpoint client", () => {
     const ownerApi = modules["./ownerApi.ts"] as OwnerApiModule | undefined;
     if (!ownerApi) return;
 
-    const settingsError = await captureApiError(ownerApi.fetchOwnerSettings(
-      vi.fn(async () => jsonResponse({ ...settings, internalNote: "private" })) as unknown as typeof fetch,
-    ));
-    const snapshotsError = await captureApiError(ownerApi.fetchOwnerSnapshots(
-      vi.fn(async () => jsonResponse({ snapshots: [{ key: "current.json", createdAt: "yesterday" }] })) as unknown as typeof fetch,
-    ));
+    const settingsError = await captureApiError(
+      ownerApi.fetchOwnerSettings(
+        vi.fn(async () =>
+          jsonResponse({ ...settings, internalNote: "private" }),
+        ) as unknown as typeof fetch,
+      ),
+    );
+    const snapshotsError = await captureApiError(
+      ownerApi.fetchOwnerSnapshots(
+        vi.fn(async () =>
+          jsonResponse({
+            snapshots: [{ key: "current.json", createdAt: "yesterday" }],
+          }),
+        ) as unknown as typeof fetch,
+      ),
+    );
 
     expect(settingsError.kind).toBe("service");
     expect(snapshotsError.kind).toBe("service");
@@ -124,22 +149,42 @@ describe("owner endpoint client", () => {
     const canonical = "2024-02-29T23:59:59.000Z";
     const impossible = "2026-02-30T12:00:00.000Z";
 
-    await expect(ownerApi.fetchOwnerSnapshots(
-      vi.fn(async () => jsonResponse({ snapshots: [{
-        key: `snapshots/${canonical}-valid.json`,
-        createdAt: canonical,
-      }] })) as unknown as typeof fetch,
-    )).resolves.toEqual({ snapshots: [{
-      key: `snapshots/${canonical}-valid.json`,
-      createdAt: canonical,
-    }] });
+    await expect(
+      ownerApi.fetchOwnerSnapshots(
+        vi.fn(async () =>
+          jsonResponse({
+            snapshots: [
+              {
+                key: `snapshots/${canonical}-valid.json`,
+                createdAt: canonical,
+              },
+            ],
+          }),
+        ) as unknown as typeof fetch,
+      ),
+    ).resolves.toEqual({
+      snapshots: [
+        {
+          key: `snapshots/${canonical}-valid.json`,
+          createdAt: canonical,
+        },
+      ],
+    });
 
-    const error = await captureApiError(ownerApi.fetchOwnerSnapshots(
-      vi.fn(async () => jsonResponse({ snapshots: [{
-        key: `snapshots/${impossible}-invalid.json`,
-        createdAt: impossible,
-      }] })) as unknown as typeof fetch,
-    ));
+    const error = await captureApiError(
+      ownerApi.fetchOwnerSnapshots(
+        vi.fn(async () =>
+          jsonResponse({
+            snapshots: [
+              {
+                key: `snapshots/${impossible}-invalid.json`,
+                createdAt: impossible,
+              },
+            ],
+          }),
+        ) as unknown as typeof fetch,
+      ),
+    );
     expect(error.kind).toBe("service");
   });
 });

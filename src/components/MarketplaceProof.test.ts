@@ -8,8 +8,7 @@ const modules = import.meta.glob("./MarketplaceProof.astro", { eager: true });
 describe("marketplace proof gate", () => {
   it("renders no claims while reverification is required", async () => {
     const module = modules["./MarketplaceProof.astro"] as
-      | { default: Parameters<AstroContainer["renderToString"]>[0] }
-      | undefined;
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     expect(module).toBeDefined();
     if (!module) return;
 
@@ -25,12 +24,13 @@ describe("marketplace proof gate", () => {
 
   it("renders the centralized approved proof after reverification", async () => {
     const module = modules["./MarketplaceProof.astro"] as
-      | { default: Parameters<AstroContainer["renderToString"]>[0] }
-      | undefined;
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     if (!module) return;
     const container = await AstroContainer.create();
     const html = await container.renderToString(module.default, {
-      props: { proof: { ...marketplaceProof, requiresLaunchReverification: false } },
+      props: {
+        proof: { ...marketplaceProof, requiresLaunchReverification: false },
+      },
     });
 
     expect(html).toContain(marketplaceProof.airbnb.rating);

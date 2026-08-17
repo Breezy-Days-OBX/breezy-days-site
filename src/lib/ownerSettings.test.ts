@@ -37,7 +37,9 @@ describe("owner settings contract", () => {
       expect(definition.allowed, key).not.toBe("");
       expect(definition.publicDestination, key).not.toBe("");
       expect(definition.ownerHelpText, key).not.toBe("");
-      expect(definition.fallback, key).toBe(ownerSettingsDefaults[key as keyof typeof ownerSettingsDefaults]);
+      expect(definition.fallback, key).toBe(
+        ownerSettingsDefaults[key as keyof typeof ownerSettingsDefaults],
+      );
     }
   });
 
@@ -55,22 +57,26 @@ describe("owner settings contract", () => {
   });
 
   it("accepts all inclusive numeric boundaries and nullable provisional values", () => {
-    expect(validateOwnerSettings({
-      ...validSettings,
-      startingWeeklyRateUsd: 500,
-      minimumStayNights: 1,
-      poolHeatFeeUsd: 0,
-      petFeeUsd: 0,
-      maxPets: 0,
-    }).success).toBe(true);
-    expect(validateOwnerSettings({
-      ...validSettings,
-      startingWeeklyRateUsd: 50_000,
-      minimumStayNights: 30,
-      poolHeatFeeUsd: 2_000,
-      petFeeUsd: 1_000,
-      maxPets: 4,
-    }).success).toBe(true);
+    expect(
+      validateOwnerSettings({
+        ...validSettings,
+        startingWeeklyRateUsd: 500,
+        minimumStayNights: 1,
+        poolHeatFeeUsd: 0,
+        petFeeUsd: 0,
+        maxPets: 0,
+      }).success,
+    ).toBe(true);
+    expect(
+      validateOwnerSettings({
+        ...validSettings,
+        startingWeeklyRateUsd: 50_000,
+        minimumStayNights: 30,
+        poolHeatFeeUsd: 2_000,
+        petFeeUsd: 1_000,
+        maxPets: 4,
+      }).success,
+    ).toBe(true);
     expect(validateOwnerSettings(validSettings).success).toBe(true);
   });
 
@@ -89,34 +95,47 @@ describe("owner settings contract", () => {
     expect(validateOwnerSettings({ ...validSettings, [field]: value }).success).toBe(false);
   });
 
-  it.each([
-    "startingWeeklyRateUsd",
-    "minimumStayNights",
-    "poolHeatFeeUsd",
-    "petFeeUsd",
-    "maxPets",
-  ])("rejects non-integer numeric field %s", (field) => {
-    expect(validateOwnerSettings({ ...validSettings, [field]: 1.5 }).success).toBe(false);
-    expect(validateOwnerSettings({ ...validSettings, [field]: "2" }).success).toBe(false);
-  });
+  it.each(["startingWeeklyRateUsd", "minimumStayNights", "poolHeatFeeUsd", "petFeeUsd", "maxPets"])(
+    "rejects non-integer numeric field %s",
+    (field) => {
+      expect(validateOwnerSettings({ ...validSettings, [field]: 1.5 }).success).toBe(false);
+      expect(validateOwnerSettings({ ...validSettings, [field]: "2" }).success).toBe(false);
+    },
+  );
 
   it("enforces pricing-note length boundaries and rejects markup", () => {
     expect(validateOwnerSettings({ ...validSettings, pricingNote: "x" }).success).toBe(true);
-    expect(validateOwnerSettings({ ...validSettings, pricingNote: "x".repeat(160) }).success).toBe(true);
+    expect(validateOwnerSettings({ ...validSettings, pricingNote: "x".repeat(160) }).success).toBe(
+      true,
+    );
     expect(validateOwnerSettings({ ...validSettings, pricingNote: "" }).success).toBe(false);
-    expect(validateOwnerSettings({ ...validSettings, pricingNote: "x".repeat(161) }).success).toBe(false);
-    expect(validateOwnerSettings({ ...validSettings, pricingNote: "<strong>Call for rates</strong>" }).success).toBe(false);
+    expect(validateOwnerSettings({ ...validSettings, pricingNote: "x".repeat(161) }).success).toBe(
+      false,
+    );
+    expect(
+      validateOwnerSettings({
+        ...validSettings,
+        pricingNote: "<strong>Call for rates</strong>",
+      }).success,
+    ).toBe(false);
   });
 
   it("accepts real month-days and rejects malformed or impossible dates", () => {
-    expect(validateOwnerSettings({ ...validSettings, poolOpenMonthDay: "02-29" }).success).toBe(true);
+    expect(validateOwnerSettings({ ...validSettings, poolOpenMonthDay: "02-29" }).success).toBe(
+      true,
+    );
     for (const value of ["2-01", "02-30", "00-10", "13-01", "04/15"]) {
-      expect(validateOwnerSettings({ ...validSettings, poolOpenMonthDay: value }).success, value).toBe(false);
+      expect(
+        validateOwnerSettings({ ...validSettings, poolOpenMonthDay: value }).success,
+        value,
+      ).toBe(false);
     }
   });
 
   it("rejects unknown keys, wrong schema versions, and malformed timestamps", () => {
-    expect(validateOwnerSettings({ ...validSettings, internalNote: "private" }).success).toBe(false);
+    expect(validateOwnerSettings({ ...validSettings, internalNote: "private" }).success).toBe(
+      false,
+    );
     expect(validateOwnerSettings({ ...validSettings, schemaVersion: 2 }).success).toBe(false);
     for (const updatedAt of ["", "2026-08-14", "not-a-timestamp", "2026-02-30T12:00:00Z"]) {
       expect(validateOwnerSettings({ ...validSettings, updatedAt }).success, updatedAt).toBe(false);
@@ -124,7 +143,10 @@ describe("owner settings contract", () => {
   });
 
   it("projects only approved public fields and updatedAt", () => {
-    const storedSettings: OwnerSettings & { internalNote: string; ownerEmail: string } = {
+    const storedSettings: OwnerSettings & {
+      internalNote: string;
+      ownerEmail: string;
+    } = {
       ...validSettings,
       internalNote: "never public",
       ownerEmail: "private@example.com",
@@ -149,24 +171,30 @@ describe("owner settings contract", () => {
     expect(parsePublicOwnerSettings).toBeTypeOf("function");
     if (!parsePublicOwnerSettings) return;
 
-    expect(parsePublicOwnerSettings({
-      ...ownerSettingsDefaults,
-      updatedAt: validSettings.updatedAt,
-    })).toEqual({
+    expect(
+      parsePublicOwnerSettings({
+        ...ownerSettingsDefaults,
+        updatedAt: validSettings.updatedAt,
+      }),
+    ).toEqual({
       ...ownerSettingsDefaults,
       updatedAt: validSettings.updatedAt,
     });
 
     expect(parsePublicOwnerSettings({ ...ownerSettingsDefaults, source: "default" })).toBeNull();
-    expect(parsePublicOwnerSettings({
-      ...ownerSettingsDefaults,
-      updatedAt: validSettings.updatedAt,
-      ownerEmail: "private@example.com",
-    })).toBeNull();
-    expect(parsePublicOwnerSettings({
-      ...ownerSettingsDefaults,
-      maxPets: 99,
-      updatedAt: validSettings.updatedAt,
-    })).toBeNull();
+    expect(
+      parsePublicOwnerSettings({
+        ...ownerSettingsDefaults,
+        updatedAt: validSettings.updatedAt,
+        ownerEmail: "private@example.com",
+      }),
+    ).toBeNull();
+    expect(
+      parsePublicOwnerSettings({
+        ...ownerSettingsDefaults,
+        maxPets: 99,
+        updatedAt: validSettings.updatedAt,
+      }),
+    ).toBeNull();
   });
 });

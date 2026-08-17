@@ -22,10 +22,22 @@ describe("approved property facts", () => {
       bedroomCount: 4,
       bedCount: 7,
       rooms: [
-        { name: "First-floor primary bedroom", beds: [{ size: "king", count: 1 }] },
-        { name: "First-floor bunk bedroom", beds: [{ size: "twin bunk", count: 4 }] },
-        { name: "First-floor queen bedroom", beds: [{ size: "queen", count: 1 }] },
-        { name: "Second-floor primary bedroom", beds: [{ size: "king", count: 1 }] },
+        {
+          name: "First-floor primary bedroom",
+          beds: [{ size: "king", count: 1 }],
+        },
+        {
+          name: "First-floor bunk bedroom",
+          beds: [{ size: "twin bunk", count: 4 }],
+        },
+        {
+          name: "First-floor queen bedroom",
+          beds: [{ size: "queen", count: 1 }],
+        },
+        {
+          name: "Second-floor primary bedroom",
+          beds: [{ size: "king", count: 1 }],
+        },
       ],
     });
   });
@@ -37,8 +49,7 @@ describe("approved property facts", () => {
       entry:
         "The house is elevated on posts, and a full flight of stairs is required to reach the front door",
       beach: "Shared access a few steps from the Atlantic Ocean",
-      pier:
-        "The home is next to the historic pier, and pier passes are included with the stay",
+      pier: "The home is next to the historic pier, and pier passes are included with the stay",
     });
     expect(property.amenities.provided).toEqual([
       "Full kitchen",
@@ -67,12 +78,7 @@ describe("approved property facts", () => {
     );
     expect(property.outdoor).toEqual({
       poolAreaFacilities: ["Outdoor shower", "Changing room"],
-      spacesAndViews: [
-        "Multiple decks",
-        "Ship's watch",
-        "Ocean views",
-        "Sound-side sunset views",
-      ],
+      spacesAndViews: ["Multiple decks", "Ship's watch", "Ocean views", "Sound-side sunset views"],
       fishCleaningTable: true,
     });
     expect(property.entertainment).toEqual({
@@ -92,9 +98,21 @@ describe("approved property facts", () => {
       heatNoticeHours: 48,
       heatFeeBasis: "per stay",
     });
-    expect(property.hotTub).toEqual({ private: true, available: "year-round", capacity: 7 });
-    expect(property.pets).toEqual({ maximum: 2, feeUsd: 150, feeBasis: "per stay", feePurpose: "additional cleaning" });
-    expect(property.arrival).toEqual({ checkIn: "After 4:00 PM", checkout: "Before 10:00 AM" });
+    expect(property.hotTub).toEqual({
+      private: true,
+      available: "year-round",
+      capacity: 7,
+    });
+    expect(property.pets).toEqual({
+      maximum: 2,
+      feeUsd: 150,
+      feeBasis: "per stay",
+      feePurpose: "additional cleaning",
+    });
+    expect(property.arrival).toEqual({
+      checkIn: "After 4:00 PM",
+      checkout: "Before 10:00 AM",
+    });
     expect(property.rules).toEqual({
       primaryRenterMinimumAge: 24,
       childrenAllowed: true,
@@ -117,7 +135,8 @@ describe("approved property facts", () => {
     expect(property.booking).toEqual({
       model: "request-to-book",
       instantBookingOffered: false,
-      availabilitySource: "Airbnb and Vrbo currently sync; no separate master calendar is maintained",
+      availabilitySource:
+        "Airbnb and Vrbo currently sync; no separate master calendar is maintained",
       guestRequest: "Guest submits dates and party information",
       ownerReview: "Dates, guest fit, availability, and final pricing are verified before approval",
       confirmation: "After approval, the owner sends the agreement and payment instructions",

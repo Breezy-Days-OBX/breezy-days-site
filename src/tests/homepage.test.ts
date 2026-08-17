@@ -39,7 +39,11 @@ describe("Breezy Days homepage", () => {
   it("uses one dominant CTA path and does not leak owner routes", async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HomePage, { partial: false });
-    const primaryActions = [...html.matchAll(/<(?:a|button)[^>]*(?:button|mobile-booking-bar)[^>]*>([\s\S]*?)<\/(?:a|button)>/g)]
+    const primaryActions = [
+      ...html.matchAll(
+        /<(?:a|button)[^>]*(?:button|mobile-booking-bar)[^>]*>([\s\S]*?)<\/(?:a|button)>/g,
+      ),
+    ]
       .map((match) => match[1].replace(/<[^>]+>/g, "").trim())
       .filter(Boolean);
 
@@ -72,11 +76,11 @@ describe("Breezy Days homepage", () => {
     expect(html).toContain('action="/thanks"');
     expect(html).toContain('data-netlify="true"');
     expect(html).toContain('netlify-honeypot="company-website"');
-    expect(html).toContain('data-form-error-summary');
+    expect(html).toContain("data-form-error-summary");
     expect(html).toContain('aria-live="polite"');
     expect(html).toContain('aria-busy="false"');
     expect(html).not.toMatch(/<form[^>]+novalidate/i);
-    expect(html).toContain('data-max-pets-select');
+    expect(html).toContain("data-max-pets-select");
   });
 
   it("withholds marketplace proof until the centralized reverification gate is cleared", async () => {

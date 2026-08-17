@@ -13,11 +13,14 @@ describe("static owner routes", () => {
     ["login", "../pages/owner/index.astro"],
     ["dashboard", "../pages/owner/dashboard.astro"],
   ])("renders the %s route as noindex and without analytics or signup", async (_name, pagePath) => {
-    const page = pages[pagePath] as { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
+    const page = pages[pagePath] as
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     expect(page).toBeDefined();
     if (!page) return;
     const container = await AstroContainer.create();
-    const html = await container.renderToString(page.default, { partial: false });
+    const html = await container.renderToString(page.default, {
+      partial: false,
+    });
 
     expect(html).toContain('<meta name="robots" content="noindex, nofollow">');
     expect(html).toContain('data-analytics-enabled="false"');
@@ -26,10 +29,13 @@ describe("static owner routes", () => {
   });
 
   it("renders exactly the shared eight-field dashboard contract and guidance", async () => {
-    const page = pages["../pages/owner/dashboard.astro"] as { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
+    const page = pages["../pages/owner/dashboard.astro"] as
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     if (!page) return;
     const container = await AstroContainer.create();
-    const html = await container.renderToString(page.default, { partial: false });
+    const html = await container.renderToString(page.default, {
+      partial: false,
+    });
 
     for (const [key, definition] of Object.entries(ownerSettingDefinitions)) {
       expect(html).toContain(`name="${key}"`);
@@ -39,7 +45,7 @@ describe("static owner routes", () => {
       expect(html).toContain(definition.publicDestination);
       expect(html).toContain(String(definition.fallback ?? "Not currently published"));
     }
-    expect((html.match(/data-owner-setting-field/g) ?? [])).toHaveLength(8);
+    expect(html.match(/data-owner-setting-field/g) ?? []).toHaveLength(8);
   });
 
   it("keeps owner routes out of the public sitemap and navigation", async () => {
@@ -50,6 +56,6 @@ describe("static owner routes", () => {
       container.renderToString(SiteHeader),
       container.renderToString(SiteFooter),
     ]);
-    expect(`${header}\n${footer}`).not.toMatch(/href="\/owner(?:\/|\")/);
+    expect(`${header}\n${footer}`).not.toMatch(/href="\/owner(?:\/|")/);
   });
 });

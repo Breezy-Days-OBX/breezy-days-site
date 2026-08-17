@@ -18,7 +18,10 @@ type OwnerAuthModule = {
 
 describe("owner authentication entry states", () => {
   it.each([
-    [{ type: "invite", user: null, token: "invite-token" }, { state: "invite", token: "invite-token" }],
+    [
+      { type: "invite", user: null, token: "invite-token" },
+      { state: "invite", token: "invite-token" },
+    ],
     [{ type: "recovery", user: { id: "owner" } }, { state: "recovery" }],
     [{ type: "confirmation", user: { id: "owner" } }, { state: "authenticated" }],
   ])("classifies supported public owner callbacks", async (callback, expected) => {
@@ -37,28 +40,38 @@ describe("owner authentication entry states", () => {
     const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
     if (!ownerAuth) return;
 
-    await expect(ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => null),
-      getUser: vi.fn(async () => null),
-    })).resolves.toEqual({ state: "login" });
-    await expect(ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => null),
-      getUser: vi.fn(async () => ({ id: "owner" })),
-    })).resolves.toMatchObject({ state: "authenticated" });
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => null),
+        getUser: vi.fn(async () => null),
+      }),
+    ).resolves.toEqual({ state: "login" });
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => null),
+        getUser: vi.fn(async () => ({ id: "owner" })),
+      }),
+    ).resolves.toMatchObject({ state: "authenticated" });
   });
 
   it("fails closed for malformed callbacks and maps Identity failures without exposing internals", async () => {
     const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
     if (!ownerAuth) return;
 
-    await expect(ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => ({ type: "invite", user: null })),
-      getUser: vi.fn(async () => ({ id: "owner" })),
-    })).resolves.toEqual({ state: "callback_error" });
-    await expect(ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => { throw new Error("secret token detail"); }),
-      getUser: vi.fn(async () => null),
-    })).resolves.toEqual({ state: "callback_error" });
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => ({ type: "invite", user: null })),
+        getUser: vi.fn(async () => ({ id: "owner" })),
+      }),
+    ).resolves.toEqual({ state: "callback_error" });
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => {
+          throw new Error("secret token detail");
+        }),
+        getUser: vi.fn(async () => null),
+      }),
+    ).resolves.toEqual({ state: "callback_error" });
     expect(ownerAuth.describeAuthError("login")).not.toMatch(/token|stack|secret/i);
   });
 
@@ -68,7 +81,11 @@ describe("owner authentication entry states", () => {
     const replace = vi.fn();
 
     await ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => ({ type: "invite", user: null, token: "secret" })),
+      handleAuthCallback: vi.fn(async () => ({
+        type: "invite",
+        user: null,
+        token: "secret",
+      })),
       getUser: vi.fn(async () => null),
       callbackUrl: {
         hash: "#invite_token=secret",
@@ -88,16 +105,20 @@ describe("owner authentication entry states", () => {
     if (!ownerAuth) return;
     const replace = vi.fn();
 
-    await expect(ownerAuth.loadOwnerEntryState({
-      handleAuthCallback: vi.fn(async () => { throw new Error("expired"); }),
-      getUser: vi.fn(async () => null),
-      callbackUrl: {
-        hash: "#recovery_token=secret",
-        pathname: "/owner",
-        search: "",
-        replace,
-      },
-    })).resolves.toEqual({ state: "callback_error" });
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => {
+          throw new Error("expired");
+        }),
+        getUser: vi.fn(async () => null),
+        callbackUrl: {
+          hash: "#recovery_token=secret",
+          pathname: "/owner",
+          search: "",
+          replace,
+        },
+      }),
+    ).resolves.toEqual({ state: "callback_error" });
 
     expect(replace).toHaveBeenCalledWith("/owner");
   });

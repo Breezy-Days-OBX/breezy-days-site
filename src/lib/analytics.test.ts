@@ -23,16 +23,24 @@ describe("public analytics privacy boundary", () => {
       name: "form_submit",
       category: "availability_form",
     });
-    expect(analytics.createPublicAnalyticsEvent("form_submit", "guest@example.com", "/")).toBeNull();
-    expect(analytics.createPublicAnalyticsEvent("arrival_2026-09-10", "availability_form", "/")).toBeNull();
+    expect(
+      analytics.createPublicAnalyticsEvent("form_submit", "guest@example.com", "/"),
+    ).toBeNull();
+    expect(
+      analytics.createPublicAnalyticsEvent("arrival_2026-09-10", "availability_form", "/"),
+    ).toBeNull();
   });
 
   it("never emits analytics on owner routes", () => {
     const analytics = modules["./analytics.ts"] as AnalyticsModule | undefined;
     if (!analytics) return;
 
-    expect(analytics.createPublicAnalyticsEvent("form_start", "availability_form", "/owner")).toBeNull();
-    expect(analytics.createPublicAnalyticsEvent("form_start", "availability_form", "/owner/dashboard")).toBeNull();
+    expect(
+      analytics.createPublicAnalyticsEvent("form_start", "availability_form", "/owner"),
+    ).toBeNull();
+    expect(
+      analytics.createPublicAnalyticsEvent("form_start", "availability_form", "/owner/dashboard"),
+    ).toBeNull();
   });
 
   it("sends only the fixed name and category to configured clients", () => {

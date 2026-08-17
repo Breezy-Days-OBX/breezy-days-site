@@ -15,15 +15,21 @@ import { siteContent } from "../content/site";
 >
   <input type="hidden" name="form-name" value="availability-request" />
   <p class="honeypot" hidden>
-    <label>Leave this field empty <input name="company-website" tabindex="-1" autocomplete="off" /></label>
+    <label
+      >Leave this field empty <input
+        name="company-website"
+        tabindex="-1"
+        autocomplete="off"
+      /></label
+    >
   </p>
 
   <div class="form-intro">
     <p class="eyebrow">Start with the week</p>
     <h2>Tell us who’s coming.</h2>
     <p>
-      Michelle and Danny review every request against the synced Airbnb and Vrbo calendars,
-      guest fit, and date-specific pricing.
+      Michelle and Danny review every request against the synced Airbnb and Vrbo calendars, guest
+      fit, and date-specific pricing.
     </p>
   </div>
 
@@ -37,16 +43,37 @@ import { siteContent } from "../content/site";
     <div class="form-fields form-fields-stay">
       <div class="form-field">
         <label for="arrival">Arrival</label>
-        <input id="arrival" name="arrival" type="date" aria-describedby="arrival-hint arrival-error" required />
-        <span class="field-hint" id="arrival-hint">Check-in is {property.arrival.checkIn.toLowerCase()}.</span>
-        <span class="field-error" id="arrival-error" data-field-error="arrival" aria-live="polite"></span>
+        <input
+          id="arrival"
+          name="arrival"
+          type="date"
+          aria-describedby="arrival-hint arrival-error"
+          required
+        />
+        <span class="field-hint" id="arrival-hint"
+          >Check-in is {property.arrival.checkIn.toLowerCase()}.</span
+        >
+        <span class="field-error" id="arrival-error" data-field-error="arrival" aria-live="polite"
+        ></span>
       </div>
 
       <div class="form-field">
         <label for="departure">Departure</label>
-        <input id="departure" name="departure" type="date" aria-describedby="departure-hint departure-error" required />
-        <span class="field-hint" id="departure-hint">Checkout is {property.arrival.checkout.toLowerCase()}.</span>
-        <span class="field-error" id="departure-error" data-field-error="departure" aria-live="polite"></span>
+        <input
+          id="departure"
+          name="departure"
+          type="date"
+          aria-describedby="departure-hint departure-error"
+          required
+        />
+        <span class="field-hint" id="departure-hint"
+          >Checkout is {property.arrival.checkout.toLowerCase()}.</span
+        >
+        <span
+          class="field-error"
+          id="departure-error"
+          data-field-error="departure"
+          aria-live="polite"></span>
       </div>
 
       <div class="form-field">
@@ -61,8 +88,11 @@ import { siteContent } from "../content/site";
           aria-describedby="guests-hint guests-error"
           required
         />
-        <span class="field-hint" id="guests-hint">Up to {property.fit.maximumOvernightGuests} overnight guests.</span>
-        <span class="field-error" id="guests-error" data-field-error="guests" aria-live="polite"></span>
+        <span class="field-hint" id="guests-hint"
+          >Up to {property.fit.maximumOvernightGuests} overnight guests.</span
+        >
+        <span class="field-error" id="guests-error" data-field-error="guests" aria-live="polite"
+        ></span>
       </div>
 
       <div class="form-field">
@@ -76,11 +106,17 @@ import { siteContent } from "../content/site";
           required
         >
           <option value="0">No pets</option>
-          {Array.from({ length: property.pets.maximum }, (_, index) => index + 1).map((count) => (
-            <option value={count}>{count} {count === 1 ? "pet" : "pets"}</option>
-          ))}
+          {
+            Array.from({ length: property.pets.maximum }, (_, index) => index + 1).map((count) => (
+              <option value={count}>
+                {count} {count === 1 ? "pet" : "pets"}
+              </option>
+            ))
+          }
         </select>
-        <span class="field-hint" id="pets-hint">Up to <span data-public-setting="maxPets">{property.pets.maximum}</span> pets.</span>
+        <span class="field-hint" id="pets-hint"
+          >Up to <span data-public-setting="maxPets">{property.pets.maximum}</span> pets.</span
+        >
         <span class="field-error" id="pets-error" data-field-error="pets" aria-live="polite"></span>
       </div>
     </div>
@@ -91,46 +127,111 @@ import { siteContent } from "../content/site";
     <div class="form-fields form-fields-contact">
       <div class="form-field">
         <label for="name">Name</label>
-        <input id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" aria-describedby="name-error" required />
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          minlength="2"
+          maxlength="80"
+          aria-describedby="name-error"
+          required
+        />
         <span class="field-error" id="name-error" data-field-error="name" aria-live="polite"></span>
       </div>
 
       <div class="form-field">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" aria-describedby="email-error" required />
-        <span class="field-error" id="email-error" data-field-error="email" aria-live="polite"></span>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          maxlength="254"
+          aria-describedby="email-error"
+          required
+        />
+        <span class="field-error" id="email-error" data-field-error="email" aria-live="polite"
+        ></span>
       </div>
 
       <div class="form-field">
         <label for="phone">Phone</label>
-        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" minlength="7" maxlength="20" aria-describedby="phone-hint phone-error" required />
-        <span class="field-hint" id="phone-hint">Used only if the owner needs to clarify the request.</span>
-        <span class="field-error" id="phone-error" data-field-error="phone" aria-live="polite"></span>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          autocomplete="tel"
+          inputmode="tel"
+          minlength="7"
+          maxlength="20"
+          aria-describedby="phone-hint phone-error"
+          required
+        />
+        <span class="field-hint" id="phone-hint"
+          >Used only if the owner needs to clarify the request.</span
+        >
+        <span class="field-error" id="phone-error" data-field-error="phone" aria-live="polite"
+        ></span>
       </div>
 
       <div class="form-field form-field-message">
         <label for="message">Anything the owner should know? <span>(optional)</span></label>
-        <textarea id="message" name="message" rows="4" maxlength="500" aria-describedby="message-hint message-error"></textarea>
-        <span class="field-hint" id="message-hint">Accessibility needs or a brief question are helpful here. Please do not include payment information.</span>
-        <span class="field-error" id="message-error" data-field-error="message" aria-live="polite"></span>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          maxlength="500"
+          aria-describedby="message-hint message-error"></textarea>
+        <span class="field-hint" id="message-hint"
+          >Accessibility needs or a brief question are helpful here. Please do not include payment
+          information.</span
+        >
+        <span class="field-error" id="message-error" data-field-error="message" aria-live="polite"
+        ></span>
       </div>
     </div>
   </fieldset>
 
   <div class="form-confirmations">
     <div class="checkbox-field">
-      <input id="acknowledges-request" name="acknowledgesRequestNotReservation" type="checkbox" value="true" aria-describedby="acknowledgesRequestNotReservation-error" required />
+      <input
+        id="acknowledges-request"
+        name="acknowledgesRequestNotReservation"
+        type="checkbox"
+        value="true"
+        aria-describedby="acknowledgesRequestNotReservation-error"
+        required
+      />
       <label for="acknowledges-request">
-        I understand this request is not a reservation or a guaranteed price. The owner must confirm availability, total price, the agreement, and payment steps.
+        I understand this request is not a reservation or a guaranteed price. The owner must confirm
+        availability, total price, the agreement, and payment steps.
       </label>
-      <span class="field-error" id="acknowledgesRequestNotReservation-error" data-field-error="acknowledgesRequestNotReservation" aria-live="polite"></span>
+      <span
+        class="field-error"
+        id="acknowledgesRequestNotReservation-error"
+        data-field-error="acknowledgesRequestNotReservation"
+        aria-live="polite"></span>
     </div>
     <div class="checkbox-field">
-      <input id="acknowledges-privacy" name="acknowledgesPrivacy" type="checkbox" value="true" aria-describedby="acknowledgesPrivacy-error" required />
+      <input
+        id="acknowledges-privacy"
+        name="acknowledgesPrivacy"
+        type="checkbox"
+        value="true"
+        aria-describedby="acknowledgesPrivacy-error"
+        required
+      />
       <label for="acknowledges-privacy">
-        I agree that Breezy Days may use these details to review and reply to this request, as described in the <a href="/privacy">privacy notice</a>.
+        I agree that Breezy Days may use these details to review and reply to this request, as
+        described in the <a href="/privacy">privacy notice</a>.
       </label>
-      <span class="field-error" id="acknowledgesPrivacy-error" data-field-error="acknowledgesPrivacy" aria-live="polite"></span>
+      <span
+        class="field-error"
+        id="acknowledgesPrivacy-error"
+        data-field-error="acknowledgesPrivacy"
+        aria-live="polite"></span>
     </div>
   </div>
 
@@ -139,9 +240,7 @@ import { siteContent } from "../content/site";
       <span data-submit-label>{siteContent.primaryAction.label}</span>
       <span class="form-pending-label" aria-hidden="true">Sending request…</span>
     </button>
-    <p>
-      No payment is collected here. Your request goes to the owners for a personal review.
-    </p>
+    <p>No payment is collected here. Your request goes to the owners for a personal review.</p>
   </div>
 </form>
 
@@ -211,7 +310,9 @@ import { siteContent } from "../content/site";
         errorSummary.hidden = false;
         for (const error of errors) {
           const field = form.elements.namedItem(error.field);
-          const inlineError = form.querySelector<HTMLElement>(`[data-field-error="${error.field}"]`);
+          const inlineError = form.querySelector<HTMLElement>(
+            `[data-field-error="${error.field}"]`,
+          );
           if (field instanceof HTMLElement) field.setAttribute("aria-invalid", "true");
           if (inlineError) inlineError.textContent = error.message;
 

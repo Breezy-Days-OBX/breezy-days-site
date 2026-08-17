@@ -4,4 +4,3 @@ export default defineConfig({
   output: "static",
   site: "https://breezydaysobx.com",
 });
-

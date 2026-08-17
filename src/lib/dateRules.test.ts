@@ -9,12 +9,8 @@ describe("availability date rules", () => {
 
   it("requires departure to be at least one day after arrival", () => {
     expect(addDays("2026-08-14", 1)).toBe("2026-08-15");
-    expect(getDateRangeError("2026-08-14", "2026-08-14")).toBe(
-      "Departure must be after arrival.",
-    );
-    expect(getDateRangeError("2026-08-14", "2026-08-13")).toBe(
-      "Departure must be after arrival.",
-    );
+    expect(getDateRangeError("2026-08-14", "2026-08-14")).toBe("Departure must be after arrival.");
+    expect(getDateRangeError("2026-08-14", "2026-08-13")).toBe("Departure must be after arrival.");
     expect(getDateRangeError("2026-08-14", "2026-08-15")).toBe("");
   });
 

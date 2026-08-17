@@ -5,23 +5,29 @@ const pages = import.meta.glob("../pages/*.{astro,ts}", { eager: true });
 
 describe("public page map", () => {
   it("includes every approved public route", () => {
-    expect(Object.keys(pages)).toEqual(expect.arrayContaining([
-      "../pages/index.astro",
-      "../pages/thanks.astro",
-      "../pages/privacy.astro",
-      "../pages/rental-information.astro",
-      "../pages/404.astro",
-      "../pages/sitemap.xml.ts",
-    ]));
+    expect(Object.keys(pages)).toEqual(
+      expect.arrayContaining([
+        "../pages/index.astro",
+        "../pages/thanks.astro",
+        "../pages/privacy.astro",
+        "../pages/rental-information.astro",
+        "../pages/404.astro",
+        "../pages/sitemap.xml.ts",
+      ]),
+    );
   });
 
   it.each([
     ["thanks", "../pages/thanks.astro", "not a reservation"],
     ["privacy", "../pages/privacy.astro", "Privacy"],
   ])("renders the %s page without prototype language", async (_name, path, requiredCopy) => {
-    const page = pages[path] as { default: Parameters<AstroContainer["renderToString"]>[0] };
+    const page = pages[path] as {
+      default: Parameters<AstroContainer["renderToString"]>[0];
+    };
     const container = await AstroContainer.create();
-    const html = await container.renderToString(page.default, { partial: false });
+    const html = await container.renderToString(page.default, {
+      partial: false,
+    });
 
     expect(html).toContain(requiredCopy);
     expect(html).not.toMatch(/prototype|prelaunch|TBD|TODO/i);

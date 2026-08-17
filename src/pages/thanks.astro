@@ -18,11 +18,30 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         Your request is with the owners for review. It is not a reservation or a guaranteed price.
       </p>
       <ol class="thanks-steps">
-        <li><span>01</span><p>The owners check the synced Airbnb and Vrbo calendars, guest fit, and date-specific price.</p></li>
-        <li><span>02</span><p>They reply by {property.booking.preferredContactAfterInquiry.toLowerCase()} with availability, the total price, and next steps.</p></li>
-        <li><span>03</span><p>A reservation is complete only after owner approval, the agreement, and the required payment steps.</p></li>
+        <li>
+          <span>01</span><p>
+            The owners check the synced Airbnb and Vrbo calendars, guest fit, and date-specific
+            price.
+          </p>
+        </li>
+        <li>
+          <span>02</span><p>
+            They reply by {property.booking.preferredContactAfterInquiry.toLowerCase()} with availability,
+            the total price, and next steps.
+          </p>
+        </li>
+        <li>
+          <span>03</span><p>
+            A reservation is complete only after owner approval, the agreement, and the required
+            payment steps.
+          </p>
+        </li>
       </ol>
-      <p class="thanks-contact">Need to add context? Email <a href={`mailto:${property.identity.email}`}>{property.identity.email}</a>.</p>
+      <p class="thanks-contact">
+        Need to add context? Email <a href={`mailto:${property.identity.email}`}
+          >{property.identity.email}</a
+        >.
+      </p>
       <a class="button" href="/">Back to Breezy Days</a>
     </div>
   </main>

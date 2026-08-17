@@ -28,7 +28,7 @@ Analytics accepts only fixed event names and non-personal categories. It must ne
 
 ## Environment inventory
 
-Task 1 requires no environment variables. Later deployment may use `PUBLIC_GA4_MEASUREMENT_ID` and `PUBLIC_CLARITY_PROJECT_ID`; both are optional public identifiers, and absence must disable the corresponding integration without breaking the site. Netlify supplies deployment, Identity, Forms, Functions, and Blobs context through its platform configuration rather than repository secrets. No SMS environment variables exist while SMS is gated. `.env` files and live credentials must not be committed.
+Task 1 requires no environment variables. Later deployment may use `PUBLIC_GA4_ID` and `PUBLIC_CLARITY_ID`; both are optional public identifiers, and absence must disable the corresponding integration without breaking the site. Netlify supplies deployment, Identity, Forms, Functions, and Blobs context through its platform configuration rather than repository secrets. No SMS environment variables exist while SMS is gated. `.env` files and live credentials must not be committed.
 
 ## Failure and fallback behavior
 

@@ -47,8 +47,7 @@ export interface InquiryError {
 }
 
 export type InquiryValidationResult =
-  | { success: true; data: Inquiry }
-  | { success: false; errors: readonly InquiryError[] };
+  { success: true; data: Inquiry } | { success: false; errors: readonly InquiryError[] };
 
 const inquiryFields = new Set<InquiryField>([
   "arrival",
@@ -75,7 +74,10 @@ export function validateInquiry(
   options: { today?: string; maximumPets?: number } = {},
 ): InquiryValidationResult {
   if (!isRecord(input)) {
-    return { success: false, errors: [{ field: "form", category: "invalid_type" }] };
+    return {
+      success: false,
+      errors: [{ field: "form", category: "invalid_type" }],
+    };
   }
 
   const errors: InquiryError[] = [];
@@ -159,7 +161,10 @@ export function validateInquiry(
     });
   }
   if (input.acknowledgesPrivacy !== true) {
-    errors.push({ field: "acknowledgesPrivacy", category: "acknowledgement_required" });
+    errors.push({
+      field: "acknowledgesPrivacy",
+      category: "acknowledgement_required",
+    });
   }
 
   if (errors.length > 0) return { success: false, errors };

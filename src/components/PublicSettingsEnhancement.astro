@@ -1,14 +1,9 @@
 <script>
-  import {
-    enhancePublicSettings,
-    type PublicSettingsView,
-  } from "../lib/publicSettings";
+  import { enhancePublicSettings, type PublicSettingsView } from "../lib/publicSettings";
 
   const view: PublicSettingsView = {
     setText(key, value) {
-      for (const node of document.querySelectorAll<HTMLElement>(
-        `[data-public-setting="${key}"]`,
-      )) {
+      for (const node of document.querySelectorAll<HTMLElement>(`[data-public-setting="${key}"]`)) {
         node.textContent = value;
       }
     },
@@ -33,10 +28,11 @@
 
   try {
     await enhancePublicSettings(
-      () => fetch("/.netlify/functions/public-settings", {
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      }),
+      () =>
+        fetch("/.netlify/functions/public-settings", {
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        }),
       view,
     );
   } finally {

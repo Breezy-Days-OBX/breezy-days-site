@@ -1,7 +1,4 @@
-import {
-  parsePublicOwnerSettings,
-  type PublicOwnerSettings,
-} from "./ownerSettings";
+import { parsePublicOwnerSettings, type PublicOwnerSettings } from "./ownerSettings";
 
 type PublicSettingKey = keyof Omit<PublicOwnerSettings, "updatedAt">;
 
@@ -31,12 +28,14 @@ const formatMonthDay = (value: string) => {
 };
 
 const formatSettings = (settings: PublicOwnerSettings): Record<PublicSettingKey, string> => ({
-  startingWeeklyRateUsd: settings.startingWeeklyRateUsd === null
-    ? "Personalized quote for your dates"
-    : `From ${money.format(settings.startingWeeklyRateUsd)} per week`,
-  minimumStayNights: settings.minimumStayNights === null
-    ? "Stay requirements vary by dates"
-    : `${settings.minimumStayNights}-night minimum stay`,
+  startingWeeklyRateUsd:
+    settings.startingWeeklyRateUsd === null
+      ? "Personalized quote for your dates"
+      : `From ${money.format(settings.startingWeeklyRateUsd)} per week`,
+  minimumStayNights:
+    settings.minimumStayNights === null
+      ? "Stay requirements vary by dates"
+      : `${settings.minimumStayNights}-night minimum stay`,
   pricingNote: settings.pricingNote,
   poolHeatFeeUsd: `${money.format(settings.poolHeatFeeUsd)} per stay`,
   petFeeUsd: `${money.format(settings.petFeeUsd)} per stay`,

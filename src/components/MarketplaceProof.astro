@@ -12,18 +12,38 @@ interface Props {
 const { proof } = Astro.props;
 ---
 
-{!proof.requiresLaunchReverification && (
-  <div class="shell review-layout">
-    <div class="review-quote-wrap">
-      <p class="eyebrow">04 · Guest perspective</p>
-      <blockquote>“{proof.quote.text}”</blockquote>
-      <p class="quote-source">{proof.quote.source}</p>
+{
+  !proof.requiresLaunchReverification && (
+    <div class="shell review-layout">
+      <div class="review-quote-wrap">
+        <p class="eyebrow">04 · Guest perspective</p>
+        <blockquote>“{proof.quote.text}”</blockquote>
+        <p class="quote-source">{proof.quote.source}</p>
+      </div>
+      <aside class="rating-panel" aria-label="Marketplace rating snapshot">
+        <p class="rating-label">Guest ratings</p>
+        <div class="rating-row">
+          <>
+            <strong>{proof.airbnb.rating}</strong>
+            <span>
+              Airbnb
+              <br />
+              {proof.airbnb.reviewCount} reviews
+            </span>
+          </>
+        </div>
+        <div class="rating-row">
+          <>
+            <strong>{proof.vrbo.rating.replace("/10", "")}</strong>
+            <span>
+              Vrbo
+              <br />
+              {proof.vrbo.reviewCount} reviews
+            </span>
+          </>
+        </div>
+        <p class="rating-note">Ratings checked {proof.checkedOnDisplay}.</p>
+      </aside>
     </div>
-    <aside class="rating-panel" aria-label="Marketplace rating snapshot">
-      <p class="rating-label">Guest ratings</p>
-      <div class="rating-row"><strong>{proof.airbnb.rating}</strong><span>Airbnb<br />{proof.airbnb.reviewCount} reviews</span></div>
-      <div class="rating-row"><strong>{proof.vrbo.rating.replace("/10", "")}</strong><span>Vrbo<br />{proof.vrbo.reviewCount} reviews</span></div>
-      <p class="rating-note">Ratings checked {proof.checkedOnDisplay}.</p>
-    </aside>
-  </div>
-)}
+  )
+}

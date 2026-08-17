@@ -6,7 +6,9 @@ type Transition = (state: string) => void;
 const failureState = (error: unknown): DashboardFailure => {
   if (typeof error === "object" && error !== null && "kind" in error) {
     const kind = (error as { kind?: unknown }).kind;
-    if (["validation", "auth", "forbidden", "conflict", "method", "service"].includes(String(kind))) {
+    if (
+      ["validation", "auth", "forbidden", "conflict", "method", "service"].includes(String(kind))
+    ) {
       return kind as DashboardFailure;
     }
   }
@@ -16,7 +18,11 @@ const failureState = (error: unknown): DashboardFailure => {
 interface SaveOptions<TSettings, TData> {
   serialize: () =>
     | { success: true; data: TSettings }
-    | { success: false; errors: readonly string[]; fieldErrors: Record<string, string> };
+    | {
+        success: false;
+        errors: readonly string[];
+        fieldErrors: Record<string, string>;
+      };
   save: (settings: TSettings) => Promise<unknown>;
   refresh: () => Promise<TData>;
   transition: Transition;
@@ -26,7 +32,10 @@ export async function runOwnerSave<TSettings, TData>(options: SaveOptions<TSetti
   const serialized = options.serialize();
   if (!serialized.success) {
     options.transition("validation");
-    return { state: "validation" as const, fieldErrors: serialized.fieldErrors };
+    return {
+      state: "validation" as const,
+      fieldErrors: serialized.fieldErrors,
+    };
   }
   options.transition("saving");
   try {
