@@ -3,11 +3,54 @@ import { describe, expect, it, vi } from "vitest";
 const modules = import.meta.glob("./ownerDashboard.ts", { eager: true });
 
 type OwnerDashboardModule = {
+  describeOwnerSnapshotRestore: (formattedDate: string) => string;
+  loadOwnerDashboardData: (options: {
+    loadSettings: () => Promise<unknown>;
+    loadSnapshots: () => Promise<unknown>;
+  }) => Promise<{
+    settings: PromiseSettledResult<unknown>;
+    snapshots: PromiseSettledResult<unknown>;
+  }>;
   runOwnerSave: (options: Record<string, unknown>) => Promise<Record<string, unknown>>;
   runOwnerRestore: (options: Record<string, unknown>) => Promise<Record<string, unknown>>;
 };
 
 describe("owner dashboard transitions", () => {
+  it("gives repeated restore controls a unique name that includes the displayed snapshot time", () => {
+    const dashboard = modules["./ownerDashboard.ts"] as OwnerDashboardModule | undefined;
+    expect(dashboard).toBeDefined();
+    if (!dashboard) return;
+
+    expect(dashboard.describeOwnerSnapshotRestore("Aug 14, 2026, 11:00 AM")).toBe(
+      "Restore version saved Aug 14, 2026, 11:00 AM",
+    );
+  });
+
+  it("keeps valid snapshot recovery available when current settings cannot load", async () => {
+    const dashboard = modules["./ownerDashboard.ts"] as OwnerDashboardModule | undefined;
+    expect(dashboard).toBeDefined();
+    if (!dashboard) return;
+    const settingsFailure = Object.assign(new Error("safe"), { kind: "service" });
+    const snapshots = {
+      snapshots: [
+        {
+          key: "snapshots/2026-08-14T15:00:00.000Z-recovery.json",
+          createdAt: "2026-08-14T15:00:00.000Z",
+        },
+      ],
+    };
+
+    const result = await dashboard.loadOwnerDashboardData({
+      loadSettings: async () => {
+        throw settingsFailure;
+      },
+      loadSnapshots: async () => snapshots,
+    });
+
+    expect(result.settings).toEqual({ status: "rejected", reason: settingsFailure });
+    expect(result.snapshots).toEqual({ status: "fulfilled", value: snapshots });
+  });
+
   it("moves through pending and success while refreshing live settings and snapshots after save", async () => {
     const dashboard = modules["./ownerDashboard.ts"] as OwnerDashboardModule | undefined;
     expect(dashboard).toBeDefined();

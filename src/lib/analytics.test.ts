@@ -43,6 +43,19 @@ describe("public analytics privacy boundary", () => {
     ).toBeNull();
   });
 
+  it("accepts only the two approved categories for marketplace outbound events", () => {
+    const analytics = modules["./analytics.ts"] as AnalyticsModule | undefined;
+    if (!analytics) return;
+
+    expect(
+      analytics.createPublicAnalyticsEvent("marketplace_outbound_click", "marketplace_airbnb", "/"),
+    ).toEqual({ name: "marketplace_outbound_click", category: "marketplace_airbnb" });
+    expect(
+      analytics.createPublicAnalyticsEvent("marketplace_outbound_click", "hero", "/"),
+    ).toBeNull();
+    expect(analytics.createPublicAnalyticsEvent("form_submit", "marketplace_vrbo", "/")).toBeNull();
+  });
+
   it("sends only the fixed name and category to configured clients", () => {
     const analytics = modules["./analytics.ts"] as AnalyticsModule | undefined;
     if (!analytics) return;

@@ -48,6 +48,44 @@ describe("static owner routes", () => {
     expect(html.match(/data-owner-setting-field/g) ?? []).toHaveLength(8);
   });
 
+  it("renders a stable no-access state with logout for authenticated non-owners", async () => {
+    const page = pages["../pages/owner/index.astro"] as
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
+    if (!page) return;
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(page.default, { partial: false });
+
+    expect(html).toContain("data-owner-no-access");
+    expect(html).toMatch(/does not have owner access/i);
+    expect(html).toContain("data-no-access-logout");
+    expect(html).toMatch(/data-no-access-logout[^>]*>Log out</);
+  });
+
+  it("renders native numeric limits from the shared machine-readable field ranges", async () => {
+    const page = pages["../pages/owner/dashboard.astro"] as
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
+    if (!page) return;
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(page.default, { partial: false });
+    const expectedRanges = {
+      startingWeeklyRateUsd: { minimum: 500, maximum: 50_000 },
+      minimumStayNights: { minimum: 1, maximum: 30 },
+      poolHeatFeeUsd: { minimum: 0, maximum: 2_000 },
+      petFeeUsd: { minimum: 0, maximum: 1_000 },
+      maxPets: { minimum: 0, maximum: 4 },
+    } as const;
+
+    for (const [key, expected] of Object.entries(expectedRanges)) {
+      const definition = ownerSettingDefinitions[key as keyof typeof expectedRanges] as {
+        range?: { minimum: number; maximum: number };
+      };
+      const input = html.match(new RegExp(`<input[^>]*name="${key}"[^>]*>`))?.[0];
+      expect(definition.range, key).toEqual(expected);
+      expect(input, key).toContain(`min="${expected.minimum}"`);
+      expect(input, key).toContain(`max="${expected.maximum}"`);
+    }
+  });
+
   it("keeps owner routes out of the public sitemap and navigation", async () => {
     expect(siteContent.indexableRoutes.every((route) => !route.startsWith("/owner"))).toBe(true);
 

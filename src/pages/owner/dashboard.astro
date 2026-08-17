@@ -33,7 +33,11 @@ const displayFallback = (value: unknown) =>
     </div>
 
     <div class="owner-dashboard-grid" data-dashboard-content hidden>
-      <section class="owner-settings-panel" aria-labelledby="settings-title">
+      <section
+        class="owner-settings-panel"
+        aria-labelledby="settings-title"
+        data-owner-settings-panel
+      >
         <div class="owner-panel-heading">
           <div>
             <p class="eyebrow">Live public values</p>
@@ -95,6 +99,8 @@ const displayFallback = (value: unknown) =>
                         inputmode={definition.type === "month-day" ? "numeric" : "decimal"}
                         pattern={definition.type === "month-day" ? "[0-9]{2}-[0-9]{2}" : undefined}
                         step={definition.type.includes("integer") ? "1" : undefined}
+                        min={definition.range?.minimum}
+                        max={definition.range?.maximum}
                         value={definition.fallback ?? ""}
                         aria-describedby={`owner-help-${key} owner-error-${key}`}
                         required={!definition.type.startsWith("nullable")}
@@ -150,12 +156,19 @@ const displayFallback = (value: unknown) =>
       saveOwnerSettings,
       type OwnerSnapshot,
     } from "../../lib/owner/ownerApi";
-    import { runOwnerRestore, runOwnerSave } from "../../lib/owner/ownerDashboard";
+    import {
+      describeOwnerSnapshotRestore,
+      loadOwnerDashboardData,
+      runOwnerRestore,
+      runOwnerSave,
+    } from "../../lib/owner/ownerDashboard";
+    import { hasOwnerRole } from "../../lib/owner/ownerAuth";
     import { OWNER_EDITABLE_KEYS, serializeOwnerSettings } from "../../lib/owner/ownerForm";
     import type { OwnerSettings } from "../../lib/ownerSettings";
 
     const content = document.querySelector<HTMLElement>("[data-dashboard-content]");
     const form = document.querySelector<HTMLFormElement>("[data-owner-settings-form]");
+    const settingsPanel = document.querySelector<HTMLElement>("[data-owner-settings-panel]");
     const status = document.querySelector<HTMLElement>("[data-dashboard-status]");
     const lastSaved = document.querySelector<HTMLTimeElement>("[data-last-saved]");
     const snapshotList = document.querySelector<HTMLOListElement>("[data-snapshot-list]");
@@ -178,6 +191,8 @@ const displayFallback = (value: unknown) =>
       forbidden: "This account does not have permission to manage owner settings.",
       method: "That owner action is not currently available.",
       service: "The owner settings service is temporarily unavailable. Try again shortly.",
+      recovery:
+        "Current settings could not be loaded. Choose a saved version to recover them, or try again shortly.",
     };
 
     const setBusy = (busy: boolean) => {
@@ -255,12 +270,14 @@ const displayFallback = (value: unknown) =>
       for (const snapshot of snapshots) {
         const item = document.createElement("li");
         const time = document.createElement("time");
+        const formattedDate = formatDate(snapshot.createdAt);
         time.dateTime = snapshot.createdAt;
-        time.textContent = formatDate(snapshot.createdAt);
+        time.textContent = formattedDate;
         const button = document.createElement("button");
         button.type = "button";
         button.dataset.restoreKey = snapshot.key;
         button.textContent = "Restore";
+        button.ariaLabel = describeOwnerSnapshotRestore(formattedDate);
         button.addEventListener("click", () => void restoreSnapshot(snapshot));
         item.append(time, button);
         snapshotList.append(item);
@@ -268,13 +285,23 @@ const displayFallback = (value: unknown) =>
     };
 
     const refreshDashboard = async () => {
-      const [settings, snapshotResponse] = await Promise.all([
-        fetchOwnerSettings(),
-        fetchOwnerSnapshots(),
-      ]);
-      applySettings(settings);
-      renderSnapshots(snapshotResponse.snapshots);
-      return { settings, snapshots: snapshotResponse.snapshots };
+      const result = await loadOwnerDashboardData({
+        loadSettings: fetchOwnerSettings,
+        loadSnapshots: fetchOwnerSnapshots,
+      });
+      const settings = result.settings.status === "fulfilled" ? result.settings.value : null;
+      const snapshots =
+        result.snapshots.status === "fulfilled" ? result.snapshots.value.snapshots : [];
+
+      if (settings) applySettings(settings);
+      else currentSettings = null;
+      if (settingsPanel) settingsPanel.hidden = settings === null;
+      renderSnapshots(snapshots);
+
+      if (result.settings.status === "rejected" && result.snapshots.status === "rejected") {
+        throw result.settings.reason;
+      }
+      return { settings, snapshots };
     };
 
     const restoreSnapshot = async (snapshot: OwnerSnapshot) => {
@@ -323,12 +350,16 @@ const displayFallback = (value: unknown) =>
 
     try {
       const user = await getUser();
-      if (!user) {
+      if (!hasOwnerRole(user)) {
         window.location.replace("/owner");
       } else {
-        await refreshDashboard();
+        const dashboard = await refreshDashboard();
         if (content) content.hidden = false;
-        if (status) status.textContent = "Current settings loaded.";
+        if (dashboard.settings) {
+          if (status) status.textContent = "Current settings loaded.";
+        } else {
+          transition("recovery");
+        }
       }
     } catch (error) {
       transition(

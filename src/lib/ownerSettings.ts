@@ -40,6 +40,7 @@ interface OwnerSettingDefinition<T> {
   publicDestination: string;
   fallback: T;
   ownerHelpText: string;
+  range?: { minimum: number; maximum: number };
 }
 
 export const ownerSettingDefinitions: {
@@ -53,6 +54,7 @@ export const ownerSettingDefinitions: {
     publicDestination: "Public pricing summary",
     fallback: ownerSettingsDefaults.startingWeeklyRateUsd,
     ownerHelpText: "Leave blank until an owner-approved starting weekly rate is ready to publish.",
+    range: { minimum: 500, maximum: 50_000 },
   },
   minimumStayNights: {
     name: "Minimum stay",
@@ -63,6 +65,7 @@ export const ownerSettingDefinitions: {
     fallback: ownerSettingsDefaults.minimumStayNights,
     ownerHelpText:
       "Leave blank when the minimum stay varies or has not been approved for publication.",
+    range: { minimum: 1, maximum: 30 },
   },
   pricingNote: {
     name: "Pricing note",
@@ -81,6 +84,7 @@ export const ownerSettingDefinitions: {
     publicDestination: "Pool details and rental information",
     fallback: ownerSettingsDefaults.poolHeatFeeUsd,
     ownerHelpText: "Enter the complete per-stay fee in whole dollars.",
+    range: { minimum: 0, maximum: 2_000 },
   },
   petFeeUsd: {
     name: "Pet fee",
@@ -90,6 +94,7 @@ export const ownerSettingDefinitions: {
     publicDestination: "Pet policy and rental information",
     fallback: ownerSettingsDefaults.petFeeUsd,
     ownerHelpText: "Enter the complete per-stay pet fee in whole dollars.",
+    range: { minimum: 0, maximum: 1_000 },
   },
   maxPets: {
     name: "Maximum pets",
@@ -99,6 +104,7 @@ export const ownerSettingDefinitions: {
     publicDestination: "Pet policy and availability form guidance",
     fallback: ownerSettingsDefaults.maxPets,
     ownerHelpText: "Use 0 when pets are not allowed; otherwise enter the current maximum.",
+    range: { minimum: 0, maximum: 4 },
   },
   poolOpenMonthDay: {
     name: "Pool opening date",
@@ -138,12 +144,19 @@ const isIntegerInRange = (value: unknown, minimum: number, maximum: number) =>
 const isNullableIntegerInRange = (value: unknown, minimum: number, maximum: number) =>
   value === null || isIntegerInRange(value, minimum, maximum);
 
-const isPlainText = (value: unknown) => {
-  if (typeof value !== "string" || value.length < 1 || value.length > 160) return false;
-  return !Array.from(value).some((character) => {
-    const code = character.charCodeAt(0);
-    return character === "<" || character === ">" || code <= 31 || code === 127;
-  });
+const normalizePlainText = (value: unknown) => {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  if (normalized.length < 1 || normalized.length > 160) return null;
+  if (
+    Array.from(normalized).some((character) => {
+      const code = character.charCodeAt(0);
+      return character === "<" || character === ">" || code <= 31 || code === 127;
+    })
+  ) {
+    return null;
+  }
+  return normalized;
 };
 
 const isMonthDay = (value: unknown) =>
@@ -180,18 +193,42 @@ export function validateOwnerSettings(input: unknown): OwnerSettingsValidationRe
   if (!isRecord(input)) return { success: false, errors: ["settings.invalid_type"] };
 
   const errors: string[] = [];
+  const pricingNote = normalizePlainText(input.pricingNote);
+  const startingRateRange = ownerSettingDefinitions.startingWeeklyRateUsd.range!;
+  const minimumStayRange = ownerSettingDefinitions.minimumStayNights.range!;
+  const poolHeatRange = ownerSettingDefinitions.poolHeatFeeUsd.range!;
+  const petFeeRange = ownerSettingDefinitions.petFeeUsd.range!;
+  const maxPetsRange = ownerSettingDefinitions.maxPets.range!;
   if (Object.keys(input).some((key) => !allowedKeys.has(key))) errors.push("settings.unknown_key");
   if (input.schemaVersion !== OWNER_SETTINGS_SCHEMA_VERSION) errors.push("schemaVersion.invalid");
-  if (!isNullableIntegerInRange(input.startingWeeklyRateUsd, 500, 50_000)) {
+  if (
+    !isNullableIntegerInRange(
+      input.startingWeeklyRateUsd,
+      startingRateRange.minimum,
+      startingRateRange.maximum,
+    )
+  ) {
     errors.push("startingWeeklyRateUsd.invalid");
   }
-  if (!isNullableIntegerInRange(input.minimumStayNights, 1, 30)) {
+  if (
+    !isNullableIntegerInRange(
+      input.minimumStayNights,
+      minimumStayRange.minimum,
+      minimumStayRange.maximum,
+    )
+  ) {
     errors.push("minimumStayNights.invalid");
   }
-  if (!isPlainText(input.pricingNote)) errors.push("pricingNote.invalid");
-  if (!isIntegerInRange(input.poolHeatFeeUsd, 0, 2_000)) errors.push("poolHeatFeeUsd.invalid");
-  if (!isIntegerInRange(input.petFeeUsd, 0, 1_000)) errors.push("petFeeUsd.invalid");
-  if (!isIntegerInRange(input.maxPets, 0, 4)) errors.push("maxPets.invalid");
+  if (pricingNote === null) errors.push("pricingNote.invalid");
+  if (!isIntegerInRange(input.poolHeatFeeUsd, poolHeatRange.minimum, poolHeatRange.maximum)) {
+    errors.push("poolHeatFeeUsd.invalid");
+  }
+  if (!isIntegerInRange(input.petFeeUsd, petFeeRange.minimum, petFeeRange.maximum)) {
+    errors.push("petFeeUsd.invalid");
+  }
+  if (!isIntegerInRange(input.maxPets, maxPetsRange.minimum, maxPetsRange.maximum)) {
+    errors.push("maxPets.invalid");
+  }
   if (!isMonthDay(input.poolOpenMonthDay)) errors.push("poolOpenMonthDay.invalid");
   if (!isMonthDay(input.poolCloseMonthDay)) errors.push("poolCloseMonthDay.invalid");
   if (!isValidIsoTimestamp(input.updatedAt)) errors.push("updatedAt.invalid");
@@ -204,7 +241,7 @@ export function validateOwnerSettings(input: unknown): OwnerSettingsValidationRe
       schemaVersion: OWNER_SETTINGS_SCHEMA_VERSION,
       startingWeeklyRateUsd: input.startingWeeklyRateUsd as number | null,
       minimumStayNights: input.minimumStayNights as number | null,
-      pricingNote: input.pricingNote as string,
+      pricingNote: pricingNote as string,
       poolHeatFeeUsd: input.poolHeatFeeUsd as number,
       petFeeUsd: input.petFeeUsd as number,
       maxPets: input.maxPets as number,

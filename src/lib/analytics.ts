@@ -22,7 +22,23 @@ export type PublicAnalyticsEvent = (typeof publicAnalyticsEvents)[number];
 export type PublicAnalyticsCategory = (typeof publicAnalyticsCategories)[number];
 
 const eventNames = new Set<unknown>(publicAnalyticsEvents);
-const eventCategories = new Set<unknown>(publicAnalyticsCategories);
+const primaryCategories = new Set<unknown>([
+  "header",
+  "hero",
+  "inline",
+  "final_action",
+  "mobile_action",
+]);
+const formCategories = new Set<unknown>(["availability_form"]);
+const marketplaceCategories = new Set<unknown>(["marketplace_airbnb", "marketplace_vrbo"]);
+const categoriesByEvent: Record<PublicAnalyticsEvent, Set<unknown>> = {
+  primary_request_click: primaryCategories,
+  form_start: formCategories,
+  form_validation_error: formCategories,
+  form_submit: formCategories,
+  form_success: formCategories,
+  marketplace_outbound_click: marketplaceCategories,
+};
 
 export function createPublicAnalyticsEvent(
   name: unknown,
@@ -30,10 +46,12 @@ export function createPublicAnalyticsEvent(
   pathname: string,
 ): { name: PublicAnalyticsEvent; category: PublicAnalyticsCategory } | null {
   if (pathname === "/owner" || pathname.startsWith("/owner/")) return null;
-  if (!eventNames.has(name) || !eventCategories.has(category)) return null;
+  if (!eventNames.has(name)) return null;
+  const eventName = name as PublicAnalyticsEvent;
+  if (!categoriesByEvent[eventName].has(category)) return null;
 
   return {
-    name: name as PublicAnalyticsEvent,
+    name: eventName,
     category: category as PublicAnalyticsCategory,
   };
 }

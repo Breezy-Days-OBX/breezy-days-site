@@ -329,6 +329,27 @@ describe("settings Function handlers", () => {
     expect(capturedPriorValues).toEqual(capturedPriorValues.map(() => storedSettings));
   });
 
+  it("rejects a sequential save submitted from an older dashboard before snapshotting or writing", async () => {
+    store.values.set("current.json", JSON.stringify(storedSettings));
+    const { ownerSettings } = createSettingsHandlers(dependencies);
+    const firstSave = { ...storedSettings, pricingNote: "First dashboard committed this note." };
+    const staleSave = { ...storedSettings, pricingNote: "Stale dashboard overwrote the note." };
+
+    const firstResponse = await responseJson(await ownerSettings(request("PUT", firstSave)));
+    const staleResponse = await responseJson(await ownerSettings(request("PUT", staleSave)));
+
+    expect(firstResponse.status).toBe(200);
+    expect(staleResponse).toEqual({
+      status: 409,
+      cacheControl: "no-store",
+      body: { error: "settings_conflict" },
+    });
+    expect(JSON.parse(store.values.get("current.json")!)).toEqual(firstResponse.body);
+    expect([...store.values.keys()].filter((key) => key.startsWith("snapshots/"))).toEqual([
+      `snapshots/${secondSavedAt}-save-1.json`,
+    ]);
+  });
+
   it("never returns another writer's value when live storage changes before readback", async () => {
     store.values.set("current.json", JSON.stringify(storedSettings));
     const concurrentValue = {
@@ -386,6 +407,23 @@ describe("settings Function handlers", () => {
       cacheControl: "no-store",
       body: storedSettings,
     });
+  });
+
+  it("returns server-stamped repository defaults to an owner when live settings are absent", async () => {
+    const { ownerSettings } = createSettingsHandlers(dependencies);
+
+    const response = await responseJson(await ownerSettings(request("GET")));
+
+    expect(response).toEqual({
+      status: 200,
+      cacheControl: "no-store",
+      body: {
+        schemaVersion: OWNER_SETTINGS_SCHEMA_VERSION,
+        ...ownerSettingsDefaults,
+        updatedAt: secondSavedAt,
+      },
+    });
+    expect(store.values.size).toBe(0);
   });
 
   it("lists only generated snapshot metadata newest first without blob contents", async () => {
@@ -455,6 +493,31 @@ describe("settings Function handlers", () => {
     expect(JSON.parse(store.values.get(`snapshots/${secondSavedAt}-restore-1.json`)!)).toEqual(
       storedSettings,
     );
+  });
+
+  it("restores a valid snapshot over malformed live settings using the captured live version", async () => {
+    const restoredSettings = {
+      ...storedSettings,
+      pricingNote: "Last known valid owner settings.",
+    };
+    const snapshotKey = `snapshots/${firstSavedAt}-recover-corrupt.json`;
+    store.forceSet("current.json", "{not-json");
+    store.values.set(snapshotKey, JSON.stringify(restoredSettings));
+    nextId = "recover-corrupt";
+    const { restoreSettings } = createSettingsHandlers(dependencies);
+
+    const response = await responseJson(
+      await restoreSettings(request("POST", { key: snapshotKey })),
+    );
+
+    const expectedRestored = { ...restoredSettings, updatedAt: secondSavedAt };
+    expect(response).toEqual({
+      status: 200,
+      cacheControl: "no-store",
+      body: expectedRestored,
+    });
+    expect(JSON.parse(store.values.get("current.json")!)).toEqual(expectedRestored);
+    expect([...store.values.keys()].sort()).toEqual(["current.json", snapshotKey].sort());
   });
 
   it("protects restore from a save captured from the same live version", async () => {

@@ -16,10 +16,12 @@ import { property } from "../content/property";
 import { derivePublicPropertyFacts } from "../content/propertyPresentation";
 import { siteContent } from "../content/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getMarketplaceProofPresentation } from "../lib/marketplaceProof.mjs";
 import { ownerSettingsDefaults } from "../lib/ownerSettings";
 
 const proof = siteContent.marketplaceProof;
-const publishProof = !proof.requiresLaunchReverification;
+const approvedProof = getMarketplaceProofPresentation(proof);
+const publishProof = approvedProof !== null;
 const publicFacts = derivePublicPropertyFacts(property);
 const poolOpen = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -154,14 +156,15 @@ const structuredData = {
               <div class="hero-proof" aria-label="Marketplace review summary">
                 <div class="proof-ratings">
                   <span>
-                    <strong>{proof.airbnb.rating}</strong> Airbnb · {proof.airbnb.label}
+                    <strong>{approvedProof.airbnb.rating}</strong> Airbnb
+                    {approvedProof.airbnb.label ? ` · ${approvedProof.airbnb.label}` : ""}
                   </span>
                   <span>
-                    <strong>{proof.vrbo.rating}</strong> Vrbo
+                    <strong>{approvedProof.vrbo.rating}</strong> Vrbo
                   </span>
                 </div>
                 <blockquote>
-                  “{proof.quote.text}”<cite>{proof.quote.source}</cite>
+                  “{approvedProof.quote.text}”<cite>{approvedProof.quote.source}</cite>
                 </blockquote>
               </div>
             )

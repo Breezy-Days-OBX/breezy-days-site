@@ -145,6 +145,21 @@ const readRequiredSettings = async (store: BlobStore, key: string) => {
   return settings;
 };
 
+const readOwnerSettings = async (store: BlobStore, now: SettingsServiceDependencies["now"]) => {
+  const current = await readCurrentSettingsState(store);
+  if (current.kind === "missing") {
+    const defaults = validateOwnerSettings({
+      schemaVersion: OWNER_SETTINGS_SCHEMA_VERSION,
+      ...ownerSettingsDefaults,
+      updatedAt: now().toISOString(),
+    });
+    if (!defaults.success) throw new Error("Clock produced invalid timestamp");
+    return defaults.data;
+  }
+  if (current.kind === "malformed") throw new Error("Settings unavailable");
+  return current.settings;
+};
+
 const readVersionedSettings = async (store: BlobStore, key: string) => {
   const entry = await store.getWithMetadata(key);
   if (!entry) return null;
@@ -152,6 +167,21 @@ const readVersionedSettings = async (store: BlobStore, key: string) => {
   const settings = parseStoredSettings(entry.data);
   if (!settings) throw new Error("Settings unavailable");
   return { settings, etag: entry.etag };
+};
+
+type CurrentSettingsState =
+  | { kind: "missing" }
+  | { kind: "malformed"; etag: string }
+  | { kind: "valid"; settings: OwnerSettings; etag: string };
+
+const readCurrentSettingsState = async (store: BlobStore): Promise<CurrentSettingsState> => {
+  const entry = await store.getWithMetadata(CURRENT_SETTINGS_KEY);
+  if (!entry) return { kind: "missing" };
+
+  const settings = parseStoredSettings(entry.data);
+  return settings
+    ? { kind: "valid", settings, etag: entry.etag }
+    : { kind: "malformed", etag: entry.etag };
 };
 
 const replaceCurrentSettings = async (
@@ -217,9 +247,7 @@ export function createSettingsHandlers(
       if (authFailure) return authFailure;
 
       if (request.method === "GET") {
-        return protectedResponse(
-          await readRequiredSettings(dependencies.store, CURRENT_SETTINGS_KEY),
-        );
+        return protectedResponse(await readOwnerSettings(dependencies.store, dependencies.now));
       }
 
       const originFailure = await verifyMutationOrigin(request, dependencies.verifyOrigin);
@@ -229,6 +257,11 @@ export function createSettingsHandlers(
       const validation = validateOwnerSettings(payload);
       if (!validation.success) return protectedError("invalid_settings", 400);
 
+      const current = await readVersionedSettings(dependencies.store, CURRENT_SETTINGS_KEY);
+      if (current && validation.data.updatedAt !== current.settings.updatedAt) {
+        throw new SettingsConflictError();
+      }
+
       const snapshot = safeSnapshotKey(dependencies);
       const savedValidation = validateOwnerSettings({
         ...validation.data,
@@ -237,7 +270,6 @@ export function createSettingsHandlers(
       });
       if (!savedValidation.success) throw new Error("Clock produced invalid timestamp");
 
-      const current = await readVersionedSettings(dependencies.store, CURRENT_SETTINGS_KEY);
       if (current) {
         await writeSnapshot(dependencies.store, snapshot.key, current.settings);
       }
@@ -297,7 +329,7 @@ export function createSettingsHandlers(
       }
 
       const selected = await readRequiredSettings(dependencies.store, payload.key);
-      const current = await readVersionedSettings(dependencies.store, CURRENT_SETTINGS_KEY);
+      const current = await readCurrentSettingsState(dependencies.store);
 
       const snapshot = safeSnapshotKey(dependencies);
       const restoredValidation = validateOwnerSettings({
@@ -307,13 +339,13 @@ export function createSettingsHandlers(
       });
       if (!restoredValidation.success) throw new Error("Clock produced invalid timestamp");
 
-      if (current) {
+      if (current.kind === "valid") {
         await writeSnapshot(dependencies.store, snapshot.key, current.settings);
       }
       const readback = await replaceCurrentSettings(
         dependencies.store,
         restoredValidation.data,
-        current?.etag ?? null,
+        current.kind === "missing" ? null : current.etag,
       );
       return protectedResponse(readback);
     } catch (error) {

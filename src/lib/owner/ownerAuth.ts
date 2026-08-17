@@ -1,11 +1,13 @@
 export interface OwnerIdentityUser {
   id: string;
   email?: string;
+  roles?: readonly string[];
 }
 
 export type OwnerEntryState =
   | { state: "login" }
   | { state: "authenticated"; user: OwnerIdentityUser }
+  | { state: "forbidden"; user: OwnerIdentityUser }
   | { state: "invite"; token: string }
   | { state: "recovery"; user: OwnerIdentityUser }
   | { state: "callback_error" };
@@ -51,6 +53,9 @@ export function scrubOwnerCallbackHash(callbackUrl: OwnerCallbackUrl | undefined
 const isUser = (value: unknown): value is OwnerIdentityUser =>
   typeof value === "object" && value !== null && typeof (value as { id?: unknown }).id === "string";
 
+export const hasOwnerRole = (value: unknown): value is OwnerIdentityUser =>
+  isUser(value) && Array.isArray(value.roles) && value.roles.includes("owner");
+
 const isCallback = (value: unknown): value is OwnerCallbackResult => {
   if (typeof value !== "object" || value === null) return false;
   const type = (value as { type?: unknown }).type;
@@ -68,17 +73,20 @@ export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promis
           : { state: "callback_error" };
       }
       if (callback.type === "recovery") {
-        return isUser(callback.user)
+        if (!isUser(callback.user)) return { state: "callback_error" };
+        return hasOwnerRole(callback.user)
           ? { state: "recovery", user: callback.user }
-          : { state: "callback_error" };
+          : { state: "forbidden", user: callback.user };
       }
-      return isUser(callback.user)
+      if (!isUser(callback.user)) return { state: "callback_error" };
+      return hasOwnerRole(callback.user)
         ? { state: "authenticated", user: callback.user }
-        : { state: "callback_error" };
+        : { state: "forbidden", user: callback.user };
     }
 
     const user = await identity.getUser();
-    return isUser(user) ? { state: "authenticated", user } : { state: "login" };
+    if (!isUser(user)) return { state: "login" };
+    return hasOwnerRole(user) ? { state: "authenticated", user } : { state: "forbidden", user };
   } catch {
     return { state: "callback_error" };
   } finally {

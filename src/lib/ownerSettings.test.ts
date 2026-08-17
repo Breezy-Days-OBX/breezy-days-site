@@ -120,6 +120,27 @@ describe("owner settings contract", () => {
     ).toBe(false);
   });
 
+  it("normalizes pricing-note whitespace before enforcing the 1–160 character boundaries", () => {
+    const trimmed = validateOwnerSettings({ ...validSettings, pricingNote: "  Quote by dates.  " });
+    expect(trimmed.success).toBe(true);
+    if (trimmed.success) expect(trimmed.data.pricingNote).toBe("Quote by dates.");
+
+    expect(validateOwnerSettings({ ...validSettings, pricingNote: " \t\n " }).success).toBe(false);
+
+    const paddedBoundary = validateOwnerSettings({
+      ...validSettings,
+      pricingNote: `  ${"x".repeat(160)}  `,
+    });
+    expect(paddedBoundary.success).toBe(true);
+    if (paddedBoundary.success) expect(paddedBoundary.data.pricingNote).toBe("x".repeat(160));
+    expect(
+      validateOwnerSettings({
+        ...validSettings,
+        pricingNote: ` ${"x".repeat(161)} `,
+      }).success,
+    ).toBe(false);
+  });
+
   it("accepts real month-days and rejects malformed or impossible dates", () => {
     expect(validateOwnerSettings({ ...validSettings, poolOpenMonthDay: "02-29" }).success).toBe(
       true,

@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { inspectMarketplaceProof } from "../src/lib/marketplaceProof.mjs";
+
 const defaultProofUrl = new URL("../src/content/marketplace-proof.json", import.meta.url);
 const defaultRecordUrl = new URL("../docs/launch-gate-record.json", import.meta.url);
 
@@ -86,44 +88,34 @@ function hasCompleteSmokeEvidence(value) {
 
 function collectMarketplaceBlockers(proof, launchDate) {
   const blockers = [];
-  if (proof.requiresLaunchReverification !== false) {
+  const inspected = inspectMarketplaceProof(proof);
+  const issues = new Set(inspected.issues);
+  if (issues.has("reverification")) {
     blockers.push(
       `marketplace ratings, counts, and quote permission were last checked ${
         isRequiredString(proof.checkedOn) ? proof.checkedOn : "on an unrecorded date"
       }; reverify them and clear requiresLaunchReverification.`,
     );
   }
-  if (!isIsoDate(proof.checkedOn) || proof.checkedOn !== launchDate) {
+  if (issues.has("checked_on") || proof.checkedOn !== launchDate) {
     blockers.push(`marketplace proof must be reverified on the launch date ${launchDate}.`);
   }
 
-  const airbnb = asRecord(proof.airbnb);
-  if (
-    !isRequiredString(airbnb.rating) ||
-    !Number.isInteger(airbnb.reviewCount) ||
-    airbnb.reviewCount < 1
-  ) {
+  if (issues.has("airbnb_rating")) {
     blockers.push("marketplace proof must record Airbnb rating and review count.");
   }
-  if (!isRecordedLink(airbnb.link))
+  if (issues.has("airbnb_link"))
     blockers.push("marketplace proof must record an Airbnb listing link.");
 
-  const vrbo = asRecord(proof.vrbo);
-  if (
-    !isRequiredString(vrbo.rating) ||
-    !Number.isInteger(vrbo.reviewCount) ||
-    vrbo.reviewCount < 1
-  ) {
+  if (issues.has("vrbo_rating")) {
     blockers.push("marketplace proof must record Vrbo rating and review count.");
   }
-  if (!isRecordedLink(vrbo.link))
-    blockers.push("marketplace proof must record a Vrbo listing link.");
+  if (issues.has("vrbo_link")) blockers.push("marketplace proof must record a Vrbo listing link.");
 
-  const quote = asRecord(proof.quote);
-  if (!isRequiredString(quote.text) || !isRequiredString(quote.source)) {
+  if (issues.has("quote")) {
     blockers.push("marketplace proof must record a quote excerpt and source.");
   }
-  if (quote.permission !== "approved") {
+  if (issues.has("quote_permission")) {
     blockers.push("marketplace proof must record quote permission as approved.");
   }
   return blockers;

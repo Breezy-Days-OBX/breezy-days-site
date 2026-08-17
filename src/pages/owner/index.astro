@@ -55,6 +55,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <button class="button" type="submit" data-password-button>Save password</button>
       </form>
 
+      <div class="owner-no-access" data-owner-no-access hidden>
+        <p>This signed-in account does not have owner access.</p>
+        <p>Log out, then sign in with an account that has the owner role.</p>
+        <button class="button" type="button" data-no-access-logout>Log out</button>
+      </div>
+
       <noscript>
         <p class="owner-noscript">JavaScript is required for secure owner access.</p>
       </noscript>
@@ -68,15 +74,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       getUser,
       handleAuthCallback,
       login,
+      logout,
       updateUser,
     } from "@netlify/identity";
-    import { describeAuthError, loadOwnerEntryState } from "../../lib/owner/ownerAuth";
+    import {
+      describeAuthError,
+      hasOwnerRole,
+      loadOwnerEntryState,
+    } from "../../lib/owner/ownerAuth";
 
     const status = document.querySelector<HTMLElement>("[data-owner-status]");
     const loginForm = document.querySelector<HTMLFormElement>("[data-login-form]");
     const passwordForm = document.querySelector<HTMLFormElement>("[data-password-form]");
     const loginButton = document.querySelector<HTMLButtonElement>("[data-login-button]");
     const passwordButton = document.querySelector<HTMLButtonElement>("[data-password-button]");
+    const noAccess = document.querySelector<HTMLElement>("[data-owner-no-access]");
+    const noAccessLogout = document.querySelector<HTMLButtonElement>("[data-no-access-logout]");
     let callbackMode: "invite" | "recovery" | null = null;
     let inviteToken: string | null = null;
 
@@ -87,6 +100,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     };
 
     const redirectToDashboard = () => window.location.replace("/owner/dashboard");
+
+    const showNoAccess = () => {
+      if (loginForm) loginForm.hidden = true;
+      if (passwordForm) passwordForm.hidden = true;
+      if (noAccess) noAccess.hidden = false;
+      showStatus("This account does not have permission to open the owner dashboard.", "error");
+    };
+
+    const finishAuthentication = (user: unknown) => {
+      if (!hasOwnerRole(user)) {
+        showNoAccess();
+        return;
+      }
+      showStatus("Access confirmed. Opening the dashboard…", "success");
+      redirectToDashboard();
+    };
 
     const entry = await loadOwnerEntryState({
       handleAuthCallback,
@@ -101,6 +130,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     if (entry.state === "authenticated") {
       showStatus("Access confirmed. Opening the dashboard…", "success");
       redirectToDashboard();
+    } else if (entry.state === "forbidden") {
+      showNoAccess();
     } else if (entry.state === "invite" || entry.state === "recovery") {
       callbackMode = entry.state;
       inviteToken = entry.state === "invite" ? entry.token : null;
@@ -130,9 +161,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       loginButton?.setAttribute("disabled", "");
       showStatus("Signing in…");
       try {
-        await login(email, password);
-        showStatus("Access confirmed. Opening the dashboard…", "success");
-        redirectToDashboard();
+        finishAuthentication(await login(email, password));
       } catch {
         showStatus(describeAuthError("login"), "error");
         loginButton?.removeAttribute("disabled");
@@ -146,14 +175,26 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       passwordButton?.setAttribute("disabled", "");
       showStatus("Saving your password…");
       try {
-        if (callbackMode === "invite" && inviteToken) await acceptInvite(inviteToken, password);
-        else if (callbackMode === "recovery") await updateUser({ password });
+        let user: unknown;
+        if (callbackMode === "invite" && inviteToken)
+          user = await acceptInvite(inviteToken, password);
+        else if (callbackMode === "recovery") user = await updateUser({ password });
         else throw new Error("Invalid callback state");
-        showStatus("Password saved. Opening the dashboard…", "success");
-        redirectToDashboard();
+        finishAuthentication(user);
       } catch {
         showStatus(describeAuthError("password"), "error");
         passwordButton?.removeAttribute("disabled");
+      }
+    });
+
+    noAccessLogout?.addEventListener("click", async () => {
+      noAccessLogout.setAttribute("disabled", "");
+      try {
+        await logout();
+        window.location.replace("/owner");
+      } catch {
+        showStatus("We could not log out. Try again.", "error");
+        noAccessLogout.removeAttribute("disabled");
       }
     });
   </script>

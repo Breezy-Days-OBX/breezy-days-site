@@ -1,48 +1,65 @@
 ---
+import { getMarketplaceProofPresentation } from "../lib/marketplaceProof.mjs";
+
 interface Props {
-  proof: {
-    requiresLaunchReverification: boolean;
-    checkedOnDisplay: string;
-    airbnb: { rating: string; reviewCount: number };
-    vrbo: { rating: string; reviewCount: number };
-    quote: { text: string; source: string };
-  };
+  proof: unknown;
 }
 
 const { proof } = Astro.props;
+const presentation = getMarketplaceProofPresentation(proof);
 ---
 
 {
-  !proof.requiresLaunchReverification && (
+  presentation && (
     <div class="shell review-layout">
       <div class="review-quote-wrap">
         <p class="eyebrow">04 · Guest perspective</p>
-        <blockquote>“{proof.quote.text}”</blockquote>
-        <p class="quote-source">{proof.quote.source}</p>
+        <blockquote>“{presentation.quote.text}”</blockquote>
+        <p class="quote-source">{presentation.quote.source}</p>
       </div>
       <aside class="rating-panel" aria-label="Marketplace rating snapshot">
         <p class="rating-label">Guest ratings</p>
         <div class="rating-row">
           <>
-            <strong>{proof.airbnb.rating}</strong>
+            <strong>{presentation.airbnb.rating}</strong>
             <span>
               Airbnb
               <br />
-              {proof.airbnb.reviewCount} reviews
+              {presentation.airbnb.reviewCount} reviews
             </span>
           </>
         </div>
         <div class="rating-row">
           <>
-            <strong>{proof.vrbo.rating.replace("/10", "")}</strong>
+            <strong>{presentation.vrbo.rating.replace("/10", "")}</strong>
             <span>
               Vrbo
               <br />
-              {proof.vrbo.reviewCount} reviews
+              {presentation.vrbo.reviewCount} reviews
             </span>
           </>
         </div>
-        <p class="rating-note">Ratings checked {proof.checkedOnDisplay}.</p>
+        <p class="rating-note">Ratings checked {presentation.checkedOnDisplay}.</p>
+        <div class="marketplace-links" aria-label="View marketplace listings">
+          <a
+            href={presentation.airbnb.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-analytics-event="marketplace_outbound_click"
+            data-analytics-category="marketplace_airbnb"
+          >
+            View on Airbnb
+          </a>
+          <a
+            href={presentation.vrbo.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-analytics-event="marketplace_outbound_click"
+            data-analytics-category="marketplace_vrbo"
+          >
+            View on Vrbo
+          </a>
+        </div>
       </aside>
     </div>
   )

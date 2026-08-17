@@ -3,6 +3,9 @@ import type { OwnerApiErrorKind } from "./ownerApi";
 type DashboardFailure = OwnerApiErrorKind | "service";
 type Transition = (state: string) => void;
 
+export const describeOwnerSnapshotRestore = (formattedDate: string) =>
+  `Restore version saved ${formattedDate}`;
+
 const failureState = (error: unknown): DashboardFailure => {
   if (typeof error === "object" && error !== null && "kind" in error) {
     const kind = (error as { kind?: unknown }).kind;
@@ -14,6 +17,17 @@ const failureState = (error: unknown): DashboardFailure => {
   }
   return "service";
 };
+
+export async function loadOwnerDashboardData<TSettings, TSnapshots>(options: {
+  loadSettings: () => Promise<TSettings>;
+  loadSnapshots: () => Promise<TSnapshots>;
+}) {
+  const [settings, snapshots] = await Promise.allSettled([
+    options.loadSettings(),
+    options.loadSnapshots(),
+  ]);
+  return { settings, snapshots };
+}
 
 interface SaveOptions<TSettings, TData> {
   serialize: () =>

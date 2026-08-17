@@ -21,8 +21,8 @@
 
 [[redirects]]
   from = "/owner/dashboard"
-  to = "/owner"
-  status = 401
+  to = "/owner?access=denied"
+  status = 302
   force = true
 
 [[redirects]]
@@ -34,8 +34,8 @@
 
 [[redirects]]
   from = "/owner/dashboard/*"
-  to = "/owner"
-  status = 401
+  to = "/owner?access=denied"
+  status = 302
   force = true
 
 # Activate only after Netlify has assigned the production project and both

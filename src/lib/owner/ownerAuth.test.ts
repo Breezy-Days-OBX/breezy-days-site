@@ -22,8 +22,8 @@ describe("owner authentication entry states", () => {
       { type: "invite", user: null, token: "invite-token" },
       { state: "invite", token: "invite-token" },
     ],
-    [{ type: "recovery", user: { id: "owner" } }, { state: "recovery" }],
-    [{ type: "confirmation", user: { id: "owner" } }, { state: "authenticated" }],
+    [{ type: "recovery", user: { id: "owner", roles: ["owner"] } }, { state: "recovery" }],
+    [{ type: "confirmation", user: { id: "owner", roles: ["owner"] } }, { state: "authenticated" }],
   ])("classifies supported public owner callbacks", async (callback, expected) => {
     const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
     expect(ownerAuth).toBeDefined();
@@ -49,9 +49,25 @@ describe("owner authentication entry states", () => {
     await expect(
       ownerAuth.loadOwnerEntryState({
         handleAuthCallback: vi.fn(async () => null),
-        getUser: vi.fn(async () => ({ id: "owner" })),
+        getUser: vi.fn(async () => ({ id: "owner", roles: ["owner"] })),
       }),
     ).resolves.toMatchObject({ state: "authenticated" });
+  });
+
+  it.each([
+    [null, { id: "member", roles: ["guest"] }],
+    [{ type: "confirmation", user: { id: "member", roles: [] } }, null],
+    [{ type: "recovery", user: { id: "member", roles: ["guest"] } }, null],
+  ])("keeps an authenticated non-owner in a stable no-access state", async (callback, session) => {
+    const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
+    if (!ownerAuth) return;
+
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => callback),
+        getUser: vi.fn(async () => session),
+      }),
+    ).resolves.toMatchObject({ state: "forbidden", user: { id: "member" } });
   });
 
   it("fails closed for malformed callbacks and maps Identity failures without exposing internals", async () => {
@@ -61,7 +77,7 @@ describe("owner authentication entry states", () => {
     await expect(
       ownerAuth.loadOwnerEntryState({
         handleAuthCallback: vi.fn(async () => ({ type: "invite", user: null })),
-        getUser: vi.fn(async () => ({ id: "owner" })),
+        getUser: vi.fn(async () => ({ id: "owner", roles: ["owner"] })),
       }),
     ).resolves.toEqual({ state: "callback_error" });
     await expect(
