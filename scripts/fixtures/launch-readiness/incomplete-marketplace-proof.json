@@ -5,17 +5,14 @@
   "airbnb": {
     "rating": "4.9",
     "label": "Guest Favorite",
-    "reviewCount": 39,
-    "link": "https://fixture.example.test/airbnb"
+    "reviewCount": 39
   },
   "vrbo": {
     "rating": "9.4/10",
-    "reviewCount": 88,
-    "link": "https://fixture.example.test/vrbo"
+    "reviewCount": 88
   },
   "quote": {
     "text": "Great family trip. Beach was beautiful and house was just what we needed.",
-    "source": "Verified Vrbo guest",
-    "permission": "approved"
+    "source": "Verified Vrbo guest"
   }
 }

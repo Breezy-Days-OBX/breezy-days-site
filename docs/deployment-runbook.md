@@ -7,7 +7,7 @@ This is a handoff guide for the client-owned Netlify project. It describes actio
 - Keep the Netlify team, site ownership, billing, Identity administration, Forms notification recipients, Blobs access, analytics accounts, and domain registrar under client-approved ownership.
 - Local work uses Node `22.19.0`, `npm ci`, and the repository quality commands. Local gates need no Netlify account or credentials.
 - Deploy previews use the same static build and must retain their preview hostname. Do not activate the prepared canonical-host redirect for previews.
-- Production is the intended Netlify site only. Record its deployed URL and smoke-test results in `docs/launch-gate-record.json` after each launch decision.
+- Production is the intended Netlify site only. Record each passing smoke result in `docs/launch-gate-record.json` with the observed date, responsible owner, production URL, observed result, and evidence location after each launch decision.
 
 ## Environment inventory
 
@@ -21,7 +21,7 @@ Netlify provides deployment, Functions, Identity, Forms, and Blobs context throu
 2. Enable Identity, disable public registration, invite only approved owners, and assign every approved dashboard account the exact `owner` role.
 3. Verify the unauthorised fallback from `/owner/dashboard` to `/owner` and separately verify the owner-role route. Function authorization remains required even when the edge route permits the page.
 4. Enable Blobs. With an approved owner account, exercise settings read, save, conflict handling, snapshot creation, and restore; record the result.
-5. Confirm Netlify detects the `availability-request` form. Configure the owner-approved email notification recipient in the Netlify UI, submit the approved production smoke request, and verify both the Forms record and email delivery without representing it as a reservation.
+5. Confirm Netlify detects the `availability-request` form. Configure the owner-approved email notification recipient in the Netlify UI, submit the approved production smoke request, and verify both the Forms record and email delivery without representing it as a reservation. Record the complete smoke-evidence object only after that observation.
 6. Configure optional approved analytics IDs in the correct context. Confirm analytics is absent when waived, and that public events never include form values or owner activity.
 
 ## Domain cutover and rollback

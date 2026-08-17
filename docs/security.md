@@ -15,7 +15,7 @@ Retention and deletion periods remain owner-approval and applicable-requirements
 
 ## Deployment controls
 
-`netlify.toml` sets a restrictive same-origin CSP with only the optional GA4 and Clarity endpoints, frame denial, HSTS, strict referrer and permissions policies, and MIME sniffing protection. The CSP permits `unsafe-inline` only for Astro-generated JSON-LD in this static deployment; it does not permit `unsafe-eval`, inline event handlers, remote styles, or generic third-party script hosts.
+`netlify.toml` sets a restrictive same-origin CSP with only the optional GA4 and Clarity endpoints, frame denial, HSTS, strict referrer and permissions policies, and MIME sniffing protection. Its `script-src 'unsafe-inline'` permits inline script blocks generally in this static deployment; JSON-LD is the known required inline block, but CSP does not limit that source expression to JSON-LD. The policy does not permit `unsafe-eval`, inline event handlers through `script-src-attr 'none'`, remote styles, or generic third-party script hosts. Moving to hashes or nonces needs a separately designed static-build or response-layer change.
 
 Keep secrets out of the repository. Do not commit `.env` files, live identifiers beyond intentionally public analytics IDs, credentials, exported client data, Netlify state, or build artifacts. Run `npm run check:secrets` before release and keep platform credentials in the client-owned provider.
 

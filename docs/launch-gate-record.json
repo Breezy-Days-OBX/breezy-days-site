@@ -11,12 +11,12 @@
     "PUBLIC_CLARITY_ID": "pending"
   },
   "productionSmoke": {
-    "deployment": "pending",
-    "identityOwnerRole": "pending",
-    "blobs": "pending",
-    "formsEmailNotification": "pending",
-    "responseHeaders": "pending",
-    "analytics": "pending",
-    "domainTlsCanonicalHost": "pending"
+    "deployment": { "status": "pending" },
+    "identityOwnerRole": { "status": "pending" },
+    "blobs": { "status": "pending" },
+    "formsEmailNotification": { "status": "pending" },
+    "responseHeaders": { "status": "pending" },
+    "analytics": { "status": "pending" },
+    "domainTlsCanonicalHost": { "status": "pending" }
   }
 }

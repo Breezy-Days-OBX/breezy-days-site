@@ -59,3 +59,25 @@ Reviewed the full `0ad13fe..worktree` Task 6 diff for scope, factual honesty, se
 ## Concerns
 
 The system-wide default Node executable is `v22.18.0`; the recorded clean-install and quality commands used an on-demand `v22.19.0` runtime to meet the repository pin. The test runner emitted existing `NO_COLOR`/`FORCE_COLOR` warnings during Playwright execution, but all tests passed. No live smoke test was attempted, so no production result is represented as complete.
+
+## Fix Round 1: Fail-Closed Evidence Contracts
+
+### Changed behavior
+
+- Marketplace proof now requires the reverification flag to be clear **and** a valid `checkedOn` date equal to the launch date. The normal command uses the current UTC date; the fixture-only `--today` input makes the launch-day rule deterministic in tests.
+- A cleared marketplace proof must contain non-empty Airbnb and Vrbo ratings and positive review counts, an HTTP(S) listing link for each marketplace, and a non-empty quote excerpt/source with `permission: "approved"`. The real proof remains unreverified and was not augmented with invented links or permission.
+- Every production smoke item now requires an evidence object with `status: "passed"`, `observedOn`, `responsibleOwner`, `productionUrl`, `observedResult: "passed"`, and `evidenceLocation`. The real record keeps all seven objects at `status: "pending"` only.
+- The pending-record regression test now asserts all 4 owner, 2 environment, and 7 smoke blockers. The security guide now accurately states that `script-src 'unsafe-inline'` permits inline script blocks generally; it is not scoped to JSON-LD.
+
+### TDD evidence
+
+The tests name the breaks they catch: accepting incomplete/stale proof, accepting bare smoke strings or missing evidence fields, and omitting any individual external blocker.
+
+1. **RED:** `node --test scripts/check-launch-readiness.test.mjs` before the checker change: 8 tests ran, 2 passed and 6 failed. The complete evidence fixture was rejected as seven bare-string smoke failures; stale/incomplete marketplace fixtures lacked their expected blockers; bare `"passed"` smoke strings were incorrectly accepted; incomplete and malformed evidence produced only the old generic status blocker.
+2. **GREEN:** Implemented the date-equality freshness rule, complete marketplace contract, and complete smoke-evidence validation. `node --test scripts/check-launch-readiness.test.mjs` then passed all 8 tests.
+3. **Focused suite:** `npm run test:checkers` passed all 18 checker tests under Node `v22.19.0`.
+4. **Full suite:** `npx --yes --package=node@22.19.0 -- node C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js run ci` passed: Astro check reported 0 errors; 122 unit, 28 integration, 18 checker, 8 browser, and 5 accessibility tests passed; build/link/CSP/secret/audit gates passed with 0 production dependency vulnerabilities. The initial aggregate attempt stopped at Prettier; the only cause was one script line wrap, corrected before this passing run.
+
+### Self-review and real gate state
+
+Reviewed the fix-round diff for fail-closed branches and documentation consistency. Missing, malformed, or stale proof/evidence cannot pass; fixtures use `2026-08-17` only as fixture-only test data. The real `npm run check:launch` was rerun under Node `v22.19.0` and intentionally failed with 18 genuine external gates: five marketplace-evidence items, four owner approvals, two analytics-ID dispositions, and seven production smoke evidence items. No client approval, marketplace evidence, production observation, account data, or external state was created or changed.

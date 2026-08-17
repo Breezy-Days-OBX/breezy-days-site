@@ -11,7 +11,7 @@ Use this checklist at release time. `npm run check:launch` is intentionally sepa
 
 ## Decisions and approvals
 
-- [ ] Reverify the marketplace rating, count, quote, source permission, and links on launch day; update the marketplace proof only with verified evidence.
+- [ ] Reverify the marketplace rating, count, quote excerpt and source, quote permission, and Airbnb/Vrbo links on launch day. Clear the reverification flag only after the complete proof is recorded with that launch date.
 - [ ] Explicitly approve or narrow the eight dashboard fields, meanings, public destinations, fallbacks, and help text.
 - [ ] Approve public policy and inquiry-retention decisions; obtain appropriate advice where needed rather than treating the repository as legal approval.
 - [ ] Make and approve the SMS choice. SMS remains disabled unless provider, cost, consent, and implementation decisions are separately approved.
@@ -26,7 +26,7 @@ Use this checklist at release time. `npm run check:launch` is intentionally sepa
 - [ ] Inspect the production response headers and owner no-store/noindex behavior.
 - [ ] Confirm approved analytics behavior or the waived state; do not send personal or owner data.
 - [ ] Confirm domain, TLS, canonical host, canonical metadata, sitemap, robots, and only then the `www` redirect.
-- [ ] Update every applicable production-smoke field to `passed` in `docs/launch-gate-record.json` and run `npm run check:launch` again.
+- [ ] Update every passing production-smoke field with the complete evidence object defined in `docs/pre-launch-test-record.md`, then run `npm run check:launch` again.
 
 ## Release and rollback readiness
 

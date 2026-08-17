@@ -5,14 +5,19 @@ import { pathToFileURL } from "node:url";
 const defaultProofUrl = new URL("../src/content/marketplace-proof.json", import.meta.url);
 const defaultRecordUrl = new URL("../docs/launch-gate-record.json", import.meta.url);
 
-function optionPath(name) {
+function optionValue(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return null;
   const value = process.argv[index + 1];
   if (!value || value.startsWith("--")) {
     throw new Error(`Missing value for ${name}.`);
   }
-  return pathToFileURL(resolve(value));
+  return value;
+}
+
+function optionPath(name) {
+  const value = optionValue(name);
+  return value ? pathToFileURL(resolve(value)) : null;
 }
 
 async function readJson(label, url) {
@@ -47,15 +52,86 @@ function asRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value) ? value : {};
 }
 
-function collectLaunchBlockers(proof, record) {
+function isRequiredString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isIsoDate(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+function isRecordedLink(value) {
+  if (!isRequiredString(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function hasCompleteSmokeEvidence(value) {
+  const evidence = asRecord(value);
+  return (
+    evidence.status === "passed" &&
+    isIsoDate(evidence.observedOn) &&
+    isRequiredString(evidence.responsibleOwner) &&
+    isRecordedLink(evidence.productionUrl) &&
+    evidence.observedResult === "passed" &&
+    isRequiredString(evidence.evidenceLocation)
+  );
+}
+
+function collectMarketplaceBlockers(proof, launchDate) {
   const blockers = [];
   if (proof.requiresLaunchReverification !== false) {
     blockers.push(
       `marketplace ratings, counts, and quote permission were last checked ${
-        typeof proof.checkedOn === "string" ? proof.checkedOn : "on an unrecorded date"
+        isRequiredString(proof.checkedOn) ? proof.checkedOn : "on an unrecorded date"
       }; reverify them and clear requiresLaunchReverification.`,
     );
   }
+  if (!isIsoDate(proof.checkedOn) || proof.checkedOn !== launchDate) {
+    blockers.push(`marketplace proof must be reverified on the launch date ${launchDate}.`);
+  }
+
+  const airbnb = asRecord(proof.airbnb);
+  if (
+    !isRequiredString(airbnb.rating) ||
+    !Number.isInteger(airbnb.reviewCount) ||
+    airbnb.reviewCount < 1
+  ) {
+    blockers.push("marketplace proof must record Airbnb rating and review count.");
+  }
+  if (!isRecordedLink(airbnb.link))
+    blockers.push("marketplace proof must record an Airbnb listing link.");
+
+  const vrbo = asRecord(proof.vrbo);
+  if (
+    !isRequiredString(vrbo.rating) ||
+    !Number.isInteger(vrbo.reviewCount) ||
+    vrbo.reviewCount < 1
+  ) {
+    blockers.push("marketplace proof must record Vrbo rating and review count.");
+  }
+  if (!isRecordedLink(vrbo.link))
+    blockers.push("marketplace proof must record a Vrbo listing link.");
+
+  const quote = asRecord(proof.quote);
+  if (!isRequiredString(quote.text) || !isRequiredString(quote.source)) {
+    blockers.push("marketplace proof must record a quote excerpt and source.");
+  }
+  if (quote.permission !== "approved") {
+    blockers.push("marketplace proof must record quote permission as approved.");
+  }
+  return blockers;
+}
+
+function collectLaunchBlockers(proof, record, launchDate) {
+  const blockers = [];
+  blockers.push(...collectMarketplaceBlockers(proof, launchDate));
 
   if (record.schemaVersion !== 1) blockers.push("launch gate record schemaVersion must be 1.");
 
@@ -73,8 +149,10 @@ function collectLaunchBlockers(proof, record) {
 
   const productionSmoke = asRecord(record.productionSmoke);
   for (const [key, label] of productionSmokeGates) {
-    if (productionSmoke[key] !== "passed") {
-      blockers.push(`production smoke test: ${label}`);
+    if (!hasCompleteSmokeEvidence(productionSmoke[key])) {
+      blockers.push(
+        `production smoke test: ${label} requires complete production evidence (status, observedOn, responsibleOwner, productionUrl, observedResult, evidenceLocation).`,
+      );
     }
   }
 
@@ -83,16 +161,19 @@ function collectLaunchBlockers(proof, record) {
 
 let proof;
 let record;
+let launchDate;
 try {
   proof = await readJson("marketplace proof", optionPath("--proof") ?? defaultProofUrl);
   record = await readJson("launch gate record", optionPath("--record") ?? defaultRecordUrl);
+  launchDate = optionValue("--today") ?? new Date().toISOString().slice(0, 10);
+  if (!isIsoDate(launchDate)) throw new Error("Launch date must use YYYY-MM-DD.");
 } catch (error) {
   console.error(`Launch blocked: ${error instanceof Error ? error.message : "unknown error"}`);
   process.exitCode = 1;
   process.exit();
 }
 
-const blockers = collectLaunchBlockers(asRecord(proof), asRecord(record));
+const blockers = collectLaunchBlockers(asRecord(proof), asRecord(record), launchDate);
 
 if (blockers.length > 0) {
   console.error("Launch blocked:");

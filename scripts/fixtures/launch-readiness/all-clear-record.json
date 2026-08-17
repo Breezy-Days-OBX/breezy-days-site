@@ -11,12 +11,61 @@
     "PUBLIC_CLARITY_ID": "waived"
   },
   "productionSmoke": {
-    "deployment": "passed",
-    "identityOwnerRole": "passed",
-    "blobs": "passed",
-    "formsEmailNotification": "passed",
-    "responseHeaders": "passed",
-    "analytics": "passed",
-    "domainTlsCanonicalHost": "passed"
+    "deployment": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only deployment evidence"
+    },
+    "identityOwnerRole": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only Identity evidence"
+    },
+    "blobs": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only Blobs evidence"
+    },
+    "formsEmailNotification": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only Forms evidence"
+    },
+    "responseHeaders": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only response-header evidence"
+    },
+    "analytics": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only analytics evidence"
+    },
+    "domainTlsCanonicalHost": {
+      "status": "passed",
+      "observedOn": "2026-08-17",
+      "responsibleOwner": "Fixture operator",
+      "productionUrl": "https://fixture.example.test/",
+      "observedResult": "passed",
+      "evidenceLocation": "Fixture-only domain evidence"
+    }
   }
 }
