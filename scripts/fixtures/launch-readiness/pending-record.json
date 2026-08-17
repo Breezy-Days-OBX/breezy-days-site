@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "ownerApproval": {
+    "dashboardFields": "pending",
+    "publicPolicies": "pending",
+    "inquiryRetention": "pending",
+    "smsChoice": "pending"
+  },
+  "environmentIds": {
+    "PUBLIC_GA4_ID": "pending",
+    "PUBLIC_CLARITY_ID": "pending"
+  },
+  "productionSmoke": {
+    "deployment": "pending",
+    "identityOwnerRole": "pending",
+    "blobs": "pending",
+    "formsEmailNotification": "pending",
+    "responseHeaders": "pending",
+    "analytics": "pending",
+    "domainTlsCanonicalHost": "pending"
+  }
+}

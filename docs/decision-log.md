@@ -1,0 +1,13 @@
+# Decision Log
+
+| Decision                                                        | Status                                       | Basis and next gate                                                                                                           |
+| --------------------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Static Astro site with standalone Netlify Functions             | Implemented                                  | `docs/technical-design.md` documents the static-first architecture; no Astro server adapter is used.                          |
+| Netlify Forms is the durable inquiry path                       | Implemented                                  | Form submissions are requests, not reservations or payments; notification delivery still needs production verification.       |
+| Owner dashboard is invite-only and limited                      | Implemented, approval pending                | Identity must use the exact `owner` role. The eight-field contract remains provisional until explicitly approved or narrowed. |
+| Netlify Blobs store only validated owner settings and snapshots | Implemented, production verification pending | Guest inquiries, reservations, payment data, and Identity data are excluded.                                                  |
+| SMS is disabled                                                 | Pending owner decision                       | No provider, cost, consent flow, credentials, or sending code is approved. Email notification is the baseline.                |
+| Optional GA4 and Clarity integrations                           | Pending configured-or-waived decision        | Their public IDs are optional; their absence disables analytics. No personal, inquiry, or owner data may be tracked.          |
+| Marketplace proof                                               | Reverification pending                       | Ratings, counts, quote, source permission, and links require launch-day verification.                                         |
+| Custom-domain canonical redirect                                | Production gate                              | Activate only after domain and TLS verification, then re-run production smoke tests.                                          |
+| Retention and public policy decisions                           | Owner approval pending                       | Do not infer legal or recordkeeping decisions from the implementation.                                                        |

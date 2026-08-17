@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "ownerApproval": {
+    "dashboardFields": "approved",
+    "publicPolicies": "approved",
+    "inquiryRetention": "approved",
+    "smsChoice": "approved"
+  },
+  "environmentIds": {
+    "PUBLIC_GA4_ID": "waived",
+    "PUBLIC_CLARITY_ID": "waived"
+  },
+  "productionSmoke": {
+    "deployment": "passed",
+    "identityOwnerRole": "passed",
+    "blobs": "passed",
+    "formsEmailNotification": "passed",
+    "responseHeaders": "passed",
+    "analytics": "passed",
+    "domainTlsCanonicalHost": "passed"
+  }
+}

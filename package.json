@@ -24,7 +24,7 @@
     "test:run": "vitest run",
     "test:unit": "vitest run src",
     "test:integration": "vitest run netlify",
-    "test:checkers": "node --test scripts/check-built-site.test.mjs scripts/check-csp.test.mjs scripts/check-secrets.test.mjs",
+    "test:checkers": "node --test scripts/check-built-site.test.mjs scripts/check-csp.test.mjs scripts/check-launch-readiness.test.mjs scripts/check-secrets.test.mjs",
     "test:e2e": "npm run build && playwright test --grep-invert @axe",
     "test:a11y": "npm run build && playwright test --grep @axe",
     "audit:prod": "npm audit --omit=dev",

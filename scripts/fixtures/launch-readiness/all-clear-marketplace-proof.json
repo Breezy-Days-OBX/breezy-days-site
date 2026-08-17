@@ -1,0 +1,18 @@
+{
+  "checkedOn": "2026-08-17",
+  "checkedOnDisplay": "August 17, 2026",
+  "requiresLaunchReverification": false,
+  "airbnb": {
+    "rating": "4.9",
+    "label": "Guest Favorite",
+    "reviewCount": 39
+  },
+  "vrbo": {
+    "rating": "9.4/10",
+    "reviewCount": 88
+  },
+  "quote": {
+    "text": "Great family trip. Beach was beautiful and house was just what we needed.",
+    "source": "Verified Vrbo guest"
+  }
+}
