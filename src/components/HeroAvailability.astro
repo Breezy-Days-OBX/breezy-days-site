@@ -50,10 +50,7 @@ const { maximumGuests } = Astro.props;
 
 <script>
   import { addDays, toLocalIsoDate } from "../lib/dateRules";
-  import {
-    AVAILABILITY_DRAFT_FIELDS,
-    copyAvailabilityDraft,
-  } from "../lib/availabilityPrefill";
+  import { AVAILABILITY_DRAFT_FIELDS, copyAvailabilityDraft } from "../lib/availabilityPrefill";
 
   for (const entry of document.querySelectorAll<HTMLElement>("[data-availability-entry]")) {
     const arrival = entry.querySelector<HTMLInputElement>("#hero-arrival");

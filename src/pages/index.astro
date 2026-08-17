@@ -70,6 +70,11 @@ const faqs = [
     answer: `${property.amenities.provided.includes("Beach chairs") ? "Beach chairs are provided." : ""} ${property.amenities.notProvided.join(", ")} are not provided. ${property.amenities.localRentalNote}.`,
   },
 ];
+const ownerStorySentences = property.ownerStory
+  .match(/[^.!?]+[.!?]+/g)
+  ?.map((sentence) => sentence.trim()) ?? [property.ownerStory];
+const ownerStoryLead = ownerStorySentences.slice(0, 2).join(" ");
+const ownerStoryRest = ownerStorySentences.slice(2).join(" ");
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -162,8 +167,8 @@ const structuredData = {
           {
             !publishProof && (
               <p class="hero-facts">
-                {property.fit.maximumOvernightGuests} guests · {property.sleeping.bedroomCount} bedrooms
-                · Private pool + hot tub
+                {property.fit.maximumOvernightGuests} guests · {property.sleeping.bedroomCount}{" "}
+                bedrooms · Private pool + hot tub
               </p>
             )
           }
@@ -180,8 +185,8 @@ const structuredData = {
             <h2 id="fit-title">One house, with room for the whole family rhythm.</h2>
           </div>
           <p>
-            {property.fit.bestFor}. Sleeps up to {property.fit.maximumOvernightGuests} guests, with
-            the practical details made clear before anyone packs.
+            {property.fit.bestFor}. Sleeps up to {property.fit.maximumOvernightGuests} guests, with the
+            practical details made clear before anyone packs.
           </p>
         </div>
         <div class="fit-strip" aria-label="Breezy Days at a glance">
@@ -320,9 +325,10 @@ const structuredData = {
             <p class="eyebrow eyebrow-light">04 · Sleep, settle in, pack well</p>
             <h2 id="essentials-title">The practical details, made plain.</h2>
             <p>
-              {property.sleeping.bedroomCount} bedrooms, {property.bathrooms.full} full bathrooms and {
-                property.bathrooms.half
-              } half bathroom, with the everyday supplies that make arrival easier.
+              {property.sleeping.bedroomCount} bedrooms, {property.bathrooms.full} full bathrooms and{
+                " "
+              }
+              {property.bathrooms.half} half bathroom, with the everyday supplies that make arrival easier.
             </p>
             <a class="text-link text-link-light" href="/rental-information"
               >Read all rental information <span aria-hidden="true">→</span></a
@@ -379,7 +385,9 @@ const structuredData = {
                 <p>
                   <span data-public-setting="petFeeUsd"
                     >{money.format(ownerSettingsDefaults.petFeeUsd)} per stay</span
-                  > · Up to <span data-public-setting="maxPets">{ownerSettingsDefaults.maxPets}</span> pets
+                  > · Up to <span data-public-setting="maxPets"
+                    >{ownerSettingsDefaults.maxPets}</span
+                  > pets
                 </p>
               </div>
             </div>
@@ -397,8 +405,11 @@ const structuredData = {
       <MarketplaceProof proof={proof} />
       <div class="shell owner-story">
         <p class="eyebrow">Why this home</p>
-        <blockquote>{property.ownerStory}</blockquote>
-        <p>{property.identity.hostLine}</p>
+        <div class="owner-story-copy">
+          <blockquote class="owner-story-lead">{ownerStoryLead}</blockquote>
+          {ownerStoryRest && <p class="owner-story-rest">{ownerStoryRest}</p>}
+          <p class="owner-story-host">{property.identity.hostLine}</p>
+        </div>
       </div>
     </section>
 

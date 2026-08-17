@@ -6,6 +6,7 @@
   --home-forest-hover: #385043;
   --home-sand: #ddd5c8;
   --home-muted: #686c67;
+  --home-muted-on-sand: #636762;
   --home-gold: #d69a39;
   --home-display: "Newsreader Variable", Georgia, serif;
   --home-body: "Manrope Variable", "Segoe UI", sans-serif;
@@ -57,6 +58,7 @@
   font-size: 1.95rem;
   font-weight: 600;
   letter-spacing: -0.035em;
+  white-space: nowrap;
 }
 
 .home-page .wordmark span {
@@ -357,6 +359,11 @@
   background: #ede7dc;
 }
 
+.home-page .fit-strip-access span,
+.home-page .pricing-note {
+  color: var(--home-muted-on-sand);
+}
+
 .home-page .fit-footnote {
   max-width: 900px;
   margin: 24px 0 0;
@@ -590,6 +597,10 @@
   padding: clamp(40px, 5vw, 72px);
 }
 
+.home-page .owner-story-copy {
+  max-width: 920px;
+}
+
 .home-page .owner-story blockquote {
   max-width: 920px;
   font-size: clamp(2rem, 3.25vw, 3.4rem);
@@ -598,9 +609,21 @@
   line-height: 1.08;
 }
 
-.home-page .owner-story > p:last-child {
+.home-page .owner-story-rest {
+  max-width: 790px;
+  margin: 26px 0 0;
+  color: var(--home-muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.home-page .owner-story-host {
+  margin: 28px 0 0;
   color: var(--home-muted);
   font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .home-page .process-section {
@@ -804,8 +827,7 @@
   padding: clamp(44px, 6vw, 86px);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.09), transparent 30%),
-    #18231f;
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.09), transparent 30%), #18231f;
 }
 
 .home-page .final-layout h2 {
@@ -1059,8 +1081,9 @@
     gap: 24px;
   }
 
-  .home-page .owner-story > p:last-child {
-    grid-column: 1;
+  .home-page .owner-story blockquote {
+    font-size: 1.82rem;
+    line-height: 1.06;
   }
 
   .home-page .availability-form {
@@ -1090,12 +1113,13 @@
   }
 
   .home-page .wordmark {
-    font-size: 1.28rem;
+    gap: 3px;
+    font-size: 1.08rem;
   }
 
   .home-page .button-small {
-    padding-inline: 13px;
-    font-size: 0.68rem;
+    padding-inline: 10px;
+    font-size: 0.6rem;
   }
 
   .home-page .section h2 {

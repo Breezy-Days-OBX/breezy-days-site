@@ -162,5 +162,7 @@ describe("Breezy Days homepage", () => {
     expect(html).toContain('class="stay-details-panel"');
     expect(html).toContain('data-gallery-feature="living"');
     expect(html).toContain('data-gallery-feature="pool"');
+    expect(html).toContain('class="owner-story-lead"');
+    expect(html).toContain('class="owner-story-rest"');
   });
 });

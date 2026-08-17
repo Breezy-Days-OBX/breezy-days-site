@@ -27,6 +27,7 @@
 ### Task 1: Lock the new funnel order and availability-transfer behavior
 
 **Files:**
+
 - Modify: `src/content/site.test.ts`
 - Modify: `src/tests/homepage.test.ts`
 - Create: `src/lib/availabilityPrefill.test.ts`
@@ -34,6 +35,7 @@
 - Modify: `src/content/site.ts`
 
 **Interfaces:**
+
 - Consumes: the existing `siteContent.primaryAction` and full form fields named `arrival`, `departure`, and `guests`.
 - Produces: `AVAILABILITY_DRAFT_FIELDS`, `AvailabilityDraftReader`, `AvailabilityDraftWriter`, and `copyAvailabilityDraft(reader, writer): readonly AvailabilityDraftField[]`.
 
@@ -77,7 +79,9 @@ const source = { arrival: "2035-06-10", departure: "2035-06-17", guests: "6" };
 const written: Record<string, string> = {};
 const copied = module.copyAvailabilityDraft(
   (field) => source[field],
-  (field, value) => { written[field] = value; },
+  (field, value) => {
+    written[field] = value;
+  },
 );
 
 expect(copied).toEqual(["arrival", "departure", "guests"]);
@@ -145,6 +149,7 @@ git commit -m "test: define premium homepage funnel"
 ### Task 2: Establish the scoped visual foundation
 
 **Files:**
+
 - Modify: `package.json`
 - Modify: `package-lock.json`
 - Modify: `src/layouts/BaseLayout.astro`
@@ -153,6 +158,7 @@ git commit -m "test: define premium homepage funnel"
 - Modify: `src/components/SiteHeader.astro`
 
 **Interfaces:**
+
 - Consumes: `BaseLayout` title, description, `noindex`, and structured data props.
 - Produces: optional `bodyClass?: string`, a `home-page` root scope, Fontsource families `Newsreader Variable` and `Manrope Variable`, and the approved header hierarchy.
 
@@ -170,7 +176,7 @@ These packages are bundled locally; no external font request may appear in the p
 
 In `BaseLayout.astro`, add:
 
-```astro
+```ts
 import "@fontsource-variable/manrope/wght.css";
 import "@fontsource-variable/newsreader/wght.css";
 
@@ -261,12 +267,14 @@ git commit -m "feat: establish Breezy Days visual system"
 ### Task 3: Build the cinematic hero and compact availability card
 
 **Files:**
+
 - Create: `src/components/HeroAvailability.astro`
 - Modify: `src/pages/index.astro`
 - Modify: `src/styles/home.css`
 - Modify: `e2e/public.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `copyAvailabilityDraft`, `property.fit.maximumOvernightGuests`, `siteContent.booking.disclaimer`, and the full form named `availability-request`.
 - Produces: `[data-availability-entry]`, source controls `hero-arrival`, `hero-departure`, `hero-guests`, and an anchor fallback to `#availability`.
 
@@ -275,7 +283,9 @@ git commit -m "feat: establish Breezy Days visual system"
 Add a Playwright test that fills the hero controls, clicks its `Check availability` link, and asserts the real full form received the literal values and scrolled into view:
 
 ```ts
-test("hero availability carries dates and guests into the owner-reviewed request", async ({ page }) => {
+test("hero availability carries dates and guests into the owner-reviewed request", async ({
+  page,
+}) => {
   await page.goto("/");
   const entry = page.locator("[data-availability-entry]");
   await entry.locator("#hero-arrival").fill("2035-06-10");
@@ -310,14 +320,35 @@ Render a semantic non-submitting group with three controls and one fallback link
 
 ```astro
 <div class="hero-availability" data-availability-entry aria-labelledby="availability-entry-title">
-  <p id="availability-entry-title" class="hero-availability-title">Check whether your dates are available</p>
+  <p id="availability-entry-title" class="hero-availability-title">
+    Check whether your dates are available
+  </p>
   <div class="hero-availability-fields">
     <label for="hero-arrival"><span>Arrival</span><input id="hero-arrival" type="date" /></label>
-    <label for="hero-departure"><span>Departure</span><input id="hero-departure" type="date" /></label>
-    <label for="hero-guests"><span>Guests</span><input id="hero-guests" type="number" min="1" max={maximumGuests} inputmode="numeric" placeholder="Add guests" /></label>
+    <label for="hero-departure"
+      ><span>Departure</span><input id="hero-departure" type="date" /></label
+    >
+    <label for="hero-guests"
+      ><span>Guests</span><input
+        id="hero-guests"
+        type="number"
+        min="1"
+        max={maximumGuests}
+        inputmode="numeric"
+        placeholder="Add guests"
+      /></label
+    >
   </div>
-  <a class="button hero-availability-action" href="#availability" data-prefill-availability data-analytics-event="primary_request_click" data-analytics-category="hero">Check availability</a>
-  <p class="hero-availability-note">Checking these dates starts a request. The owner confirms availability and total price.</p>
+  <a
+    class="button hero-availability-action"
+    href="#availability"
+    data-prefill-availability
+    data-analytics-event="primary_request_click"
+    data-analytics-category="hero">Check availability</a
+  >
+  <p class="hero-availability-note">
+    Checking these dates starts a request. The owner confirms availability and total price.
+  </p>
 </div>
 ```
 
@@ -373,11 +404,13 @@ git commit -m "feat: add cinematic availability hero"
 ### Task 4: Recompose the property story as an editorial journey
 
 **Files:**
+
 - Modify: `src/pages/index.astro`
 - Modify: `src/styles/home.css`
 - Modify: `src/tests/homepage.test.ts`
 
 **Interfaces:**
+
 - Consumes: the existing six optimized images, typed `property`, `publicFacts`, and public-settings markers.
 - Produces: rounded fit strip, asymmetric gallery, location story, and practical-stay section in the approved order.
 
@@ -422,8 +455,13 @@ Use `livingDining` as the large lead image, `privatePool` and `bedroom` as stack
   gap: 18px;
 }
 
-.home-page [data-gallery-feature="living"] { grid-row: 1 / 3; }
-.home-page .gallery-kitchen { grid-column: 1 / -1; min-height: 380px; }
+.home-page [data-gallery-feature="living"] {
+  grid-row: 1 / 3;
+}
+.home-page .gallery-kitchen {
+  grid-column: 1 / -1;
+  min-height: 380px;
+}
 ```
 
 - [ ] **Step 5: Move and restyle the location story**
@@ -456,6 +494,7 @@ git commit -m "feat: reshape the Breezy Days property story"
 ### Task 5: Refine proof, process, full inquiry, FAQ, and closing action
 
 **Files:**
+
 - Modify: `src/pages/index.astro`
 - Modify: `src/components/AvailabilityForm.astro`
 - Modify: `src/components/MarketplaceProof.astro`
@@ -463,6 +502,7 @@ git commit -m "feat: reshape the Breezy Days property story"
 - Modify: `src/styles/home.css`
 
 **Interfaces:**
+
 - Consumes: the existing gated marketplace presentation, owner story, full form controller, Netlify form, public settings, and footer links.
 - Produces: a premium lower-page conversion sequence with no behavior-contract changes.
 
@@ -519,6 +559,7 @@ git commit -m "feat: polish the availability request journey"
 ### Task 6: Responsive fidelity and full verification checkpoint
 
 **Files:**
+
 - Modify: `src/styles/home.css`
 - Create: `artifacts/homepage-redesign/desktop-1536x1024.png`
 - Create: `artifacts/homepage-redesign/laptop-1280x800.png`
@@ -526,6 +567,7 @@ git commit -m "feat: polish the availability request journey"
 - Create: `artifacts/homepage-redesign/mobile-320x700.png`
 
 **Interfaces:**
+
 - Consumes: the completed homepage, approved mock-ups, deterministic local fonts/images, and existing test suites.
 - Produces: four review screenshots and an evidence-backed homepage approval checkpoint.
 
