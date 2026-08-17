@@ -124,6 +124,150 @@
   padding-inline: 24px;
 }
 
+.home-page .hero {
+  min-height: min(850px, calc(100svh - 92px));
+  margin-bottom: 112px;
+  overflow: visible;
+  background: #5d6f67;
+}
+
+.home-page .hero-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.home-page .hero-image,
+.home-page .hero-wash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.home-page .hero-image {
+  object-fit: cover;
+  object-position: 50% 48%;
+  filter: saturate(0.92) contrast(0.98) brightness(1.04);
+}
+
+.home-page .hero-wash {
+  background:
+    linear-gradient(90deg, rgba(12, 17, 14, 0.72) 0%, rgba(12, 17, 14, 0.46) 38%, transparent 72%),
+    linear-gradient(0deg, rgba(10, 15, 12, 0.42) 0%, transparent 44%);
+}
+
+.home-page .hero-content {
+  min-height: min(850px, calc(100svh - 92px));
+  justify-content: flex-end;
+  padding-block: 96px 142px;
+}
+
+.home-page .hero-copy {
+  max-width: 820px;
+}
+
+.home-page .hero .eyebrow {
+  margin-bottom: 22px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+}
+
+.home-page .hero h1 {
+  max-width: 790px;
+  margin-bottom: 22px;
+  font-size: clamp(4.8rem, 6.1vw, 6.5rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.93;
+  text-wrap: balance;
+}
+
+.home-page .hero-lede {
+  max-width: 600px;
+  margin-bottom: 24px;
+  font-size: clamp(1.1rem, 1.5vw, 1.28rem);
+  line-height: 1.5;
+}
+
+.home-page .hero-facts {
+  width: fit-content;
+  margin: 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.38);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.home-page .hero-proof {
+  border-top-color: rgba(255, 255, 255, 0.38);
+}
+
+.home-page .hero-availability {
+  position: absolute;
+  right: 0;
+  bottom: -70px;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 22px;
+  align-items: center;
+  padding: 22px 24px;
+  border: 1px solid rgba(24, 26, 24, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 28px 70px rgba(34, 41, 36, 0.2);
+  color: var(--home-ink);
+}
+
+.home-page .hero-availability-title,
+.home-page .hero-availability-note {
+  display: none;
+}
+
+.home-page .hero-availability-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.78fr;
+  gap: 14px;
+}
+
+.home-page .hero-availability-fields label {
+  display: grid;
+  gap: 7px;
+}
+
+.home-page .hero-availability-fields label > span {
+  color: #4d504d;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.home-page .hero-availability-fields input {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 14px;
+  border: 1px solid rgba(24, 26, 24, 0.16);
+  border-radius: 10px;
+  background: #fbfaf7;
+  color: var(--home-ink);
+  font-size: 0.92rem;
+}
+
+.home-page .hero-availability-fields input:focus-visible {
+  border-color: var(--home-forest);
+  outline-color: rgba(73, 100, 83, 0.34);
+}
+
+.home-page .hero-availability-action {
+  min-width: 218px;
+  min-height: 62px;
+  align-self: end;
+}
+
 @media (max-width: 900px) {
   .home-page {
     --home-shell: min(100% - 36px, 760px);
@@ -146,6 +290,112 @@
     min-height: 44px;
     padding-inline: 16px;
     font-size: 0.72rem;
+  }
+
+  .home-page .hero {
+    min-height: calc(100svh - 70px);
+    margin-bottom: 184px;
+  }
+
+  .home-page .hero-content {
+    min-height: calc(100svh - 70px);
+    justify-content: flex-end;
+    padding-block: 72px 250px;
+  }
+
+  .home-page .hero-image {
+    object-position: 55% 50%;
+  }
+
+  .home-page .hero-wash {
+    background:
+      linear-gradient(90deg, rgba(10, 14, 12, 0.64) 0%, rgba(10, 14, 12, 0.26) 80%),
+      linear-gradient(0deg, rgba(8, 12, 10, 0.76) 0%, rgba(8, 12, 10, 0.12) 70%);
+  }
+
+  .home-page .hero .eyebrow {
+    margin-bottom: 15px;
+    font-size: 0.63rem;
+  }
+
+  .home-page .hero h1 {
+    margin-bottom: 16px;
+    font-size: clamp(3.25rem, 14.2vw, 4.1rem);
+    line-height: 0.92;
+  }
+
+  .home-page .hero-lede {
+    margin-bottom: 18px;
+    font-size: 0.96rem;
+    line-height: 1.45;
+  }
+
+  .home-page .hero-facts {
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
+  .home-page .hero-availability {
+    bottom: -150px;
+    display: block;
+    padding: 18px 14px 14px;
+    border-radius: 14px;
+  }
+
+  .home-page .hero-availability-title {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.82rem;
+    font-weight: 750;
+  }
+
+  .home-page .hero-availability-fields {
+    grid-template-columns: 1fr 1fr 0.82fr;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(24, 26, 24, 0.16);
+    border-radius: 10px;
+  }
+
+  .home-page .hero-availability-fields label {
+    gap: 4px;
+    padding: 8px;
+    border-right: 1px solid rgba(24, 26, 24, 0.14);
+    background: #fbfaf7;
+  }
+
+  .home-page .hero-availability-fields label:last-child {
+    border-right: 0;
+  }
+
+  .home-page .hero-availability-fields label > span {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+  }
+
+  .home-page .hero-availability-fields input {
+    min-width: 0;
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.67rem;
+  }
+
+  .home-page .hero-availability-action {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 10px;
+  }
+
+  .home-page .hero-availability-note {
+    display: block;
+    margin: 8px auto 0;
+    color: var(--home-muted);
+    font-size: 0.59rem;
+    line-height: 1.4;
+    text-align: center;
   }
 }
 

@@ -72,6 +72,23 @@ test("a valid request uses the real form state and reaches the success page", as
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
 });
 
+test("hero availability carries dates and guests into the owner-reviewed request", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const entry = page.locator("[data-availability-entry]");
+  await entry.locator("#hero-arrival").fill("2035-06-10");
+  await entry.locator("#hero-departure").fill("2035-06-17");
+  await entry.locator("#hero-guests").fill("6");
+  await entry.getByRole("link", { name: "Check availability" }).click();
+
+  const request = page.locator('.availability-form[name="availability-request"]');
+  await expect(request.locator("#arrival")).toHaveValue("2035-06-10");
+  await expect(request.locator("#departure")).toHaveValue("2035-06-17");
+  await expect(request.locator("#guests")).toHaveValue("6");
+  await expect(request).toBeInViewport();
+});
+
 test("owner login remains public while the dashboard falls back without a session", async ({
   page,
 }) => {
@@ -118,16 +135,17 @@ test("unknown routes use the branded 404 page", async ({ page }) => {
   );
 });
 
-test("the mobile booking action stays fixed and visible", async ({ page }) => {
+test("the rounded hero entry stays visible within the mobile hero", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const action = page.locator(".mobile-booking-bar");
+  const entry = page.locator("[data-availability-entry]");
 
-  await expect(action).toBeVisible();
-  await expect(action).toHaveCSS("position", "fixed");
-  const box = await action.boundingBox();
+  await expect(entry).toBeVisible();
+  await expect(entry).toBeInViewport();
+  await expect(page.locator(".mobile-booking-bar")).toHaveCount(0);
+  const box = await entry.boundingBox();
   expect(box).not.toBeNull();
-  expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+  expect(box!.y).toBeLessThan(844);
 });
 
 test("keyboard navigation exposes a visible focus indicator", async ({ page }) => {

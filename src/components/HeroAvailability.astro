@@ -1,0 +1,98 @@
+---
+import { siteContent } from "../content/site";
+
+interface Props {
+  maximumGuests: number;
+}
+
+const { maximumGuests } = Astro.props;
+---
+
+<div class="hero-availability" data-availability-entry aria-labelledby="availability-entry-title">
+  <p id="availability-entry-title" class="hero-availability-title">
+    Check whether your dates are available
+  </p>
+  <div class="hero-availability-fields">
+    <label for="hero-arrival">
+      <span>Arrival</span>
+      <input id="hero-arrival" type="date" aria-label="Arrival date" />
+    </label>
+    <label for="hero-departure">
+      <span>Departure</span>
+      <input id="hero-departure" type="date" aria-label="Departure date" />
+    </label>
+    <label for="hero-guests">
+      <span>Guests</span>
+      <input
+        id="hero-guests"
+        type="number"
+        min="1"
+        max={maximumGuests}
+        inputmode="numeric"
+        placeholder="Add guests"
+        aria-label="Overnight guests"
+      />
+    </label>
+  </div>
+  <a
+    class="button hero-availability-action"
+    href="#availability"
+    data-prefill-availability
+    data-analytics-event="primary_request_click"
+    data-analytics-category="hero"
+  >
+    {siteContent.primaryAction.label}
+  </a>
+  <p class="hero-availability-note">
+    Checking these dates starts a request. The owner confirms availability and total price.
+  </p>
+</div>
+
+<script>
+  import { addDays, toLocalIsoDate } from "../lib/dateRules";
+  import {
+    AVAILABILITY_DRAFT_FIELDS,
+    copyAvailabilityDraft,
+  } from "../lib/availabilityPrefill";
+
+  for (const entry of document.querySelectorAll<HTMLElement>("[data-availability-entry]")) {
+    const arrival = entry.querySelector<HTMLInputElement>("#hero-arrival");
+    const departure = entry.querySelector<HTMLInputElement>("#hero-departure");
+    const action = entry.querySelector<HTMLAnchorElement>("[data-prefill-availability]");
+    const request = document.querySelector<HTMLFormElement>(
+      '.availability-form[name="availability-request"]',
+    );
+
+    if (!arrival || !departure || !action || !request) continue;
+
+    const today = toLocalIsoDate(new Date());
+    arrival.min = today;
+    departure.min = today;
+
+    arrival.addEventListener("input", () => {
+      departure.min = arrival.value ? addDays(arrival.value, 1) : today;
+    });
+
+    action.addEventListener("click", (event) => {
+      event.preventDefault();
+      copyAvailabilityDraft(
+        (field) => entry.querySelector<HTMLInputElement>(`#hero-${field}`)?.value ?? null,
+        (field, value) => {
+          const target = request.elements.namedItem(field);
+          if (target instanceof HTMLInputElement) target.value = value;
+        },
+      );
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      request.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      history.replaceState(null, "", "#availability");
+
+      for (const field of AVAILABILITY_DRAFT_FIELDS) {
+        const target = request.elements.namedItem(field);
+        if (target instanceof HTMLInputElement) {
+          target.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+    });
+  }
+</script>
