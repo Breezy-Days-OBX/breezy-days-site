@@ -18,6 +18,7 @@ import { siteContent } from "../content/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getMarketplaceProofPresentation } from "../lib/marketplaceProof.mjs";
 import { ownerSettingsDefaults } from "../lib/ownerSettings";
+import "../styles/home.css";
 
 const proof = siteContent.marketplaceProof;
 const approvedProof = getMarketplaceProofPresentation(proof);
@@ -112,6 +113,7 @@ const structuredData = {
   title={`${property.identity.publicName} | ${property.identity.propertyType} in the Outer Banks`}
   description={`${property.fit.primaryPromise}. Sleeps up to ${property.fit.maximumOvernightGuests} guests in ${property.identity.location}.`}
   structuredData={structuredData}
+  bodyClass="home-page"
 >
   <SiteHeader />
 

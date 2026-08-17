@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import "@fontsource-variable/manrope/wght.css";
+import "@fontsource-variable/newsreader/wght.css";
 import heroDeck from "../assets/images/hero-deck.jpeg";
 import PublicTracking from "../components/PublicTracking.astro";
 
@@ -8,9 +10,10 @@ interface Props {
   description: string;
   noindex?: boolean;
   structuredData?: Record<string, unknown>;
+  bodyClass?: string;
 }
 
-const { title, description, noindex = false, structuredData } = Astro.props;
+const { title, description, noindex = false, structuredData, bodyClass } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 const socialImage = new URL(heroDeck.src, Astro.site ?? Astro.url.origin);
 const isOwnerRoute = Astro.url.pathname === "/owner" || Astro.url.pathname.startsWith("/owner/");
@@ -31,13 +34,6 @@ const jsonLd = structuredData ? JSON.stringify(structuredData).replace(/</g, "\\
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link
-      rel="preload"
-      href="/fonts/InstrumentSerif-Regular.ttf"
-      as="font"
-      type="font/ttf"
-      crossorigin="anonymous"
-    />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Breezy Days OBX" />
     <meta property="og:title" content={title} />
@@ -63,7 +59,7 @@ const jsonLd = structuredData ? JSON.stringify(structuredData).replace(/</g, "\\
       )
     }
   </head>
-  <body data-analytics-enabled={analyticsEnabled ? "true" : "false"}>
+  <body class={bodyClass} data-analytics-enabled={analyticsEnabled ? "true" : "false"}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <slot />
     {!isOwnerRoute && <PublicTracking />}
