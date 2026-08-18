@@ -81,3 +81,25 @@ export function getMarketplaceProofPresentation(value) {
     quote: { text: inspected.quote.text, source: inspected.quote.source },
   };
 }
+
+export function getMarketplaceProofPreviewPresentation(value) {
+  const inspected = inspectMarketplaceProof(value);
+  const blockingIssues = new Set(["checked_on", "airbnb_rating", "vrbo_rating", "quote"]);
+  if (inspected.issues.some((issue) => blockingIssues.has(issue))) return null;
+
+  return {
+    checkedOnDisplay: formatMarketplaceProofDate(inspected.proof.checkedOn),
+    airbnb: {
+      rating: inspected.airbnb.rating,
+      label: isRequiredString(inspected.airbnb.label) ? inspected.airbnb.label : null,
+      reviewCount: inspected.airbnb.reviewCount,
+      link: inspected.airbnb.link,
+    },
+    vrbo: {
+      rating: inspected.vrbo.rating,
+      reviewCount: inspected.vrbo.reviewCount,
+      link: inspected.vrbo.link,
+    },
+    quote: { text: inspected.quote.text, source: inspected.quote.source },
+  };
+}

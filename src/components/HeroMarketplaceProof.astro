@@ -1,0 +1,39 @@
+---
+import {
+  getMarketplaceProofPresentation,
+  getMarketplaceProofPreviewPresentation,
+} from "../lib/marketplaceProof.mjs";
+
+interface Props {
+  proof: unknown;
+  preview?: boolean;
+}
+
+const { proof, preview = false } = Astro.props;
+const presentation = preview
+  ? getMarketplaceProofPreviewPresentation(proof)
+  : getMarketplaceProofPresentation(proof);
+---
+
+{
+  presentation && (
+    <div class="hero-proof" aria-label="Marketplace review summary">
+      <p class="hero-proof-summary">
+        <span class="proof-stars" aria-hidden="true">
+          ★★★★★
+        </span>
+        <strong>
+          {presentation.airbnb.label ? `${presentation.airbnb.label} · ` : ""}Airbnb{" "}
+          {presentation.airbnb.rating} ({presentation.airbnb.reviewCount} reviews)
+        </strong>
+        <span class="proof-divider" aria-hidden="true" />
+        <strong>
+          Vrbo {presentation.vrbo.rating} ({presentation.vrbo.reviewCount} verified reviews)
+        </strong>
+      </p>
+      <blockquote>
+        “{presentation.quote.text}”<cite>{presentation.quote.source}</cite>
+      </blockquote>
+    </div>
+  )
+}

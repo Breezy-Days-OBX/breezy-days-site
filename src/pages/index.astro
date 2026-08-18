@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 
 import AvailabilityForm from "../components/AvailabilityForm.astro";
 import HeroAvailability from "../components/HeroAvailability.astro";
+import HeroMarketplaceProof from "../components/HeroMarketplaceProof.astro";
 import MarketplaceProof from "../components/MarketplaceProof.astro";
 import PublicSettingsEnhancement from "../components/PublicSettingsEnhancement.astro";
 import SiteFooter from "../components/SiteFooter.astro";
@@ -23,7 +24,9 @@ import "../styles/home.css";
 
 const proof = siteContent.marketplaceProof;
 const approvedProof = getMarketplaceProofPresentation(proof);
-const publishProof = approvedProof !== null;
+const previewProof =
+  import.meta.env.DEV && import.meta.env.PUBLIC_MARKETPLACE_PROOF_PREVIEW === "true";
+const publishProof = approvedProof !== null || previewProof;
 const publicFacts = derivePublicPropertyFacts(property);
 const poolOpen = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -146,24 +149,7 @@ const structuredData = {
           <p class="hero-lede">
             A calm, credible starting point for deciding whether Breezy Days fits your family.
           </p>
-          {
-            publishProof && (
-              <div class="hero-proof" aria-label="Marketplace review summary">
-                <div class="proof-ratings">
-                  <span>
-                    <strong>{approvedProof.airbnb.rating}</strong> Airbnb
-                    {approvedProof.airbnb.label ? ` · ${approvedProof.airbnb.label}` : ""}
-                  </span>
-                  <span>
-                    <strong>{approvedProof.vrbo.rating}</strong> Vrbo
-                  </span>
-                </div>
-                <blockquote>
-                  “{approvedProof.quote.text}”<cite>{approvedProof.quote.source}</cite>
-                </blockquote>
-              </div>
-            )
-          }
+          {publishProof && <HeroMarketplaceProof proof={proof} preview={previewProof} />}
           {
             !publishProof && (
               <p class="hero-facts">
@@ -397,7 +383,12 @@ const structuredData = {
     </section>
 
     <section
-      class:list={["section", "review-section", "tide-section", { "has-proof": publishProof }]}
+      class:list={[
+        "section",
+        "review-section",
+        "tide-section",
+        { "has-proof": approvedProof !== null },
+      ]}
       id="reviews"
       aria-labelledby="reviews-title"
     >

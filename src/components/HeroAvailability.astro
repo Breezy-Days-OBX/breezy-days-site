@@ -15,23 +15,32 @@ const { maximumGuests } = Astro.props;
   <div class="hero-availability-fields">
     <label for="hero-arrival">
       <span>Arrival</span>
-      <input id="hero-arrival" type="date" aria-label="Arrival date" />
+      <span class="hero-field-control">
+        <input id="hero-arrival" type="date" aria-label="Arrival date" />
+      </span>
     </label>
     <label for="hero-departure">
       <span>Departure</span>
-      <input id="hero-departure" type="date" aria-label="Departure date" />
+      <span class="hero-field-control">
+        <input id="hero-departure" type="date" aria-label="Departure date" />
+      </span>
     </label>
     <label for="hero-guests">
       <span>Guests</span>
-      <input
-        id="hero-guests"
-        type="number"
-        min="1"
-        max={maximumGuests}
-        inputmode="numeric"
-        placeholder="Add guests"
-        aria-label="Overnight guests"
-      />
+      <span class="hero-field-control">
+        <input
+          id="hero-guests"
+          type="number"
+          min="1"
+          max={maximumGuests}
+          inputmode="numeric"
+          placeholder="Add guests"
+          aria-label="Overnight guests"
+        />
+        <svg class="hero-field-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0"></path>
+        </svg>
+      </span>
     </label>
   </div>
   <a

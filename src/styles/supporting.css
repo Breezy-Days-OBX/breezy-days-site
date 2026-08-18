@@ -8,8 +8,8 @@
   --sky: #dce7e2;
   --muted: #626761;
   --line: rgba(24, 26, 24, 0.13);
-  --serif: "Newsreader Variable", Georgia, serif;
-  --sans: "Manrope Variable", "Segoe UI", sans-serif;
+  --serif: "Playfair Display", Georgia, serif;
+  --sans: "DM Sans", "Segoe UI", sans-serif;
   --shell: min(1344px, calc(100vw - 96px));
   min-width: 0;
   padding-bottom: 0;
@@ -25,7 +25,7 @@
 .owner-page h2,
 .owner-page h3 {
   font-family: var(--serif);
-  font-weight: 520;
+  font-weight: 400;
   letter-spacing: -0.035em;
 }
 
@@ -380,7 +380,7 @@
 .owner-page .owner-access-card h1,
 .owner-page .owner-dashboard h1 {
   font-family: var(--serif);
-  font-weight: 520;
+  font-weight: 400;
 }
 
 .owner-page .owner-access-card h1 {

@@ -8,8 +8,8 @@
   --home-muted: #686c67;
   --home-muted-on-sand: #636762;
   --home-gold: #d69a39;
-  --home-display: "Newsreader Variable", Georgia, serif;
-  --home-body: "Manrope Variable", "Segoe UI", sans-serif;
+  --home-display: "Playfair Display", Georgia, serif;
+  --home-body: "DM Sans", "Segoe UI", sans-serif;
   --home-shell: min(1344px, calc(100vw - 96px));
   --ink: var(--home-ink);
   --green: var(--home-forest);
@@ -44,42 +44,42 @@
   z-index: 50;
   border-bottom: 1px solid rgba(24, 26, 24, 0.1);
   background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 1px 0 rgba(24, 26, 24, 0.02);
+  box-shadow: 0 10px 34px rgba(24, 26, 24, 0.035);
 }
 
 .home-page .header-inner {
-  min-height: 92px;
-  gap: 36px;
+  min-height: 96px;
+  gap: 44px;
 }
 
 .home-page .wordmark {
-  gap: 6px;
+  gap: 7px;
   color: var(--home-ink);
-  font-size: 1.95rem;
+  font-size: 2rem;
   font-weight: 600;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.045em;
   white-space: nowrap;
 }
 
 .home-page .wordmark span {
-  font-family: inherit;
-  font-size: 0.78em;
-  font-weight: inherit;
-  letter-spacing: inherit;
+  font-family: var(--home-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
 }
 
 .home-page .main-nav {
   justify-self: end;
-  gap: 38px;
-  margin-right: 8px;
+  gap: 42px;
+  margin-right: 12px;
 }
 
 .home-page .main-nav a {
   position: relative;
   padding-block: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 0.96rem;
+  font-weight: 500;
+  letter-spacing: -0.018em;
 }
 
 .home-page .main-nav a::after {
@@ -108,12 +108,12 @@
 
 .home-page .button {
   border-color: var(--home-forest);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--home-forest);
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  box-shadow: 0 10px 22px rgba(56, 80, 67, 0.14);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  box-shadow: 0 14px 30px rgba(56, 80, 67, 0.18);
 }
 
 .home-page .button:hover,
@@ -123,13 +123,13 @@
 }
 
 .home-page .button-small {
-  min-height: 54px;
-  padding-inline: 24px;
+  min-height: 58px;
+  padding-inline: 28px;
 }
 
 .home-page .hero {
-  min-height: min(850px, calc(100svh - 92px));
-  margin-bottom: 112px;
+  min-height: min(880px, calc(100svh - 96px));
+  margin-bottom: 118px;
   overflow: visible;
   background: #5d6f67;
 }
@@ -150,48 +150,49 @@
 
 .home-page .hero-image {
   object-fit: cover;
-  object-position: 50% 48%;
-  filter: saturate(0.92) contrast(0.98) brightness(1.04);
+  object-position: 50% 46%;
+  filter: saturate(0.78) sepia(0.1) contrast(1.04) brightness(0.98);
 }
 
 .home-page .hero-wash {
   background:
-    linear-gradient(90deg, rgba(12, 17, 14, 0.72) 0%, rgba(12, 17, 14, 0.46) 38%, transparent 72%),
-    linear-gradient(0deg, rgba(10, 15, 12, 0.42) 0%, transparent 44%);
+    linear-gradient(90deg, rgba(10, 14, 12, 0.82) 0%, rgba(10, 14, 12, 0.56) 40%, transparent 76%),
+    linear-gradient(0deg, rgba(10, 13, 11, 0.5) 0%, transparent 52%),
+    linear-gradient(120deg, rgba(112, 79, 46, 0.18), transparent 62%);
 }
 
 .home-page .hero-content {
-  min-height: min(850px, calc(100svh - 92px));
-  justify-content: flex-end;
-  padding-block: 96px 142px;
+  min-height: min(880px, calc(100svh - 96px));
+  justify-content: flex-start;
+  padding-block: 150px 176px;
 }
 
 .home-page .hero-copy {
-  max-width: 820px;
+  max-width: 940px;
 }
 
 .home-page .hero .eyebrow {
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  letter-spacing: 0.145em;
 }
 
 .home-page .hero h1 {
-  max-width: 790px;
-  margin-bottom: 22px;
-  font-size: clamp(4.8rem, 6.1vw, 6.5rem);
-  font-weight: 500;
-  letter-spacing: -0.045em;
-  line-height: 0.93;
+  max-width: 900px;
+  margin-bottom: 26px;
+  font-size: clamp(5rem, 6.55vw, 7.1rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.94;
   text-wrap: balance;
 }
 
 .home-page .hero-lede {
-  max-width: 600px;
+  max-width: 660px;
   margin-bottom: 24px;
-  font-size: clamp(1.1rem, 1.5vw, 1.28rem);
-  line-height: 1.5;
+  font-size: clamp(1.16rem, 1.55vw, 1.4rem);
+  line-height: 1.48;
 }
 
 .home-page .hero-facts {
@@ -200,28 +201,78 @@
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.38);
   color: rgba(255, 255, 255, 0.88);
-  font-size: 0.82rem;
-  font-weight: 650;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .home-page .hero-proof {
-  border-top-color: rgba(255, 255, 255, 0.38);
+  width: min(720px, 100%);
+  display: block;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.38);
+}
+
+.home-page .hero-proof-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 11px;
+  align-items: center;
+  margin-bottom: 7px;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.home-page .proof-stars {
+  color: var(--home-gold);
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+}
+
+.home-page .hero-proof-summary strong {
+  font-weight: 600;
+}
+
+.home-page .proof-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.home-page .hero-proof blockquote {
+  margin: 0;
+  font-family: var(--home-display);
+  font-size: 1.08rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.home-page .hero-proof cite {
+  display: inline;
+  margin-left: 8px;
+  font-family: var(--home-body);
+  font-size: 0.57rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .home-page .hero-availability {
   position: absolute;
   right: 0;
-  bottom: -70px;
+  bottom: -72px;
   left: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px 22px;
+  grid-template-columns: minmax(0, 1fr) 244px;
+  gap: 26px;
   align-items: center;
-  padding: 22px 24px;
-  border: 1px solid rgba(24, 26, 24, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 28px 70px rgba(34, 41, 36, 0.2);
+  min-height: 144px;
+  padding: 26px 28px;
+  border: 1px solid rgba(24, 26, 24, 0.07);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.99);
+  box-shadow: 0 32px 84px rgba(30, 38, 32, 0.24);
   color: var(--home-ink);
 }
 
@@ -233,42 +284,73 @@
 .home-page .hero-availability-fields {
   display: grid;
   grid-template-columns: 1fr 1fr 0.78fr;
-  gap: 14px;
+  gap: 0;
+  align-items: stretch;
 }
 
 .home-page .hero-availability-fields label {
   display: grid;
-  gap: 7px;
+  gap: 9px;
+  align-content: center;
+  min-width: 0;
+  padding: 4px 30px;
+  border-right: 1px solid rgba(24, 26, 24, 0.13);
 }
 
-.home-page .hero-availability-fields label > span {
-  color: #4d504d;
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
+.home-page .hero-availability-fields label:first-child {
+  padding-left: 6px;
+}
+
+.home-page .hero-field-control {
+  position: relative;
+  display: block;
+}
+
+.home-page .hero-availability-fields label > span:first-child {
+  color: #414641;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .home-page .hero-availability-fields input {
   width: 100%;
-  min-height: 58px;
-  padding: 0 14px;
-  border: 1px solid rgba(24, 26, 24, 0.16);
-  border-radius: 10px;
-  background: #fbfaf7;
+  min-height: 42px;
+  padding: 0 34px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--home-ink);
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 
 .home-page .hero-availability-fields input:focus-visible {
-  border-color: var(--home-forest);
-  outline-color: rgba(73, 100, 83, 0.34);
+  outline: 2px solid rgba(73, 100, 83, 0.32);
+  outline-offset: 5px;
+}
+
+.home-page .hero-field-icon {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: #2e332f;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+  pointer-events: none;
+  transform: translateY(-50%);
 }
 
 .home-page .hero-availability-action {
-  min-width: 218px;
-  min-height: 62px;
-  align-self: end;
+  min-width: 244px;
+  min-height: 76px;
+  align-self: center;
+  border-radius: 10px;
+  font-size: 1rem;
 }
 
 .home-page .section {
@@ -278,8 +360,8 @@
 .home-page .section h2 {
   color: var(--home-ink);
   font-size: clamp(3.25rem, 5vw, 5.2rem);
-  font-weight: 500;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  letter-spacing: -0.035em;
   line-height: 0.98;
   text-wrap: balance;
 }
@@ -342,7 +424,7 @@
   color: var(--home-ink);
   font-family: var(--home-display);
   font-size: clamp(1.55rem, 2vw, 2.15rem);
-  font-weight: 550;
+  font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1;
 }
@@ -573,7 +655,7 @@
 .home-page .review-quote-wrap blockquote {
   color: var(--home-ink);
   font-size: clamp(2.7rem, 4.7vw, 4.9rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.04em;
 }
 
@@ -604,7 +686,7 @@
 .home-page .owner-story blockquote {
   max-width: 920px;
   font-size: clamp(2rem, 3.25vw, 3.4rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1.08;
 }
@@ -661,7 +743,7 @@
 .home-page .process-list h3 {
   margin-bottom: 6px;
   font-size: 1.8rem;
-  font-weight: 550;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
@@ -684,7 +766,7 @@
 }
 
 .home-page .pricing-strip strong {
-  font-weight: 550;
+  font-weight: 600;
 }
 
 .home-page .availability {
@@ -710,7 +792,7 @@
   max-width: 330px;
   color: var(--home-ink);
   font-size: clamp(3.2rem, 4.4vw, 4.65rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.045em;
   line-height: 0.98;
 }
@@ -810,7 +892,7 @@
   min-height: 72px;
   align-items: center;
   font-size: 1.48rem;
-  font-weight: 520;
+  font-weight: 500;
 }
 
 .home-page .faq-list details p {
@@ -941,6 +1023,10 @@
     line-height: 1.45;
   }
 
+  .home-page .proof-divider {
+    display: none;
+  }
+
   .home-page .hero-availability {
     bottom: 14px;
     display: block;
@@ -974,7 +1060,7 @@
     border-right: 0;
   }
 
-  .home-page .hero-availability-fields label > span {
+  .home-page .hero-availability-fields label > span:first-child {
     font-size: 0.55rem;
     letter-spacing: 0.08em;
   }

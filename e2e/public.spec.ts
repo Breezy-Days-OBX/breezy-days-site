@@ -147,7 +147,7 @@ for (const [name, route, cardSelector] of [
 
     await expect(page.locator("body")).toHaveClass(/supporting-page/);
     await expect(page.locator(".site-header")).toBeVisible();
-    await expect(page.locator("body")).toHaveCSS("font-family", /Manrope/);
+    await expect(page.locator("body")).toHaveCSS("font-family", /DM Sans/);
 
     const card = page.locator(cardSelector);
     await expect(card).toBeVisible();
@@ -171,8 +171,11 @@ test("private owner access carries the refined system without public navigation"
 
   await expect(page.locator("body")).toHaveClass(/owner-page/);
   await expect(page.locator(".main-nav")).toHaveCount(0);
-  await expect(page.locator("body")).toHaveCSS("font-family", /Manrope/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveCSS("font-family", /Newsreader/);
+  await expect(page.locator("body")).toHaveCSS("font-family", /DM Sans/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCSS(
+    "font-family",
+    /Playfair Display/,
+  );
 
   const card = page.locator(".owner-access-card");
   const radius = await card.evaluate((element) =>
@@ -194,6 +197,39 @@ test("rental details avoid orphaned half-width rows on desktop", async ({ page }
   expect(safety).not.toBeNull();
   expect(water!.width).toBeGreaterThan(grid!.width * 0.9);
   expect(safety!.width).toBeGreaterThan(grid!.width * 0.9);
+});
+
+test("desktop hero keeps the approved editorial type and generous booking panel", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1536, height: 1000 });
+  await page.goto("/");
+
+  await expect(page.locator(".main-nav")).toHaveCSS("font-family", /DM Sans/);
+  await expect(page.locator(".hero h1")).toHaveCSS("font-family", /Playfair Display/);
+
+  const headingWeight = Number.parseInt(
+    await page.locator(".hero h1").evaluate((element) => getComputedStyle(element).fontWeight),
+    10,
+  );
+  expect(headingWeight).toBeLessThanOrEqual(450);
+
+  const panel = page.locator("[data-availability-entry]");
+  const panelBox = await panel.boundingBox();
+  const actionBox = await panel.getByRole("link", { name: "Check availability" }).boundingBox();
+  expect(panelBox).not.toBeNull();
+  expect(actionBox).not.toBeNull();
+  expect(panelBox!.height).toBeGreaterThanOrEqual(126);
+  expect(actionBox!.height).toBeGreaterThanOrEqual(68);
+  await expect(panel.locator("#hero-arrival")).toHaveCSS("border-top-width", "0px");
+});
+
+test("hero availability gives every field a recognizable visual affordance", async ({ page }) => {
+  await page.setViewportSize({ width: 1536, height: 1000 });
+  await page.goto("/");
+
+  const entry = page.locator("[data-availability-entry]");
+  await expect(entry.locator(".hero-field-icon")).toHaveCount(1);
 });
 
 test("the rounded hero entry stays visible within the mobile hero", async ({ page }) => {
