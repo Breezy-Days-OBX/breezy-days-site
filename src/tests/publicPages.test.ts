@@ -33,4 +33,19 @@ describe("public page map", () => {
     expect(html).not.toMatch(/prototype|prelaunch|TBD|TODO/i);
     expect(html).not.toContain('href="/owner');
   });
+
+  it("links visitors to the analytics providers' privacy information", async () => {
+    const page = pages["../pages/privacy.astro"] as {
+      default: Parameters<AstroContainer["renderToString"]>[0];
+    };
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(page.default, {
+      partial: false,
+    });
+
+    expect(html).toContain("https://policies.google.com/technologies/partner-sites");
+    expect(html).toContain("https://privacy.microsoft.com/privacystatement");
+    expect(html).toMatch(/heatmaps/i);
+    expect(html).toMatch(/session replays/i);
+  });
 });
