@@ -17,6 +17,12 @@ Use this checklist at release time. `npm run check:launch` is intentionally sepa
 - [ ] Make and approve the SMS choice. SMS remains disabled unless provider, cost, consent, and implementation decisions are separately approved.
 - [ ] For each optional public analytics ID, record `configured` or `waived` in `docs/launch-gate-record.json`.
 
+## Client photography and floor plans
+
+- [ ] Request a current, high-resolution photograph of Michelle and Danny together for the “Meet your hosts” section; confirm their approval for public use before publishing it.
+- [ ] Request current, high-resolution photographs of every bedroom, shared room, exterior, and major amenity. Have Michelle identify exactly which room or feature appears in each image before building room-specific links or a full photo viewer; do not rely on outdated or ambiguous photographs.
+- [ ] Ask whether current floor plans are available. Confirm that they accurately represent the rental and are approved for public display before adding them near the sleeping layout.
+
 ## Production smoke test
 
 - [ ] Record a passing Netlify deployment.
