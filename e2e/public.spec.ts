@@ -256,6 +256,56 @@ test("coastal color rhythm separates key sections and keeps host contacts visibl
   await expect(page.locator('.owner-story-contact a[href^="tel:"]')).toBeVisible();
 });
 
+test("guest capacity uses a warm accent instead of repeating the white bedroom tile", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const [capacityBackground, bedroomBackground] = await Promise.all([
+    page
+      .locator(".fit-strip > div")
+      .first()
+      .evaluate((element) => getComputedStyle(element).backgroundColor),
+    page
+      .locator(".fit-strip > div")
+      .nth(1)
+      .evaluate((element) => getComputedStyle(element).backgroundColor),
+  ]);
+  const capacityChannels = capacityBackground.match(/\d+/g)?.map(Number) ?? [];
+
+  expect(capacityBackground).not.toBe(bedroomBackground);
+  expect(capacityChannels[0]).toBeGreaterThan(capacityChannels[2]);
+});
+
+test("location story uses a dark ocean panel with light copy", async ({ page }) => {
+  await page.goto("/");
+
+  const [panelBackground, headingColor] = await Promise.all([
+    page
+      .locator(".location-story")
+      .evaluate((element) => getComputedStyle(element).backgroundColor),
+    page.locator(".location-copy h2").evaluate((element) => getComputedStyle(element).color),
+  ]);
+  const panelChannels = panelBackground.match(/\d+/g)?.map(Number) ?? [];
+  const headingChannels = headingColor.match(/\d+/g)?.map(Number) ?? [];
+
+  expect(Math.max(...panelChannels.slice(0, 3))).toBeLessThan(160);
+  expect(Math.min(...headingChannels.slice(0, 3))).toBeGreaterThan(230);
+});
+
+test("rental-information link remains bright against the dark amenities panel", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const linkColor = await page
+    .getByRole("link", { name: /Read all rental information/ })
+    .evaluate((element) => getComputedStyle(element).color);
+  const linkChannels = linkColor.match(/\d+/g)?.map(Number) ?? [];
+
+  expect(Math.min(...linkChannels.slice(0, 3))).toBeGreaterThan(240);
+});
+
 test("the rounded hero entry stays visible within the mobile hero", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
