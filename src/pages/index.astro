@@ -144,10 +144,11 @@ const structuredData = {
       </div>
       <div class="shell hero-content">
         <div class="hero-copy">
-          <p class="eyebrow eyebrow-light">One Outer Banks home · One clear family week</p>
+          <p class="eyebrow eyebrow-light">Rodanthe, North Carolina · Steps from the Atlantic</p>
           <h1 id="hero-title">Make room for the week everyone remembers.</h1>
           <p class="hero-lede">
-            A calm, credible starting point for deciding whether Breezy Days fits your family.
+            Stay together in Rodanthe, just a few steps from the beach and next door to the historic
+            Rodanthe Pier.
           </p>
           {publishProof && <HeroMarketplaceProof proof={proof} preview={previewProof} />}
           {
@@ -168,11 +169,12 @@ const structuredData = {
         <div class="fit-heading">
           <div>
             <p class="eyebrow">01 · Know the fit</p>
-            <h2 id="fit-title">One house, with room for the whole family rhythm.</h2>
+            <h2 id="fit-title">Room for up to 10 guests to stay together.</h2>
           </div>
           <p>
-            {property.fit.bestFor}. Sleeps up to {property.fit.maximumOvernightGuests} guests, with the
-            practical details made clear before anyone packs.
+            Breezy Days works especially well for {property.fit.bestFor.toLowerCase()}. The sleeping
+            layout, amenities, and stair access are listed up front so you can decide before anyone
+            packs.
           </p>
         </div>
         <div class="fit-strip" aria-label="Breezy Days at a glance">
@@ -204,12 +206,12 @@ const structuredData = {
       <div class="shell">
         <div class="section-heading split-heading">
           <div>
-            <p class="eyebrow">02 · Picture the week</p>
-            <h2 id="home-title">The spaces between beach days matter, too.</h2>
+            <p class="eyebrow">02 · Inside Breezy Days</p>
+            <h2 id="home-title">Room to gather between beach days.</h2>
           </div>
           <p class="section-lede">
-            Coffee by the windows. Dinner around one table. A last swim while the light changes.
-            This is the house at the heart of the trip.
+            Inside, an open living and dining area gives everyone space to eat, play games, and
+            unwind together. Outside, the private pool is just downstairs.
           </p>
         </div>
 
@@ -224,7 +226,7 @@ const structuredData = {
               quality={80}
               format="webp"
             />
-            <figcaption>Gather · The living and dining room</figcaption>
+            <figcaption>Open living and dining room</figcaption>
           </figure>
           <figure class="gallery-photo gallery-pool" data-gallery-feature="pool">
             <Image
@@ -236,7 +238,7 @@ const structuredData = {
               quality={80}
               format="webp"
             />
-            <figcaption>Cool off · The private pool</figcaption>
+            <figcaption>Private outdoor pool</figcaption>
           </figure>
           <figure class="gallery-photo gallery-bedroom">
             <Image
@@ -248,7 +250,7 @@ const structuredData = {
               quality={80}
               format="webp"
             />
-            <figcaption>Reset · A quiet bedroom</figcaption>
+            <figcaption>One of four bedrooms</figcaption>
           </figure>
           <figure class="gallery-photo gallery-kitchen">
             <Image
@@ -260,7 +262,7 @@ const structuredData = {
               quality={80}
               format="webp"
             />
-            <figcaption>Share · The full kitchen</figcaption>
+            <figcaption>Full kitchen with island seating</figcaption>
           </figure>
         </div>
       </div>
@@ -284,7 +286,7 @@ const structuredData = {
           <div class="location-copy">
             <p class="eyebrow">03 · Between ocean and sound</p>
             <h2 id="location-title">
-              Close enough to hear the Atlantic. Private enough to arrive calmly.
+              A few steps from the Atlantic, with Rodanthe Pier next door.
             </h2>
             <p>{publicFacts.location}. {publicFacts.proximity}</p>
             <p>
@@ -308,13 +310,12 @@ const structuredData = {
       <div class="shell">
         <div class="stay-details-panel">
           <div class="section-heading essentials-heading">
-            <p class="eyebrow eyebrow-light">04 · Sleep, settle in, pack well</p>
-            <h2 id="essentials-title">The practical details, made plain.</h2>
+            <p class="eyebrow eyebrow-light">04 · Sleeping setup and amenities</p>
+            <h2 id="essentials-title">Know what’s here before you pack.</h2>
             <p>
-              {property.sleeping.bedroomCount} bedrooms, {property.bathrooms.full} full bathrooms and{
-                " "
-              }
-              {property.bathrooms.half} half bathroom, with the everyday supplies that make arrival easier.
+              Breezy Days has {property.sleeping.bedroomCount} bedrooms, {property.bathrooms.full} full
+              bathrooms and {property.bathrooms.half} half bathroom. Linens, bath towels, beach chairs,
+              and other everyday supplies are listed below.
             </p>
             <a class="text-link text-link-light" href="/rental-information"
               >Read all rental information <span aria-hidden="true">→</span></a
@@ -409,25 +410,25 @@ const structuredData = {
         <div class="section-heading split-heading">
           <div>
             <p class="eyebrow">05 · What happens next</p><h2 id="process-title">
-              A direct request, then a human answer.
+              Send your dates. The owners confirm the details.
             </h2>
           </div>
           <p class="section-lede">
-            {property.booking.reservationStatus}. The owner confirms availability and price before
-            you decide whether to complete the booking.
+            {property.booking.reservationStatus}. Michelle and Danny confirm availability and the
+            total price before you decide whether to book.
           </p>
         </div>
         <ol class="process-list">
           <li>
             <span>01</span><div>
-              <h3>Share dates and party details</h3><p>
+              <h3>Tell the owners about your stay</h3><p>
                 {property.booking.guestRequest}.
               </p>
             </div>
           </li>
           <li>
             <span>02</span><div>
-              <h3>The owners check the whole picture</h3><p>
+              <h3>The owners confirm availability and pricing</h3><p>
                 {property.booking.ownerReview}.
               </p>
             </div>
@@ -469,11 +470,11 @@ const structuredData = {
       <div class="shell faq-layout">
         <div class="faq-heading">
           <p class="eyebrow">07 · Before you request</p>
-          <h2 id="faq-title">Clear answers before you share a thing.</h2>
+          <h2 id="faq-title">Questions before you request dates.</h2>
           <p>
             Have a different question? Email <a href={`mailto:${property.identity.email}`}
               >{property.identity.email}</a
-            >. Contact stays secondary to the availability request.
+            >. Michelle and Danny will reply directly.
           </p>
         </div>
         <div class="faq-list">
@@ -495,16 +496,14 @@ const structuredData = {
     <section class="section final-section" id="final-action" aria-labelledby="final-title">
       <div class="shell final-layout">
         <div>
-          <p class="eyebrow eyebrow-light">One family week · One clear next step</p><h2
-            id="final-title"
-          >
+          <p class="eyebrow eyebrow-light">Ready to check your dates?</p><h2 id="final-title">
             See whether your dates are open.
           </h2>
         </div>
         <div>
           <p>
-            Share the basics. The owners confirm fit, availability, total price, and terms. It is
-            not a reservation or guaranteed price.
+            Send your dates and group details. Michelle and Danny will confirm availability, total
+            price, and terms before you decide whether to book. Your request is not a reservation.
           </p>
           <a
             class="button button-light"

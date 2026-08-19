@@ -15,7 +15,7 @@ describe("approved property facts", () => {
     expect(property.fit).toEqual({
       bestFor: "Multi-generational families and family groups sharing a beach week",
       primaryPromise:
-        "Ocean and sound views, close beach access, a private pool, a private hot tub, and room for a family group",
+        "Ocean and sound views, beach access a few steps away, a private pool and hot tub, and four bedrooms for a family group",
       maximumOvernightGuests: 10,
     });
     expect(property.sleeping).toEqual({
@@ -137,13 +137,15 @@ describe("approved property facts", () => {
       instantBookingOffered: false,
       availabilitySource:
         "Airbnb and Vrbo currently sync; no separate master calendar is maintained",
-      guestRequest: "Guest submits dates and party information",
-      ownerReview: "Dates, guest fit, availability, and final pricing are verified before approval",
-      confirmation: "After approval, the owner sends the agreement and payment instructions",
+      guestRequest: "Share your dates, group size, and pet information",
+      ownerReview:
+        "Michelle and Danny check availability, make sure the home fits your group, and confirm the total price",
+      confirmation:
+        "If the request is approved, the owners send the rental agreement and payment instructions",
       reservationStatus: "An inquiry is not a confirmed reservation",
       preferredContactAfterInquiry: "Email",
       guestExpectation:
-        "The owner reviews the request before confirming availability, price, agreement, and payment steps",
+        "Michelle and Danny confirm availability, price, the rental agreement, and payment steps before the booking is complete",
       pricingMethod: "Rates are adjusted manually in response to booking demand",
     });
     expect(property.payment).toEqual({
@@ -157,7 +159,7 @@ describe("approved property facts", () => {
       interruptionRefunds: "No refunds",
     });
     expect(property.ownerStory).toBe(
-      "At Breezy Days, the house is the heart of the trip—not just a place to sleep between outings. The whole family can stay under one roof, with the Atlantic just a few steps away and sound-side sunsets waiting at day's end. Michelle and Danny were drawn to Rodanthe for that quieter, ocean-to-sound rhythm. With room for several generations, a private pool and hot tub, and the historic Rodanthe Pier next door, Breezy Days gives families an easy place to settle in and actually spend the week together.",
+      "Michelle and Danny were drawn to Rodanthe by the ocean, the sound, and the slower pace. Breezy Days gives families one place to stay together. With four bedrooms, a private pool and hot tub, beach access a few steps away, and Rodanthe Pier next door, several generations can share the same week without giving up their own space.",
     );
   });
 });
