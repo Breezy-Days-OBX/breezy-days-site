@@ -39,7 +39,7 @@ describe("Breezy Days homepage", () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HomePage, { partial: false });
 
-    expect(html).toContain("Multi-generational families and family groups sharing a beach week");
+    expect(html).toContain("multi-generational families and family groups sharing a beach week");
     expect(html).toContain("Sleeps up to 10 guests");
     expect(html).toContain("4 bedrooms");
     expect(html).toContain("2 full bathrooms and 1 half bathroom");
