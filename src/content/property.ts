@@ -143,7 +143,7 @@ export const property = {
     interruptionRefunds: "No refunds",
   },
   ownerStory:
-    "Michelle and Danny were drawn to Rodanthe by the ocean, the sound, and the slower pace. Breezy Days gives families one place to stay together. With four bedrooms, a private pool and hot tub, beach access a few steps away, and Rodanthe Pier next door, several generations can share the same week without giving up their own space.",
+    "Michelle and Danny Day are the owners and hosts of Breezy Days. They were drawn to Rodanthe by the ocean, the sound, and the slower pace. Breezy Days gives families one place to stay together. With four bedrooms, a private pool and hot tub, beach access a few steps away, and Rodanthe Pier next door, several generations can share the same week without giving up their own space.",
 } as const;
 
 export type Property = typeof property;

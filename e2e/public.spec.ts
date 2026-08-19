@@ -232,6 +232,30 @@ test("hero availability gives every field a recognizable visual affordance", asy
   await expect(entry.locator(".hero-field-icon")).toHaveCount(1);
 });
 
+test("coastal color rhythm separates key sections and keeps host contacts visible", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+
+  const [fitBackground, galleryBackground, hostBackground] = await Promise.all([
+    page.locator(".fit-section").evaluate((element) => getComputedStyle(element).backgroundColor),
+    page
+      .locator(".gallery-section")
+      .evaluate((element) => getComputedStyle(element).backgroundColor),
+    page.locator(".owner-story").evaluate((element) => getComputedStyle(element).backgroundColor),
+  ]);
+  const fitChannels = fitBackground.match(/\d+/g)?.map(Number) ?? [];
+  const hostChannels = hostBackground.match(/\d+/g)?.map(Number) ?? [];
+
+  expect(fitBackground).not.toBe(galleryBackground);
+  expect(hostBackground).not.toBe(galleryBackground);
+  expect(fitChannels[2]).toBeGreaterThan(fitChannels[0]);
+  expect(hostChannels[2]).toBeGreaterThan(hostChannels[0]);
+  await expect(page.locator('.owner-story-contact a[href^="mailto:"]')).toBeVisible();
+  await expect(page.locator('.owner-story-contact a[href^="tel:"]')).toBeVisible();
+});
+
 test("the rounded hero entry stays visible within the mobile hero", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
