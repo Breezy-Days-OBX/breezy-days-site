@@ -46,7 +46,7 @@ describe("Breezy Days homepage", () => {
     expect(html).toContain("full flight of stairs is required");
     expect(html).toContain("Beach/pool towels");
     expect(html).toContain("An inquiry is not a confirmed reservation");
-    expect(html).toContain("Hosted by Danny &amp; Michelle Day");
+    expect(html).toContain("Meet your hosts");
   });
 
   it("uses one dominant CTA path and does not leak owner routes", async () => {
@@ -109,7 +109,18 @@ describe("Breezy Days homepage", () => {
     expect(html).not.toContain(proof.airbnb.rating);
     expect(html).not.toContain(proof.vrbo.rating);
     expect(html).not.toMatch(/launch reverification|marketplace snapshot/i);
-    expect(html).toContain("Why this home");
+    expect(html).toContain("Meet your hosts");
+  });
+
+  it("makes owner contact routes clear and emphasizes key arrival logistics", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HomePage, { partial: false });
+
+    expect(html).toContain('class="fit-footnote-highlight"');
+    expect(html).toContain("Pier passes are included with the stay");
+    expect(html).toContain('class="owner-story-contact"');
+    expect(html).toContain('href="mailto:breezydaysobx@gmail.com"');
+    expect(html).toContain('href="tel:9197256797"');
   });
 
   it("ships repository defaults with allow-listed public-settings markers", async () => {

@@ -76,8 +76,9 @@ const faqs = [
 const ownerStorySentences = property.ownerStory
   .match(/[^.!?]+[.!?]+/g)
   ?.map((sentence) => sentence.trim()) ?? [property.ownerStory];
-const ownerStoryLead = ownerStorySentences.slice(0, 2).join(" ");
-const ownerStoryRest = ownerStorySentences.slice(2).join(" ");
+const ownerStoryLead = ownerStorySentences[0];
+const ownerStoryRest = ownerStorySentences.slice(1).join(" ");
+const businessPhoneHref = property.identity.businessPhone.replace(/\D/g, "");
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -186,7 +187,7 @@ const structuredData = {
               >{property.sleeping.bedCount} beds</span
             >
           </div>
-          <div>
+          <div class="fit-strip-pool">
             <strong>Private pool</strong><span>{property.hotTub.capacity}-person hot tub</span>
           </div>
           <div>
@@ -197,7 +198,11 @@ const structuredData = {
           </div>
         </div>
         <p class="fit-footnote">
-          {property.access.beach}. {property.access.pier}. {property.access.entry}.
+          {property.access.beach}. The home is next to the historic pier. <strong
+            class="fit-footnote-highlight">Pier passes are included with the stay.</strong
+          > The house is elevated on posts, and <strong class="fit-footnote-highlight"
+            >a full flight of stairs is required to reach the front door.</strong
+          >
         </p>
       </div>
     </section>
@@ -288,7 +293,10 @@ const structuredData = {
             <h2 id="location-title">
               A few steps from the Atlantic, with Rodanthe Pier next door.
             </h2>
-            <p>{publicFacts.location}. {publicFacts.proximity}</p>
+            <p>
+              {publicFacts.location}. {property.access.beach}. The home is next to the historic
+              pier, and <strong>pier passes are included with the stay.</strong>
+            </p>
             <p>
               For privacy, the exact address and arrival instructions are shared only with confirmed
               guests.
@@ -393,14 +401,23 @@ const structuredData = {
       id="reviews"
       aria-labelledby="reviews-title"
     >
-      <h2 class="visually-hidden" id="reviews-title">Guest reviews and owner story</h2>
+      <h2 class="visually-hidden" id="reviews-title">Guest reviews and hosts</h2>
       <MarketplaceProof proof={proof} />
       <div class="shell owner-story">
-        <p class="eyebrow">Why this home</p>
+        <p class="eyebrow">Meet your hosts</p>
         <div class="owner-story-copy">
-          <blockquote class="owner-story-lead">{ownerStoryLead}</blockquote>
+          <p class="owner-story-lead">{ownerStoryLead}</p>
           {ownerStoryRest && <p class="owner-story-rest">{ownerStoryRest}</p>}
-          <p class="owner-story-host">{property.identity.hostLine}</p>
+          <div class="owner-story-contact" aria-label="Contact Michelle and Danny Day">
+            <a href={`mailto:${property.identity.email}`}>
+              <span>Email</span>
+              <strong>{property.identity.email}</strong>
+            </a>
+            <a href={`tel:${businessPhoneHref}`}>
+              <span>Phone</span>
+              <strong>{property.identity.businessPhone}</strong>
+            </a>
+          </div>
         </div>
       </div>
     </section>
