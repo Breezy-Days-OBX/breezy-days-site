@@ -5,6 +5,7 @@ import { ownerSettingsDefaults } from "./ownerSettings";
 const modules = import.meta.glob("./publicSettings.ts", { eager: true });
 
 type PublicSettingsModule = {
+  formatPublicSettings?: (settings: Record<string, unknown>) => Record<string, string>;
   enhancePublicSettings: (
     fetchSettings: () => Promise<{ ok: boolean; json(): Promise<unknown> }>,
     view: {
@@ -31,6 +32,36 @@ const createView = () => {
 };
 
 describe("public settings enhancement", () => {
+  it("formats an owner-friendly pet policy for allowed and pet-free stays", () => {
+    const module = modules["./publicSettings.ts"] as PublicSettingsModule | undefined;
+    expect(module?.formatPublicSettings).toBeTypeOf("function");
+    if (!module?.formatPublicSettings) return;
+
+    expect(
+      module.formatPublicSettings({
+        ...ownerSettingsDefaults,
+        maxPets: 2,
+        petFeeUsd: 150,
+        updatedAt: "2026-08-14T15:00:00.000Z",
+      }),
+    ).toMatchObject({
+      petPolicySummary: "Up to 2 pets · $150 per stay",
+      petPolicyDetails: "Up to 2 pets; $150 per stay for additional cleaning",
+      petPolicyFormHint: "Up to 2 pets.",
+    });
+    expect(
+      module.formatPublicSettings({
+        ...ownerSettingsDefaults,
+        maxPets: 0,
+        updatedAt: "2026-08-14T15:00:00.000Z",
+      }),
+    ).toMatchObject({
+      petPolicySummary: "No pets",
+      petPolicyDetails: "Pets are not allowed",
+      petPolicyFormHint: "Pets are not allowed for this stay.",
+    });
+  });
+
   it.each([
     [
       "failed",
