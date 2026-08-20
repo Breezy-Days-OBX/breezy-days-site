@@ -28,7 +28,7 @@ describe("static owner routes", () => {
     expect(html).not.toMatch(/sign[ -]?up|create (?:an )?account/i);
   });
 
-  it("renders exactly the shared eight-field dashboard contract and guidance", async () => {
+  it("renders the eight live values as three owner-facing publishing sections", async () => {
     const page = pages["../pages/owner/dashboard.astro"] as
       { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     if (!page) return;
@@ -37,15 +37,39 @@ describe("static owner routes", () => {
       partial: false,
     });
 
-    for (const [key, definition] of Object.entries(ownerSettingDefinitions)) {
+    for (const key of Object.keys(ownerSettingDefinitions)) {
       expect(html).toContain(`name="${key}"`);
-      expect(html).toContain(definition.name);
-      expect(html).toContain(definition.allowed);
-      expect(html).toContain(definition.ownerHelpText);
-      expect(html).toContain(definition.publicDestination);
-      expect(html).toContain(String(definition.fallback ?? "Not currently published"));
     }
-    expect(html.match(/data-owner-setting-field/g) ?? []).toHaveLength(8);
+    expect(html.match(/data-owner-section=/g) ?? []).toHaveLength(3);
+    expect(html).toContain('data-owner-section="pricing"');
+    expect(html).toContain('data-owner-section="pool"');
+    expect(html).toContain('data-owner-section="pets"');
+    expect(html).toContain('data-owner-preview="pricing"');
+    expect(html).toContain('data-owner-preview="pool"');
+    expect(html).toContain('data-owner-preview="pets"');
+    expect(html).not.toMatch(/>Allowed<|>Public location<|>Fallback</);
+  });
+
+  it("renders purpose-built money, stay, date, pet, preview, and history controls", async () => {
+    const page = pages["../pages/owner/dashboard.astro"] as
+      { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
+    if (!page) return;
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(page.default, { partial: false });
+
+    expect(html.match(/data-currency-field/g) ?? []).toHaveLength(3);
+    expect(html).toMatch(/<select[^>]*name="minimumStayNights"/);
+    expect(html).toMatch(/<option[^>]*value=""[^>]*>Varies by dates</);
+    expect(html).toMatch(/<input[^>]*name="poolOpenMonthDay"[^>]*type="date"/);
+    expect(html).toMatch(/<input[^>]*name="poolCloseMonthDay"[^>]*type="date"/);
+    expect(html).toMatch(/<select[^>]*name="maxPets"/);
+    expect(html).toContain("No pets allowed");
+    expect(html).toContain('href="/#process"');
+    expect(html).toContain('href="/#essentials"');
+    expect(html).toContain('href="/rental-information#rental-water"');
+    expect(html).toContain('href="/rental-information#rental-rules"');
+    expect(html).toContain("Publish changes");
+    expect(html).toContain("data-owner-history");
   });
 
   it("renders a stable no-access state with logout for authenticated non-owners", async () => {
@@ -61,7 +85,7 @@ describe("static owner routes", () => {
     expect(html).toMatch(/data-no-access-logout[^>]*>Log out</);
   });
 
-  it("renders native numeric limits from the shared machine-readable field ranges", async () => {
+  it("keeps the shared numeric limits behind the purpose-built controls", async () => {
     const page = pages["../pages/owner/dashboard.astro"] as
       { default: Parameters<AstroContainer["renderToString"]>[0] } | undefined;
     if (!page) return;
@@ -79,11 +103,22 @@ describe("static owner routes", () => {
       const definition = ownerSettingDefinitions[key as keyof typeof expectedRanges] as {
         range?: { minimum: number; maximum: number };
       };
-      const input = html.match(new RegExp(`<input[^>]*name="${key}"[^>]*>`))?.[0];
       expect(definition.range, key).toEqual(expected);
+    }
+
+    for (const key of ["startingWeeklyRateUsd", "poolHeatFeeUsd", "petFeeUsd"] as const) {
+      const expected = expectedRanges[key];
+      const input = html.match(new RegExp(`<input[^>]*name="${key}"[^>]*>`))?.[0];
       expect(input, key).toContain(`min="${expected.minimum}"`);
       expect(input, key).toContain(`max="${expected.maximum}"`);
     }
+
+    const minimumStaySelect = html.match(
+      /<select[^>]*name="minimumStayNights"[^>]*>[\s\S]*?<\/select>/,
+    )?.[0];
+    const maximumPetsSelect = html.match(/<select[^>]*name="maxPets"[^>]*>[\s\S]*?<\/select>/)?.[0];
+    expect(minimumStaySelect?.match(/<option /g) ?? []).toHaveLength(31);
+    expect(maximumPetsSelect?.match(/<option /g) ?? []).toHaveLength(5);
   });
 
   it("keeps owner routes out of the public sitemap and navigation", async () => {

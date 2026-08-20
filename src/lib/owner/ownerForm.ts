@@ -31,6 +31,11 @@ const integerFields = new Set<keyof typeof ownerSettingDefinitions>([
   "maxPets",
 ]);
 
+const monthDayFields = new Set<keyof typeof ownerSettingDefinitions>([
+  "poolOpenMonthDay",
+  "poolCloseMonthDay",
+]);
+
 export function mapOwnerSettingsErrors(errors: readonly string[]): OwnerFieldErrors {
   const mapped: OwnerFieldErrors = {};
   for (const error of errors) {
@@ -77,6 +82,10 @@ export function serializeOwnerSettings(
       if (nullableIntegerFields.has(key) && normalized === "") return [key, null];
       if (integerFields.has(key)) {
         return [key, /^\d+$/.test(normalized) ? Number(normalized) : Number.NaN];
+      }
+      if (monthDayFields.has(key)) {
+        const calendarDate = /^\d{4}-(\d{2}-\d{2})$/.exec(normalized);
+        return [key, calendarDate?.[1] ?? normalized];
       }
       return [key, raw];
     }),

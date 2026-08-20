@@ -1,9 +1,10 @@
 import { parsePublicOwnerSettings, type PublicOwnerSettings } from "./ownerSettings";
 
 type PublicSettingKey = keyof Omit<PublicOwnerSettings, "updatedAt">;
+type PublicDisplayKey = PublicSettingKey | "petPolicySummary" | "petPolicyDetails";
 
 export interface PublicSettingsView {
-  setText(key: PublicSettingKey, value: string): void;
+  setText(key: PublicDisplayKey, value: string): void;
   setMaximumPets(maximum: number): void;
 }
 
@@ -27,22 +28,34 @@ const formatMonthDay = (value: string) => {
   }).format(new Date(Date.UTC(2000, month - 1, day)));
 };
 
-const formatSettings = (settings: PublicOwnerSettings): Record<PublicSettingKey, string> => ({
-  startingWeeklyRateUsd:
-    settings.startingWeeklyRateUsd === null
-      ? "Personalized quote for your dates"
-      : `From ${money.format(settings.startingWeeklyRateUsd)} per week`,
-  minimumStayNights:
-    settings.minimumStayNights === null
-      ? "Stay requirements vary by dates"
-      : `${settings.minimumStayNights}-night minimum stay`,
-  pricingNote: settings.pricingNote,
-  poolHeatFeeUsd: `${money.format(settings.poolHeatFeeUsd)} per stay`,
-  petFeeUsd: `${money.format(settings.petFeeUsd)} per stay`,
-  maxPets: String(settings.maxPets),
-  poolOpenMonthDay: formatMonthDay(settings.poolOpenMonthDay),
-  poolCloseMonthDay: formatMonthDay(settings.poolCloseMonthDay),
-});
+export const formatPublicSettings = (
+  settings: PublicOwnerSettings,
+): Record<PublicDisplayKey, string> => {
+  const petCount = `${settings.maxPets} ${settings.maxPets === 1 ? "pet" : "pets"}`;
+  const petFee = money.format(settings.petFeeUsd);
+
+  return {
+    startingWeeklyRateUsd:
+      settings.startingWeeklyRateUsd === null
+        ? "Personalized quote for your dates"
+        : `From ${money.format(settings.startingWeeklyRateUsd)} per week`,
+    minimumStayNights:
+      settings.minimumStayNights === null
+        ? "Stay requirements vary by dates"
+        : `${settings.minimumStayNights}-night minimum stay`,
+    pricingNote: settings.pricingNote,
+    poolHeatFeeUsd: `${money.format(settings.poolHeatFeeUsd)} per stay`,
+    petFeeUsd: `${petFee} per stay`,
+    maxPets: String(settings.maxPets),
+    poolOpenMonthDay: formatMonthDay(settings.poolOpenMonthDay),
+    poolCloseMonthDay: formatMonthDay(settings.poolCloseMonthDay),
+    petPolicySummary: settings.maxPets === 0 ? "No pets" : `Up to ${petCount} · ${petFee} per stay`,
+    petPolicyDetails:
+      settings.maxPets === 0
+        ? "Pets are not allowed"
+        : `Up to ${petCount}; ${petFee} per stay for additional cleaning`,
+  };
+};
 
 export async function enhancePublicSettings(
   fetchSettings: () => Promise<SettingsResponse>,
@@ -54,8 +67,8 @@ export async function enhancePublicSettings(
     const settings = parsePublicOwnerSettings(await response.json());
     if (!settings) return false;
 
-    const formatted = formatSettings(settings);
-    for (const key of Object.keys(formatted) as PublicSettingKey[]) {
+    const formatted = formatPublicSettings(settings);
+    for (const key of Object.keys(formatted) as PublicDisplayKey[]) {
       view.setText(key, formatted[key]);
     }
     view.setMaximumPets(settings.maxPets);

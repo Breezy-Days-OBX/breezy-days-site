@@ -131,11 +131,12 @@ const publicFacts = derivePublicPropertyFacts(property);
               old
             </li>
             <li>
-              <strong>Pets:</strong> Up to <span data-public-setting="maxPets"
-                >{ownerSettingsDefaults.maxPets}</span
-              >; <span data-public-setting="petFeeUsd"
-                >{money.format(ownerSettingsDefaults.petFeeUsd)} per stay</span
-              > for additional cleaning
+              <strong>Pets:</strong>
+              <span data-public-setting="petPolicyDetails">
+                Up to {ownerSettingsDefaults.maxPets} pets; {
+                  money.format(ownerSettingsDefaults.petFeeUsd)
+                } per stay for additional cleaning
+              </span>
             </li>
             {
               publicFacts.rules.map((rule) => (

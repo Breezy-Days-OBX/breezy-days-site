@@ -1,11 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { ownerSettingDefinitions } from "../../lib/ownerSettings";
+import { ownerSettingDefinitions, ownerSettingsDefaults } from "../../lib/ownerSettings";
 import "../../styles/supporting.css";
 
-const settingsEntries = Object.entries(ownerSettingDefinitions);
-const displayFallback = (value: unknown) =>
-  value === null ? "Not currently published" : String(value);
+const calendarYear = new Date().getFullYear();
+const startingRateRange = ownerSettingDefinitions.startingWeeklyRateUsd.range!;
+const poolHeatRange = ownerSettingDefinitions.poolHeatFeeUsd.range!;
+const petFeeRange = ownerSettingDefinitions.petFeeUsd.range!;
+const stayOptions = Array.from({ length: 30 }, (_, index) => index + 1);
+const petOptions = Array.from({ length: 5 }, (_, index) => index);
 ---
 
 <BaseLayout
@@ -19,9 +22,16 @@ const displayFallback = (value: unknown) =>
       <div>
         <a class="wordmark" href="/">Breezy Days <span>OBX</span></a>
         <p class="eyebrow">Owner dashboard</p>
-        <h1>Published stay details.</h1>
+        <h1>Keep the essentials current.</h1>
+        <p class="owner-dashboard-intro">
+          Update the details guests need before they request a stay. Every card shows exactly how
+          your changes will read on the public website.
+        </p>
       </div>
-      <button class="owner-logout" type="button" data-owner-logout>Log out</button>
+      <div class="owner-header-actions">
+        <a href="/" target="_blank" rel="noreferrer">View public website</a>
+        <button class="owner-logout" type="button" data-owner-logout>Log out</button>
+      </div>
     </header>
 
     <div
@@ -34,119 +44,320 @@ const displayFallback = (value: unknown) =>
       Loading current settings…
     </div>
 
-    <div class="owner-dashboard-grid" data-dashboard-content hidden>
-      <section
-        class="owner-settings-panel"
-        aria-labelledby="settings-title"
-        data-owner-settings-panel
-      >
+    <div class="owner-dashboard-content" data-dashboard-content hidden>
+      <section aria-labelledby="settings-title" data-owner-settings-panel>
         <div class="owner-panel-heading">
           <div>
-            <p class="eyebrow">Live public values</p>
-            <h2 id="settings-title">Settings</h2>
+            <p class="eyebrow">Live website details</p><h2 id="settings-title">What guests see</h2>
           </div>
-          <p>Last saved <time data-last-saved>—</time></p>
+          <p>Last published <time data-last-saved>—</time></p>
         </div>
 
         <form data-owner-settings-form novalidate>
           <div class="owner-error-summary" data-owner-error-summary hidden tabindex="-1">
-            <strong>Review the highlighted settings.</strong>
+            <strong>Please review the highlighted fields.</strong>
           </div>
 
-          <div class="owner-settings-list">
-            {
-              settingsEntries.map(([key, definition]) => (
-                <section class="owner-setting-row" data-owner-setting-field>
-                  <div class="owner-setting-copy">
-                    <label for={`owner-setting-${key}`}>{definition.name}</label>
-                    <p>{definition.purpose}</p>
-                    <dl>
-                      <div>
-                        <>
-                          <dt>Allowed</dt>
-                          <dd>{definition.allowed}</dd>
-                        </>
-                      </div>
-                      <div>
-                        <>
-                          <dt>Public location</dt>
-                          <dd>{definition.publicDestination}</dd>
-                        </>
-                      </div>
-                      <div>
-                        <>
-                          <dt>Fallback</dt>
-                          <dd>{displayFallback(definition.fallback)}</dd>
-                        </>
-                      </div>
-                    </dl>
-                  </div>
-                  <div class="owner-setting-control">
-                    {definition.type === "plain text" ? (
-                      <textarea
-                        id={`owner-setting-${key}`}
-                        name={key}
-                        maxlength="160"
-                        rows="3"
-                        aria-describedby={`owner-help-${key} owner-error-${key}`}
-                        required
-                      >
-                        {String(definition.fallback)}
-                      </textarea>
-                    ) : (
-                      <input
-                        id={`owner-setting-${key}`}
-                        name={key}
-                        type={definition.type === "month-day" ? "text" : "number"}
-                        inputmode={definition.type === "month-day" ? "numeric" : "decimal"}
-                        pattern={definition.type === "month-day" ? "[0-9]{2}-[0-9]{2}" : undefined}
-                        step={definition.type.includes("integer") ? "1" : undefined}
-                        min={definition.range?.minimum}
-                        max={definition.range?.maximum}
-                        value={definition.fallback ?? ""}
-                        aria-describedby={`owner-help-${key} owner-error-${key}`}
-                        required={!definition.type.startsWith("nullable")}
-                      />
-                    )}
-                    <small id={`owner-help-${key}`} class="owner-field-help">
-                      {definition.ownerHelpText}
-                    </small>
-                    <small
-                      id={`owner-error-${key}`}
-                      class="owner-field-error"
-                      data-field-error={key}
+          <section class="owner-editor-card owner-editor-pricing" data-owner-section="pricing">
+            <div class="owner-editor-heading">
+              <div>
+                <span>01</span><p class="eyebrow">Pricing & stays</p><h3>
+                  Set expectations before a guest asks.
+                </h3>
+              </div>
+              <p>Publish helpful starting guidance without promising a date-specific total.</p>
+            </div>
+            <div class="owner-editor-layout">
+              <div class="owner-controls-grid">
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-startingWeeklyRateUsd">Starting weekly rate</label>
+                  <p>Optional. Leave this blank when every stay needs a custom quote.</p>
+                  <div class="owner-currency-control" data-currency-field>
+                    <span aria-hidden="true">$</span><input
+                      id="owner-setting-startingWeeklyRateUsd"
+                      name="startingWeeklyRateUsd"
+                      type="number"
+                      inputmode="numeric"
+                      step="1"
+                      min={startingRateRange.minimum}
+                      max={startingRateRange.maximum}
+                      value={ownerSettingsDefaults.startingWeeklyRateUsd ?? ""}
+                      aria-describedby="owner-help-startingWeeklyRateUsd owner-error-startingWeeklyRateUsd"
                     />
                   </div>
-                </section>
-              ))
-            }
-          </div>
+                  <small id="owner-help-startingWeeklyRateUsd">Shown as “From $— per week.”</small>
+                  <small
+                    id="owner-error-startingWeeklyRateUsd"
+                    class="owner-field-error"
+                    data-field-error="startingWeeklyRateUsd"></small>
+                </div>
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-minimumStayNights">Minimum stay</label>
+                  <p>Choose “Varies by dates” when there is no single rule.</p>
+                  <select
+                    id="owner-setting-minimumStayNights"
+                    name="minimumStayNights"
+                    aria-describedby="owner-help-minimumStayNights owner-error-minimumStayNights"
+                  >
+                    <option value="">Varies by dates</option>
+                    {
+                      stayOptions.map((nights) => (
+                        <option value={nights}>
+                          {nights} {nights === 1 ? "night" : "nights"}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <small id="owner-help-minimumStayNights"
+                    >This appears with the rate guidance.</small
+                  >
+                  <small
+                    id="owner-error-minimumStayNights"
+                    class="owner-field-error"
+                    data-field-error="minimumStayNights"></small>
+                </div>
+                <div class="owner-control-group owner-control-wide" data-owner-setting-field>
+                  <div class="owner-label-row">
+                    <label for="owner-setting-pricingNote">Message shown beneath pricing</label
+                    ><span><output data-pricing-count>0</output>/160</span>
+                  </div>
+                  <p>Keep this short, factual, and easy for a guest to understand.</p>
+                  <textarea
+                    id="owner-setting-pricingNote"
+                    name="pricingNote"
+                    maxlength="160"
+                    rows="3"
+                    aria-describedby="owner-help-pricingNote owner-error-pricingNote"
+                    required>{ownerSettingsDefaults.pricingNote}</textarea
+                  >
+                  <small id="owner-help-pricingNote"
+                    >Example: Rates vary by dates and are confirmed in your personalized quote.</small
+                  >
+                  <small
+                    id="owner-error-pricingNote"
+                    class="owner-field-error"
+                    data-field-error="pricingNote"></small>
+                </div>
+              </div>
+              <aside class="owner-live-preview" data-owner-preview="pricing">
+                <p class="owner-preview-label"><span></span> Guest preview</p>
+                <div class="owner-preview-surface">
+                  <small>Current rate guidance</small><strong data-preview-rate
+                    >Personalized quote for your dates</strong
+                  ><small>Stay requirement</small><strong data-preview-minimum
+                    >Stay requirements vary by dates</strong
+                  ><p data-preview-pricing-note>{ownerSettingsDefaults.pricingNote}</p>
+                </div>
+                <a href="/#process" target="_blank" rel="noreferrer">View this on the website →</a>
+              </aside>
+            </div>
+          </section>
+
+          <section class="owner-editor-card owner-editor-pool" data-owner-section="pool">
+            <div class="owner-editor-heading">
+              <div>
+                <span>02</span><p class="eyebrow">Pool</p><h3>
+                  Keep the season and optional heat clear.
+                </h3>
+              </div>
+              <p>Guests will see the recurring pool season and the complete pool-heating fee.</p>
+            </div>
+            <div class="owner-editor-layout">
+              <div class="owner-controls-grid">
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-poolOpenMonthDay">Pool opens</label><p>
+                    Select the first day of the recurring pool season.
+                  </p>
+                  <input
+                    id="owner-setting-poolOpenMonthDay"
+                    name="poolOpenMonthDay"
+                    type="date"
+                    value={`${calendarYear}-${ownerSettingsDefaults.poolOpenMonthDay}`}
+                    aria-describedby="owner-help-poolOpenMonthDay owner-error-poolOpenMonthDay"
+                    required
+                  />
+                  <small id="owner-help-poolOpenMonthDay"
+                    >Only the month and day are published.</small
+                  ><small
+                    id="owner-error-poolOpenMonthDay"
+                    class="owner-field-error"
+                    data-field-error="poolOpenMonthDay"></small>
+                </div>
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-poolCloseMonthDay">Pool closes</label><p>
+                    Select the final day of the recurring pool season.
+                  </p>
+                  <input
+                    id="owner-setting-poolCloseMonthDay"
+                    name="poolCloseMonthDay"
+                    type="date"
+                    value={`${calendarYear}-${ownerSettingsDefaults.poolCloseMonthDay}`}
+                    aria-describedby="owner-help-poolCloseMonthDay owner-error-poolCloseMonthDay"
+                    required
+                  />
+                  <small id="owner-help-poolCloseMonthDay"
+                    >Only the month and day are published.</small
+                  ><small
+                    id="owner-error-poolCloseMonthDay"
+                    class="owner-field-error"
+                    data-field-error="poolCloseMonthDay"></small>
+                </div>
+                <div class="owner-control-group owner-control-wide" data-owner-setting-field>
+                  <label for="owner-setting-poolHeatFeeUsd">Optional pool heat fee</label><p>
+                    Enter the full per-stay fee. Use 0 if pool heat is included at no charge.
+                  </p>
+                  <div class="owner-currency-control" data-currency-field>
+                    <span aria-hidden="true">$</span><input
+                      id="owner-setting-poolHeatFeeUsd"
+                      name="poolHeatFeeUsd"
+                      type="number"
+                      inputmode="numeric"
+                      step="1"
+                      min={poolHeatRange.minimum}
+                      max={poolHeatRange.maximum}
+                      value={ownerSettingsDefaults.poolHeatFeeUsd}
+                      aria-describedby="owner-help-poolHeatFeeUsd owner-error-poolHeatFeeUsd"
+                      required
+                    />
+                  </div>
+                  <small id="owner-help-poolHeatFeeUsd">Published as a per-stay fee.</small><small
+                    id="owner-error-poolHeatFeeUsd"
+                    class="owner-field-error"
+                    data-field-error="poolHeatFeeUsd"></small>
+                </div>
+              </div>
+              <aside class="owner-live-preview" data-owner-preview="pool">
+                <p class="owner-preview-label"><span></span> Guest preview</p>
+                <div class="owner-preview-surface">
+                  <small>Seasonal pool</small><strong data-preview-pool-season
+                    >April 15–October 15</strong
+                  ><small>Optional pool heat</small><strong data-preview-pool-heat
+                    >$250 per stay</strong
+                  >
+                </div>
+                <div class="owner-preview-links">
+                  <a href="/#essentials" target="_blank" rel="noreferrer">Homepage →</a><a
+                    href="/rental-information#rental-water"
+                    target="_blank"
+                    rel="noreferrer">Rental details →</a
+                  >
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="owner-editor-card owner-editor-pets" data-owner-section="pets">
+            <div class="owner-editor-heading">
+              <div>
+                <span>03</span><p class="eyebrow">Pet policy</p><h3>
+                  Publish the complete pet rule together.
+                </h3>
+              </div>
+              <p>
+                The allowance and cleaning fee are presented as one policy everywhere guests see it.
+              </p>
+            </div>
+            <div class="owner-editor-layout">
+              <div class="owner-controls-grid">
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-maxPets">Pet allowance</label><p>
+                    Choose “No pets allowed” to remove the fee from the guest-facing summary.
+                  </p>
+                  <select
+                    id="owner-setting-maxPets"
+                    name="maxPets"
+                    aria-describedby="owner-help-maxPets owner-error-maxPets"
+                  >
+                    {
+                      petOptions.map((pets) => (
+                        <option value={pets} selected={pets === ownerSettingsDefaults.maxPets}>
+                          {pets === 0
+                            ? "No pets allowed"
+                            : `Up to ${pets} ${pets === 1 ? "pet" : "pets"}`}
+                        </option>
+                      ))
+                    }
+                  </select>
+                  <small id="owner-help-maxPets"
+                    >This also updates the availability request form.</small
+                  ><small
+                    id="owner-error-maxPets"
+                    class="owner-field-error"
+                    data-field-error="maxPets"></small>
+                </div>
+                <div class="owner-control-group" data-owner-setting-field>
+                  <label for="owner-setting-petFeeUsd">Pet cleaning fee</label><p>
+                    Enter the complete additional fee charged per approved pet stay.
+                  </p>
+                  <div class="owner-currency-control" data-currency-field>
+                    <span aria-hidden="true">$</span><input
+                      id="owner-setting-petFeeUsd"
+                      name="petFeeUsd"
+                      type="number"
+                      inputmode="numeric"
+                      step="1"
+                      min={petFeeRange.minimum}
+                      max={petFeeRange.maximum}
+                      value={ownerSettingsDefaults.petFeeUsd}
+                      aria-describedby="owner-help-petFeeUsd owner-error-petFeeUsd"
+                      required
+                    />
+                  </div>
+                  <small id="owner-help-petFeeUsd"
+                    >The fee is hidden from the summary when pets are not allowed.</small
+                  ><small
+                    id="owner-error-petFeeUsd"
+                    class="owner-field-error"
+                    data-field-error="petFeeUsd"></small>
+                </div>
+              </div>
+              <aside class="owner-live-preview" data-owner-preview="pets">
+                <p class="owner-preview-label"><span></span> Guest preview</p>
+                <div class="owner-preview-surface">
+                  <small>Pet policy</small><strong data-preview-pet-policy
+                    >Up to 2 pets · $150 per stay</strong
+                  >
+                </div>
+                <div class="owner-preview-links">
+                  <a href="/#essentials" target="_blank" rel="noreferrer">Homepage →</a><a
+                    href="/rental-information#rental-rules"
+                    target="_blank"
+                    rel="noreferrer">Rental details →</a
+                  >
+                </div>
+              </aside>
+            </div>
+          </section>
 
           <div class="owner-save-bar">
-            <p>
-              Saving publishes the complete validated settings object; partial changes are never
-              sent.
-            </p>
-            <button class="button" type="submit" data-owner-save>Save all settings</button>
+            <div>
+              <strong>Ready to update the website?</strong><p>
+                Your edits remain private until you publish them.
+              </p>
+            </div><button class="button" type="submit" data-owner-save>Publish changes</button>
           </div>
         </form>
       </section>
 
-      <aside class="owner-history-panel" aria-labelledby="history-title">
-        <p class="eyebrow">Recovery points</p>
-        <h2 id="history-title">Saved versions</h2>
-        <p>
-          Only save time and restore controls are shown. Saved field contents remain private until
-          restored.
-        </p>
-        <div data-snapshot-empty>No earlier versions are available yet.</div>
-        <ol class="owner-snapshot-list" data-snapshot-list></ol>
-      </aside>
+      <details class="owner-history-panel" data-owner-history>
+        <summary
+          ><span><small>Safety net</small><strong>Saved versions</strong></span><span
+            >View history</span
+          ></summary
+        >
+        <div class="owner-history-content">
+          <p>Restore an earlier published version if you ever need to undo a change.</p><div
+            data-snapshot-empty
+          >
+            No earlier versions are available yet.
+          </div><ol class="owner-snapshot-list" data-snapshot-list></ol>
+        </div>
+      </details>
     </div>
 
-    <noscript>
-      <p class="owner-noscript">JavaScript is required to use the owner dashboard.</p>
-    </noscript>
+    <noscript
+      ><p class="owner-noscript">JavaScript is required to use the owner dashboard.</p></noscript
+    >
   </main>
 
   <script>
@@ -167,6 +378,7 @@ const displayFallback = (value: unknown) =>
     import { hasOwnerRole } from "../../lib/owner/ownerAuth";
     import { OWNER_EDITABLE_KEYS, serializeOwnerSettings } from "../../lib/owner/ownerForm";
     import type { OwnerSettings } from "../../lib/ownerSettings";
+    import { formatPublicSettings } from "../../lib/publicSettings";
 
     const content = document.querySelector<HTMLElement>("[data-dashboard-content]");
     const form = document.querySelector<HTMLFormElement>("[data-owner-settings-form]");
@@ -178,38 +390,35 @@ const displayFallback = (value: unknown) =>
     const errorSummary = document.querySelector<HTMLElement>("[data-owner-error-summary]");
     const saveButton = document.querySelector<HTMLButtonElement>("[data-owner-save]");
     const logoutButton = document.querySelector<HTMLButtonElement>("[data-owner-logout]");
+    const pricingCount = document.querySelector<HTMLOutputElement>("[data-pricing-count]");
     let currentSettings: OwnerSettings | null = null;
     let currentAction: "save" | "restore" = "save";
 
     const messages: Record<string, string> = {
       loading: "Loading current settings…",
-      saving: "Saving all settings…",
+      saving: "Publishing your changes…",
       restoring: "Restoring the selected saved version…",
-      success: "Settings saved and live values refreshed.",
-      validation: "Some settings need attention before they can be saved.",
-      conflict:
-        "The settings changed in another session. Reload this page to review the latest values.",
+      success: "Changes published. The public website now shows these details.",
+      validation: "Some details need attention before they can be published.",
+      conflict: "These details changed in another session. Reload to review the newest version.",
       auth: "Your owner session has expired. Return to owner access and sign in again.",
       forbidden: "This account does not have permission to manage owner settings.",
       method: "That owner action is not currently available.",
       service: "The owner settings service is temporarily unavailable. Try again shortly.",
       recovery:
-        "Current settings could not be loaded. Choose a saved version to recover them, or try again shortly.",
+        "Current settings could not be loaded. Restore a saved version or try again shortly.",
     };
-
     const setBusy = (busy: boolean) => {
       saveButton?.toggleAttribute("disabled", busy);
       logoutButton?.toggleAttribute("disabled", busy);
-      for (const button of document.querySelectorAll<HTMLButtonElement>("[data-restore-key]")) {
+      for (const button of document.querySelectorAll<HTMLButtonElement>("[data-restore-key]"))
         button.toggleAttribute("disabled", busy);
-      }
     };
-
     const transition = (state: string) => {
       if (status) {
         status.textContent =
           state === "success" && currentAction === "restore"
-            ? "Saved version restored and live values refreshed."
+            ? "Saved version restored and public details refreshed."
             : (messages[state] ?? messages.service);
         status.dataset.kind =
           state === "success"
@@ -220,13 +429,40 @@ const displayFallback = (value: unknown) =>
       }
       setBusy(state === "saving" || state === "restoring");
     };
-
     const formatDate = (value: string) =>
-      new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }).format(new Date(value));
-
+      new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
+        new Date(value),
+      );
+    const setPreviewText = (selector: string, value: string) => {
+      const target = document.querySelector<HTMLElement>(selector);
+      if (target) target.textContent = value;
+    };
+    const renderPreview = (settings: OwnerSettings) => {
+      const formatted = formatPublicSettings(settings);
+      setPreviewText("[data-preview-rate]", formatted.startingWeeklyRateUsd);
+      setPreviewText("[data-preview-minimum]", formatted.minimumStayNights);
+      setPreviewText("[data-preview-pricing-note]", formatted.pricingNote);
+      setPreviewText(
+        "[data-preview-pool-season]",
+        `${formatted.poolOpenMonthDay}–${formatted.poolCloseMonthDay}`,
+      );
+      setPreviewText("[data-preview-pool-heat]", formatted.poolHeatFeeUsd);
+      setPreviewText("[data-preview-pet-policy]", formatted.petPolicySummary);
+      if (pricingCount) pricingCount.value = String(settings.pricingNote.length);
+    };
+    const previewForm = () => {
+      if (!form || !currentSettings) return;
+      const result = serializeOwnerSettings(
+        new FormData(form).entries(),
+        currentSettings.updatedAt,
+      );
+      if (result.success) renderPreview(result.data);
+      else {
+        const note = form.elements.namedItem("pricingNote");
+        if (pricingCount && note instanceof HTMLTextAreaElement)
+          pricingCount.value = String(note.value.length);
+      }
+    };
     const clearFieldErrors = () => {
       if (errorSummary) errorSummary.hidden = true;
       for (const field of OWNER_EDITABLE_KEYS) {
@@ -236,7 +472,6 @@ const displayFallback = (value: unknown) =>
         if (error) error.textContent = "";
       }
     };
-
     const showFieldErrors = (fieldErrors: Record<string, string>) => {
       clearFieldErrors();
       if (errorSummary) {
@@ -250,21 +485,31 @@ const displayFallback = (value: unknown) =>
         if (error) error.textContent = message;
       }
     };
-
     const applySettings = (settings: OwnerSettings) => {
       currentSettings = settings;
+      const year = new Date().getFullYear();
       for (const field of OWNER_EDITABLE_KEYS) {
         const input = form?.elements.namedItem(field);
-        if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-          input.value = settings[field] === null ? "" : String(settings[field]);
+        if (
+          input instanceof HTMLInputElement ||
+          input instanceof HTMLTextAreaElement ||
+          input instanceof HTMLSelectElement
+        ) {
+          const value = settings[field];
+          input.value =
+            input instanceof HTMLInputElement && input.type === "date"
+              ? `${year}-${String(value)}`
+              : value === null
+                ? ""
+                : String(value);
         }
       }
+      renderPreview(settings);
       if (lastSaved) {
         lastSaved.dateTime = settings.updatedAt;
         lastSaved.textContent = formatDate(settings.updatedAt);
       }
     };
-
     const renderSnapshots = (snapshots: OwnerSnapshot[]) => {
       if (!snapshotList || !snapshotEmpty) return;
       snapshotList.replaceChildren();
@@ -285,7 +530,6 @@ const displayFallback = (value: unknown) =>
         snapshotList.append(item);
       }
     };
-
     const refreshDashboard = async () => {
       const result = await loadOwnerDashboardData({
         loadSettings: fetchOwnerSettings,
@@ -294,25 +538,21 @@ const displayFallback = (value: unknown) =>
       const settings = result.settings.status === "fulfilled" ? result.settings.value : null;
       const snapshots =
         result.snapshots.status === "fulfilled" ? result.snapshots.value.snapshots : [];
-
       if (settings) applySettings(settings);
       else currentSettings = null;
       if (settingsPanel) settingsPanel.hidden = settings === null;
       renderSnapshots(snapshots);
-
-      if (result.settings.status === "rejected" && result.snapshots.status === "rejected") {
+      if (result.settings.status === "rejected" && result.snapshots.status === "rejected")
         throw result.settings.reason;
-      }
       return { settings, snapshots };
     };
-
     const restoreSnapshot = async (snapshot: OwnerSnapshot) => {
       currentAction = "restore";
       const result = await runOwnerRestore({
         key: snapshot.key,
         confirm: () =>
           window.confirm(
-            `Restore the version saved ${formatDate(snapshot.createdAt)}? Current settings will be saved as a recovery point first.`,
+            `Restore the version saved ${formatDate(snapshot.createdAt)}? Your current version will remain available in history.`,
           ),
         restore: restoreOwnerSettings,
         refresh: refreshDashboard,
@@ -321,7 +561,8 @@ const displayFallback = (value: unknown) =>
       if (result.state === "cancelled") return;
       setBusy(false);
     };
-
+    form?.addEventListener("input", previewForm);
+    form?.addEventListener("change", previewForm);
     form?.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!currentSettings) return;
@@ -338,7 +579,6 @@ const displayFallback = (value: unknown) =>
         showFieldErrors(result.fieldErrors ?? {});
       setBusy(false);
     });
-
     logoutButton?.addEventListener("click", async () => {
       setBusy(true);
       try {
@@ -349,19 +589,15 @@ const displayFallback = (value: unknown) =>
         setBusy(false);
       }
     });
-
     try {
       const user = await getUser();
-      if (!hasOwnerRole(user)) {
-        window.location.replace("/owner");
-      } else {
+      if (!hasOwnerRole(user)) window.location.replace("/owner");
+      else {
         const dashboard = await refreshDashboard();
         if (content) content.hidden = false;
         if (dashboard.settings) {
-          if (status) status.textContent = "Current settings loaded.";
-        } else {
-          transition("recovery");
-        }
+          if (status) status.textContent = "Everything is up to date.";
+        } else transition("recovery");
       }
     } catch (error) {
       transition(

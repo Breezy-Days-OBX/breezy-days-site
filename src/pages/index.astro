@@ -376,13 +376,11 @@ const structuredData = {
                 </p>
               </div>
               <div>
-                <p class="detail-kicker">Pet cleaning fee</p>
-                <p>
-                  <span data-public-setting="petFeeUsd"
-                    >{money.format(ownerSettingsDefaults.petFeeUsd)} per stay</span
-                  > · Up to <span data-public-setting="maxPets"
-                    >{ownerSettingsDefaults.maxPets}</span
-                  > pets
+                <p class="detail-kicker">Pet policy</p>
+                <p data-public-setting="petPolicySummary">
+                  Up to {ownerSettingsDefaults.maxPets} pets · {
+                    money.format(ownerSettingsDefaults.petFeeUsd)
+                  } per stay
                 </p>
               </div>
             </div>

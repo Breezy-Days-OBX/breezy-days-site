@@ -127,6 +127,26 @@ describe("owner form contract", () => {
     );
   });
 
+  it("accepts calendar input dates and stores the recurring month and day", () => {
+    const ownerForm = modules["./ownerForm.ts"] as OwnerFormModule | undefined;
+    if (!ownerForm) return;
+
+    const calendarEntries = validEntries().map(([key, value]) => {
+      if (key === "poolOpenMonthDay") return [key, "2026-04-15"] as const;
+      if (key === "poolCloseMonthDay") return [key, "2026-10-15"] as const;
+      return [key, value] as const;
+    });
+    const result = ownerForm.serializeOwnerSettings(calendarEntries, "2026-08-14T15:00:00.000Z");
+
+    expect(result).toMatchObject({
+      success: true,
+      data: {
+        poolOpenMonthDay: "04-15",
+        poolCloseMonthDay: "10-15",
+      },
+    });
+  });
+
   it.each([
     ["poolHeatFeeUsd", ""],
     ["poolHeatFeeUsd", "   "],

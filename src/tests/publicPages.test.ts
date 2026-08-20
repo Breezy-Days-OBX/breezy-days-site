@@ -48,4 +48,15 @@ describe("public page map", () => {
     expect(html).toMatch(/heatmaps/i);
     expect(html).toMatch(/session replays/i);
   });
+
+  it("renders the complete pet policy as one live-updated rental detail", async () => {
+    const page = pages["../pages/rental-information.astro"] as {
+      default: Parameters<AstroContainer["renderToString"]>[0];
+    };
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(page.default, { partial: false });
+
+    expect(html).toContain('data-public-setting="petPolicyDetails"');
+    expect(html).toContain("Up to 2 pets; $150 per stay for additional cleaning");
+  });
 });
