@@ -9,6 +9,7 @@ import "@fontsource/playfair-display/400.css";
 import "@fontsource/playfair-display/600.css";
 import heroDeck from "../assets/images/hero-deck.jpeg";
 import PublicTracking from "../components/PublicTracking.astro";
+import { identityCallbackParameters } from "../lib/owner/ownerAuth";
 
 interface Props {
   title: string;
@@ -33,6 +34,14 @@ const jsonLd = structuredData ? JSON.stringify(structuredData).replace(/</g, "\\
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline define:vars={{ identityCallbackParameters }}>
+      if (!window.location.pathname.startsWith("/owner")) {
+        const callback = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        if (identityCallbackParameters.some((parameter) => callback.has(parameter))) {
+          window.location.replace(`/owner/${window.location.search}${window.location.hash}`);
+        }
+      }
+    </script>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#173c32" />
     <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
