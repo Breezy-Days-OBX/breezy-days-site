@@ -31,7 +31,7 @@ interface OwnerCallbackUrl {
   replace: (url: string) => void;
 }
 
-const identityCallbackParameters = [
+export const identityCallbackParameters = [
   "access_token",
   "confirmation_token",
   "recovery_token",

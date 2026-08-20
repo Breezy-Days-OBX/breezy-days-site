@@ -103,6 +103,24 @@ test("owner login remains public while the dashboard falls back without a sessio
   await expect(page.locator("[data-login-form]")).toBeVisible();
 });
 
+for (const callbackParameter of ["invite_token", "recovery_token"] as const) {
+  test(`routes a Netlify Identity ${callbackParameter} callback from the public homepage to owner access`, async ({
+    page,
+  }) => {
+    await page.goto(`/#${callbackParameter}=test-token`);
+
+    await expect(page).toHaveURL(/\/owner\/?$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Welcome back.");
+  });
+}
+
+test("leaves ordinary public homepage fragments on the public page", async ({ page }) => {
+  await page.goto("/#stay-details");
+
+  await expect(page).toHaveURL(/\/#stay-details$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Make room for the week");
+});
+
 test("the local Function boundary invokes the protected handler for anonymous requests", async ({
   page,
 }) => {
