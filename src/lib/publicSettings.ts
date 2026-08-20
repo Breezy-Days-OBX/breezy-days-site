@@ -1,7 +1,8 @@
 import { parsePublicOwnerSettings, type PublicOwnerSettings } from "./ownerSettings";
 
 type PublicSettingKey = keyof Omit<PublicOwnerSettings, "updatedAt">;
-type PublicDisplayKey = PublicSettingKey | "petPolicySummary" | "petPolicyDetails";
+type PublicDisplayKey =
+  PublicSettingKey | "petPolicySummary" | "petPolicyDetails" | "petPolicyFormHint";
 
 export interface PublicSettingsView {
   setText(key: PublicDisplayKey, value: string): void;
@@ -54,6 +55,8 @@ export const formatPublicSettings = (
       settings.maxPets === 0
         ? "Pets are not allowed"
         : `Up to ${petCount}; ${petFee} per stay for additional cleaning`,
+    petPolicyFormHint:
+      settings.maxPets === 0 ? "Pets are not allowed for this stay." : `Up to ${petCount}.`,
   };
 };
 

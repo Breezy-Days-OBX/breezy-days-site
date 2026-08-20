@@ -62,6 +62,8 @@ describe("static owner routes", () => {
     expect(html).toMatch(/<option[^>]*value=""[^>]*>Varies by dates</);
     expect(html).toMatch(/<input[^>]*name="poolOpenMonthDay"[^>]*type="date"/);
     expect(html).toMatch(/<input[^>]*name="poolCloseMonthDay"[^>]*type="date"/);
+    expect(html).toContain('value="2024-04-15"');
+    expect(html).toContain('value="2024-10-15"');
     expect(html).toMatch(/<select[^>]*name="maxPets"/);
     expect(html).toContain("No pets allowed");
     expect(html).toContain('href="/#process"');

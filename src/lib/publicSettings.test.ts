@@ -47,6 +47,7 @@ describe("public settings enhancement", () => {
     ).toMatchObject({
       petPolicySummary: "Up to 2 pets · $150 per stay",
       petPolicyDetails: "Up to 2 pets; $150 per stay for additional cleaning",
+      petPolicyFormHint: "Up to 2 pets.",
     });
     expect(
       module.formatPublicSettings({
@@ -57,6 +58,7 @@ describe("public settings enhancement", () => {
     ).toMatchObject({
       petPolicySummary: "No pets",
       petPolicyDetails: "Pets are not allowed",
+      petPolicyFormHint: "Pets are not allowed for this stay.",
     });
   });
 

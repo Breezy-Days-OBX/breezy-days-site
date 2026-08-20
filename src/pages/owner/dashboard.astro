@@ -3,7 +3,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { ownerSettingDefinitions, ownerSettingsDefaults } from "../../lib/ownerSettings";
 import "../../styles/supporting.css";
 
-const calendarYear = new Date().getFullYear();
+// A fixed leap year keeps every valid recurring month/day, including February 29, selectable.
+const recurringDateLeapYear = 2024;
 const startingRateRange = ownerSettingDefinitions.startingWeeklyRateUsd.range!;
 const poolHeatRange = ownerSettingDefinitions.poolHeatFeeUsd.range!;
 const petFeeRange = ownerSettingDefinitions.petFeeUsd.range!;
@@ -172,7 +173,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
                     id="owner-setting-poolOpenMonthDay"
                     name="poolOpenMonthDay"
                     type="date"
-                    value={`${calendarYear}-${ownerSettingsDefaults.poolOpenMonthDay}`}
+                    value={`${recurringDateLeapYear}-${ownerSettingsDefaults.poolOpenMonthDay}`}
                     aria-describedby="owner-help-poolOpenMonthDay owner-error-poolOpenMonthDay"
                     required
                   />
@@ -191,7 +192,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
                     id="owner-setting-poolCloseMonthDay"
                     name="poolCloseMonthDay"
                     type="date"
-                    value={`${calendarYear}-${ownerSettingsDefaults.poolCloseMonthDay}`}
+                    value={`${recurringDateLeapYear}-${ownerSettingsDefaults.poolCloseMonthDay}`}
                     aria-describedby="owner-help-poolCloseMonthDay owner-error-poolCloseMonthDay"
                     required
                   />
@@ -487,7 +488,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
     };
     const applySettings = (settings: OwnerSettings) => {
       currentSettings = settings;
-      const year = new Date().getFullYear();
+      const recurringDateLeapYear = 2024;
       for (const field of OWNER_EDITABLE_KEYS) {
         const input = form?.elements.namedItem(field);
         if (
@@ -498,7 +499,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
           const value = settings[field];
           input.value =
             input instanceof HTMLInputElement && input.type === "date"
-              ? `${year}-${String(value)}`
+              ? `${recurringDateLeapYear}-${String(value)}`
               : value === null
                 ? ""
                 : String(value);

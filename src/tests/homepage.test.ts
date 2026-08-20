@@ -132,13 +132,14 @@ describe("Breezy Days homepage", () => {
       "minimumStayNights",
       "pricingNote",
       "poolHeatFeeUsd",
-      "maxPets",
       "poolOpenMonthDay",
       "poolCloseMonthDay",
     ]) {
       expect(html, key).toContain(`data-public-setting="${key}"`);
     }
     expect(html).toContain('data-public-setting="petPolicySummary"');
+    expect(html).toContain('data-public-setting="petPolicyFormHint"');
+    expect(html).toContain("Up to 2 pets.");
     expect(html).toContain("Rates vary by dates and are confirmed in your personalized quote.");
   });
 

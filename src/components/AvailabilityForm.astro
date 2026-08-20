@@ -114,9 +114,9 @@ import { siteContent } from "../content/site";
             ))
           }
         </select>
-        <span class="field-hint" id="pets-hint"
-          >Up to <span data-public-setting="maxPets">{property.pets.maximum}</span> pets.</span
-        >
+        <span class="field-hint" id="pets-hint" data-public-setting="petPolicyFormHint">
+          Up to {property.pets.maximum} pets.
+        </span>
         <span class="field-error" id="pets-error" data-field-error="pets" aria-live="polite"></span>
       </div>
     </div>
