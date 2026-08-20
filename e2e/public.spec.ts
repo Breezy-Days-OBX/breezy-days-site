@@ -202,6 +202,42 @@ test("private owner access carries the refined system without public navigation"
   expect(radius).toBeGreaterThanOrEqual(20);
 });
 
+test("owner password controls reveal and conceal typed values", async ({ page }) => {
+  await page.goto("/owner");
+
+  const loginForm = page.locator("[data-login-form]");
+  const loginPassword = loginForm.getByLabel("Password", { exact: true });
+  const loginVisibility = loginForm.locator("[data-password-toggle]");
+
+  await expect(loginForm).toBeVisible();
+  await loginPassword.fill("Breezy-week-2026");
+  await expect(loginPassword).toHaveAttribute("type", "password");
+  await expect(loginVisibility).toHaveAccessibleName("Show password");
+  await loginVisibility.click();
+  await expect(loginPassword).toHaveAttribute("type", "text");
+  await expect(loginPassword).toHaveValue("Breezy-week-2026");
+  await expect(loginVisibility).toHaveAccessibleName("Hide password");
+  await loginVisibility.click();
+  await expect(loginPassword).toHaveAttribute("type", "password");
+
+  const setupForm = page.locator("[data-password-form]");
+  await loginForm.evaluate((form: HTMLFormElement) => {
+    form.hidden = true;
+  });
+  await setupForm.evaluate((form: HTMLFormElement) => {
+    form.hidden = false;
+  });
+
+  const setupPassword = setupForm.getByLabel("Choose a password", { exact: true });
+  const setupVisibility = setupForm.locator("[data-password-toggle]");
+  await expect(setupVisibility).toHaveAccessibleName("Show password");
+  await setupPassword.fill("Atlantic-week-2026");
+  await setupVisibility.click();
+  await expect(setupPassword).toHaveAttribute("type", "text");
+  await expect(setupPassword).toHaveValue("Atlantic-week-2026");
+  await expect(setupVisibility).toHaveAccessibleName("Hide password");
+});
+
 test("rental details avoid orphaned half-width rows on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/rental-information");

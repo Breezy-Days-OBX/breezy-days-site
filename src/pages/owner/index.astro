@@ -30,13 +30,29 @@ import "../../styles/supporting.css";
         </div>
         <div class="owner-field">
           <label for="owner-password">Password</label>
-          <input
-            id="owner-password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
+          <div class="owner-password-input">
+            <input
+              id="owner-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              class="owner-password-toggle"
+              type="button"
+              data-password-toggle
+              aria-controls="owner-password"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+                <circle cx="12" cy="12" r="2.6"></circle>
+              </svg>
+              <span data-password-toggle-label>Show</span>
+            </button>
+          </div>
         </div>
         <button class="button" type="submit" data-login-button>Sign in</button>
       </form>
@@ -44,14 +60,30 @@ import "../../styles/supporting.css";
       <form class="owner-auth-form" data-password-form hidden>
         <div class="owner-field">
           <label for="owner-new-password">Choose a password</label>
-          <input
-            id="owner-new-password"
-            name="password"
-            type="password"
-            autocomplete="new-password"
-            minlength="8"
-            required
-          />
+          <div class="owner-password-input">
+            <input
+              id="owner-new-password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              minlength="8"
+              required
+            />
+            <button
+              class="owner-password-toggle"
+              type="button"
+              data-password-toggle
+              aria-controls="owner-new-password"
+              aria-label="Show password"
+              aria-pressed="false"
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+                <circle cx="12" cy="12" r="2.6"></circle>
+              </svg>
+              <span data-password-toggle-label>Show</span>
+            </button>
+          </div>
           <small>Use at least eight characters.</small>
         </div>
         <button class="button" type="submit" data-password-button>Save password</button>
@@ -90,6 +122,7 @@ import "../../styles/supporting.css";
     const passwordForm = document.querySelector<HTMLFormElement>("[data-password-form]");
     const loginButton = document.querySelector<HTMLButtonElement>("[data-login-button]");
     const passwordButton = document.querySelector<HTMLButtonElement>("[data-password-button]");
+    const passwordToggles = document.querySelectorAll<HTMLButtonElement>("[data-password-toggle]");
     const noAccess = document.querySelector<HTMLElement>("[data-owner-no-access]");
     const noAccessLogout = document.querySelector<HTMLButtonElement>("[data-no-access-logout]");
     let callbackMode: "invite" | "recovery" | null = null;
@@ -102,6 +135,21 @@ import "../../styles/supporting.css";
     };
 
     const redirectToDashboard = () => window.location.replace("/owner/dashboard");
+
+    passwordToggles.forEach((toggle) => {
+      const inputId = toggle.getAttribute("aria-controls");
+      const input = inputId ? document.getElementById(inputId) : null;
+      const label = toggle.querySelector<HTMLElement>("[data-password-toggle-label]");
+      if (!(input instanceof HTMLInputElement)) return;
+
+      toggle.addEventListener("click", () => {
+        const reveal = input.type === "password";
+        input.type = reveal ? "text" : "password";
+        toggle.setAttribute("aria-pressed", String(reveal));
+        toggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
+        if (label) label.textContent = reveal ? "Hide" : "Show";
+      });
+    });
 
     const showNoAccess = () => {
       if (loginForm) loginForm.hidden = true;
