@@ -19,7 +19,7 @@ Netlify provides deployment, Functions, Identity, Forms, and Blobs context throu
 
 1. Connect the intended private repository and confirm build command `npm run build`, publish directory `dist`, and Functions directory `netlify/functions`.
 2. Enable Identity, disable public registration, invite only approved owners, and assign every approved dashboard account the exact `owner` role.
-3. Verify the unauthorised fallback from `/owner/dashboard` to `/owner` and separately verify the owner-role route. Function authorization remains required even when the edge route permits the page.
+3. Verify that anonymous and non-owner visits to `/owner/dashboard` return to `/owner` before dashboard content is revealed. Separately verify that protected owner Functions deny those users and permit an approved account with the exact `owner` role. Do not add a Netlify edge redirect for `/owner/dashboard`; run `npm run check:owner-access` to prevent the browser/edge session loop from returning.
 4. Enable Blobs. With an approved owner account, exercise settings read, save, conflict handling, snapshot creation, and restore; record the result.
 5. Confirm Netlify detects the `availability-request` form. Configure the owner-approved email notification recipient in the Netlify UI, submit the approved production smoke request, and verify both the Forms record and email delivery without representing it as a reservation. Record the complete smoke-evidence object only after that observation.
 6. Configure optional approved analytics IDs in the correct context. Confirm analytics is absent when waived, and that public events never include form values or owner activity.
@@ -34,7 +34,7 @@ Netlify provides deployment, Functions, Identity, Forms, and Blobs context throu
 
 - For dependency updates, use a separate reviewed change: `npm ci`, all quality gates, a production build, and a deploy preview before any approved production release. Review production dependency audit results rather than suppressing them.
 - For a failed build, confirm Node `22.19.0`, the locked install, build command, publish directory, and Functions directory.
-- For owner access issues, check Identity invite status and the exact `owner` role, then test protected Functions; client-side visibility is not authorization evidence.
+- For owner access issues, check Identity invite status and the exact `owner` role, then test protected Functions; client-side visibility is not authorization evidence. Keep `/owner/dashboard` free of edge redirects so browser Identity can complete its own session check.
 - For missing public settings, preserve repository defaults, check the Functions and Blobs health, and do not copy settings into a guest-data store.
 - For Form notification issues, check the Netlify Forms record before the email configuration. A delivery issue must not be described as a confirmed reservation.
 - For header, analytics, domain, or TLS failures, pause launch, record the failed smoke field, correct the platform configuration through the approved owner, and retest.

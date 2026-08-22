@@ -107,7 +107,7 @@ Make the repository reproducible and enforce launch-grade quality gates.
 **Files:**
 
 - Add `.nvmrc` pinned to `22.19.0`, `.env.example` with names only, `netlify.toml`, and a complete private-project `README.md`.
-- Configure Netlify build/functions, static form handling, role-gated `/owner/dashboard*` redirects with a helpful owner-login fallback, canonical host redirects ready for later activation, and security headers: CSP matched to actual integrations, HSTS for production, `Referrer-Policy`, `Permissions-Policy`, `X-Content-Type-Options`, frame protection, and no-store/noindex owner responses where supported.
+- Configure Netlify build/functions, static form handling, browser-side owner visibility gating with independently authorized owner Functions, a checker that prohibits `/owner/dashboard*` edge redirects, canonical host redirects ready for later activation, and security headers: CSP matched to actual integrations, HSTS for production, `Referrer-Policy`, `Permissions-Policy`, `X-Content-Type-Options`, frame protection, and no-store/noindex owner responses where supported.
 - Add Prettier, ESLint with Astro/TypeScript support, Playwright, and axe accessibility testing. Add scripts for format check, lint, strict type check, unit/integration tests, e2e, accessibility, internal links/assets, secret patterns, dependency audit, production build, and aggregate CI.
 - Add Playwright tests for public navigation, date/form validation, success page, owner login shell, protected endpoint behavior that can run locally, 404, responsive sticky action, keyboard-visible focus, and no critical/serious axe findings on required public pages.
 - Add a build-output internal-link/asset checker and repository secret-pattern checker with tests.

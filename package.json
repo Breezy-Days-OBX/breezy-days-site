@@ -14,6 +14,7 @@
     "check:links": "npm run build && npm run check:links:built",
     "check:links:built": "node scripts/check-built-site.mjs dist",
     "check:csp": "node scripts/check-csp.mjs",
+    "check:owner-access": "node scripts/check-owner-access.mjs netlify.toml",
     "check:secrets": "node scripts/check-secrets.mjs .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -24,11 +25,11 @@
     "test:run": "vitest run",
     "test:unit": "vitest run src",
     "test:integration": "vitest run netlify",
-    "test:checkers": "node --test scripts/check-built-site.test.mjs scripts/check-csp.test.mjs scripts/check-launch-readiness.test.mjs scripts/check-secrets.test.mjs",
+    "test:checkers": "node --test scripts/check-built-site.test.mjs scripts/check-csp.test.mjs scripts/check-launch-readiness.test.mjs scripts/check-owner-access.test.mjs scripts/check-secrets.test.mjs",
     "test:e2e": "npm run build && playwright test --grep-invert @axe",
     "test:a11y": "npm run build && playwright test --grep @axe",
     "audit:prod": "npm audit --omit=dev",
-    "ci": "npm run format:check && npm run lint && npm run check && npm run test:unit && npm run test:integration && npm run test:checkers && npm run build && npm run check:links:built && npm run check:csp && npm run test:e2e && npm run test:a11y && npm run check:secrets && npm run audit:prod"
+    "ci": "npm run format:check && npm run lint && npm run check && npm run test:unit && npm run test:integration && npm run test:checkers && npm run build && npm run check:links:built && npm run check:csp && npm run check:owner-access && npm run test:e2e && npm run test:a11y && npm run check:secrets && npm run audit:prod"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",
@@ -49,6 +50,7 @@
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
+    "smol-toml": "1.8.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.10"
