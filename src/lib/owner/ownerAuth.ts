@@ -21,7 +21,13 @@ interface OwnerCallbackResult {
 interface OwnerIdentityReader {
   handleAuthCallback: () => Promise<unknown>;
   getUser: () => Promise<unknown>;
+  refreshSession?: () => Promise<unknown>;
   callbackUrl?: OwnerCallbackUrl;
+}
+
+interface OwnerSessionReader {
+  getUser: () => Promise<unknown>;
+  refreshSession: () => Promise<unknown>;
 }
 
 interface OwnerCallbackUrl {
@@ -62,6 +68,11 @@ const isCallback = (value: unknown): value is OwnerCallbackResult => {
   return ["oauth", "confirmation", "recovery", "invite", "email_change"].includes(String(type));
 };
 
+export async function readFreshOwnerSession(identity: OwnerSessionReader): Promise<unknown> {
+  await identity.refreshSession();
+  return identity.getUser();
+}
+
 export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promise<OwnerEntryState> {
   try {
     const callback = await identity.handleAuthCallback();
@@ -84,7 +95,12 @@ export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promis
         : { state: "forbidden", user: callback.user };
     }
 
-    const user = await identity.getUser();
+    const user = identity.refreshSession
+      ? await readFreshOwnerSession({
+          refreshSession: identity.refreshSession,
+          getUser: identity.getUser,
+        })
+      : await identity.getUser();
     if (!isUser(user)) return { state: "login" };
     return hasOwnerRole(user) ? { state: "authenticated", user } : { state: "forbidden", user };
   } catch {

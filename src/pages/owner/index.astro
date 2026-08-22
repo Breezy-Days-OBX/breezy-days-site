@@ -109,6 +109,7 @@ import "../../styles/supporting.css";
       handleAuthCallback,
       login,
       logout,
+      refreshSession,
       updateUser,
     } from "@netlify/identity";
     import {
@@ -170,6 +171,7 @@ import "../../styles/supporting.css";
     const entry = await loadOwnerEntryState({
       handleAuthCallback,
       getUser,
+      refreshSession,
       callbackUrl: {
         hash: window.location.hash,
         pathname: window.location.pathname,

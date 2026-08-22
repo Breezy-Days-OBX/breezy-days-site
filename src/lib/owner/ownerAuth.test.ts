@@ -6,6 +6,7 @@ type OwnerAuthModule = {
   loadOwnerEntryState: (identity: {
     handleAuthCallback: () => Promise<unknown>;
     getUser: () => Promise<unknown>;
+    refreshSession?: () => Promise<unknown>;
     callbackUrl?: {
       hash: string;
       pathname: string;
@@ -13,6 +14,10 @@ type OwnerAuthModule = {
       replace: (url: string) => void;
     };
   }) => Promise<Record<string, unknown>>;
+  readFreshOwnerSession: (identity: {
+    getUser: () => Promise<unknown>;
+    refreshSession: () => Promise<unknown>;
+  }) => Promise<unknown>;
   describeAuthError: (operation: "login" | "callback" | "password") => string;
 };
 
@@ -52,6 +57,36 @@ describe("owner authentication entry states", () => {
         getUser: vi.fn(async () => ({ id: "owner", roles: ["owner"] })),
       }),
     ).resolves.toMatchObject({ state: "authenticated" });
+  });
+
+  it("refreshes the browser session before trusting an existing owner or loading private data", async () => {
+    const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
+    if (!ownerAuth) return;
+    const calls: string[] = [];
+    const identity = {
+      refreshSession: vi.fn(async () => {
+        calls.push("refresh");
+        return "fresh-token";
+      }),
+      getUser: vi.fn(async () => {
+        calls.push("user");
+        return { id: "owner", roles: ["owner"] };
+      }),
+    };
+
+    await expect(ownerAuth.readFreshOwnerSession(identity)).resolves.toMatchObject({
+      id: "owner",
+    });
+    expect(calls).toEqual(["refresh", "user"]);
+
+    calls.length = 0;
+    await expect(
+      ownerAuth.loadOwnerEntryState({
+        handleAuthCallback: vi.fn(async () => null),
+        ...identity,
+      }),
+    ).resolves.toMatchObject({ state: "authenticated" });
+    expect(calls).toEqual(["refresh", "user"]);
   });
 
   it.each([
