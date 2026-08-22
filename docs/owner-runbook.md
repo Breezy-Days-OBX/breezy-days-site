@@ -6,7 +6,8 @@ Use this guide only after the Netlify project has Identity enabled, public regis
 
 1. Open `/owner` on the production site and use the invitation, sign-in, or recovery flow.
 2. After access is confirmed, open `/owner/dashboard`. If access is refused, confirm the invited account has the exact `owner` role in Netlify Identity; do not rely on a visible dashboard alone.
-3. Use **Log out** when finished, especially on a shared device. Closing a tab is not a logout check.
+3. Finishing an invitation automatically signs the new owner in again so the protected dashboard Functions receive the same secure session as the browser. If that automatic sign-in cannot finish, the saved password remains valid and the owner is moved to normal sign-in. If an old or incomplete session is detected later, the site clears it and returns to the owner sign-in screen instead of repeatedly bouncing between pages.
+4. Use **Log out** when finished, especially on a shared device. Closing a tab is not a logout check.
 
 ## Permitted edits
 

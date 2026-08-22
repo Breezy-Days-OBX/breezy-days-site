@@ -18,6 +18,20 @@ type OwnerAuthModule = {
     getUser: () => Promise<unknown>;
     refreshSession: () => Promise<unknown>;
   }) => Promise<unknown>;
+  completeOwnerInviteSession: (
+    identity: {
+      acceptInvite: (token: string, password: string) => Promise<unknown>;
+      login: (email: string, password: string) => Promise<unknown>;
+    },
+    token: string,
+    password: string,
+  ) => Promise<
+    { state: "authenticated"; user: unknown } | { state: "sign_in_required"; email: string }
+  >;
+  clearExpiredOwnerSession: (
+    error: unknown,
+    identity: { logout: () => Promise<unknown> },
+  ) => Promise<boolean>;
   describeAuthError: (operation: "login" | "callback" | "password") => string;
 };
 
@@ -87,6 +101,70 @@ describe("owner authentication entry states", () => {
       }),
     ).resolves.toMatchObject({ state: "authenticated" });
     expect(calls).toEqual(["refresh", "user"]);
+  });
+
+  it("finishes an invitation with a password login that establishes the server session", async () => {
+    const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
+    if (!ownerAuth) return;
+    const calls: string[] = [];
+    const identity = {
+      acceptInvite: vi.fn(async () => {
+        calls.push("accept");
+        return { id: "owner", email: "owner@example.com", roles: ["owner"] };
+      }),
+      login: vi.fn(async () => {
+        calls.push("login");
+        return { id: "owner", email: "owner@example.com", roles: ["owner"] };
+      }),
+    };
+
+    await expect(
+      ownerAuth.completeOwnerInviteSession(identity, "invite-token", "owner-password"),
+    ).resolves.toMatchObject({
+      state: "authenticated",
+      user: { id: "owner", roles: ["owner"] },
+    });
+    expect(calls).toEqual(["accept", "login"]);
+    expect(identity.acceptInvite).toHaveBeenCalledWith("invite-token", "owner-password");
+    expect(identity.login).toHaveBeenCalledWith("owner@example.com", "owner-password");
+  });
+
+  it("preserves a saved invite password when the follow-up login needs to be retried", async () => {
+    const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
+    if (!ownerAuth) return;
+    const identity = {
+      acceptInvite: vi.fn(async () => ({
+        id: "owner",
+        email: "owner@example.com",
+        roles: ["owner"],
+      })),
+      login: vi.fn(async () => {
+        throw new Error("temporary login failure");
+      }),
+    };
+
+    await expect(
+      ownerAuth.completeOwnerInviteSession(identity, "invite-token", "saved-password"),
+    ).resolves.toEqual({ state: "sign_in_required", email: "owner@example.com" });
+    expect(identity.acceptInvite).toHaveBeenCalledOnce();
+    expect(identity.login).toHaveBeenCalledOnce();
+  });
+
+  it("clears only an expired owner session before returning to sign in", async () => {
+    const ownerAuth = modules["./ownerAuth.ts"] as OwnerAuthModule | undefined;
+    if (!ownerAuth) return;
+    const logout = vi.fn(async () => undefined);
+
+    await expect(ownerAuth.clearExpiredOwnerSession({ kind: "auth" }, { logout })).resolves.toBe(
+      true,
+    );
+    expect(logout).toHaveBeenCalledOnce();
+
+    logout.mockClear();
+    await expect(ownerAuth.clearExpiredOwnerSession({ kind: "service" }, { logout })).resolves.toBe(
+      false,
+    );
+    expect(logout).not.toHaveBeenCalled();
   });
 
   it.each([
