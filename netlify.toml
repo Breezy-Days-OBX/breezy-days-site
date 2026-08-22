@@ -9,35 +9,6 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-# Allow an authenticated Identity user with the owner role to receive the
-# generated dashboard. The paired fallback rules keep the owner login helpful
-# instead of returning Netlify's generic role-gate 404.
-[[redirects]]
-  from = "/owner/dashboard"
-  to = "/owner/dashboard"
-  status = 200
-  force = true
-  conditions = { Role = ["owner"] }
-
-[[redirects]]
-  from = "/owner/dashboard"
-  to = "/owner?access=denied"
-  status = 302
-  force = true
-
-[[redirects]]
-  from = "/owner/dashboard/*"
-  to = "/owner/dashboard/:splat"
-  status = 200
-  force = true
-  conditions = { Role = ["owner"] }
-
-[[redirects]]
-  from = "/owner/dashboard/*"
-  to = "/owner?access=denied"
-  status = 302
-  force = true
-
 # Activate only after Netlify has assigned the production project and both
 # custom hostnames are verified. Enabling this earlier would break deploy
 # previews by forcing their hostnames onto a domain that may not be ready.

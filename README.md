@@ -11,7 +11,7 @@ Private project for the Breezy Days OBX direct-rental website. The public site p
 - Netlify Blobs for validated owner settings and recovery snapshots.
 - Optional Google Analytics 4 and Microsoft Clarity integrations, disabled when their public IDs are absent.
 
-`netlify.toml` is authoritative for the build, Functions directory, role gates, redirects, and response headers. The dashboard is protected twice: Netlify’s edge rule admits only the `owner` role, and every protected Function performs its own user, role, origin, method, and payload checks. Client-side redirects are usability fallbacks, not authorization controls.
+`netlify.toml` is authoritative for the build, Functions directory, redirects, and response headers. The dashboard is a static shell that stays hidden until the browser confirms an Identity user with the `owner` role; anonymous and non-owner visitors return to owner sign-in. Every owner-data Function independently performs its own user, role, origin, method, and payload checks, which is the authorization boundary for private data and mutations. Do not add a Netlify edge redirect for `/owner/dashboard`: edge JWT state can diverge from the browser Identity session and create a redirect loop.
 
 ## Local setup
 
@@ -32,21 +32,22 @@ These values are public integration identifiers, not secrets. Keep all `.env` fi
 
 ## Quality commands
 
-| Command                    | Gate                                                                       |
-| -------------------------- | -------------------------------------------------------------------------- |
-| `npm run format:check`     | Prettier check for source and documentation                                |
-| `npm run lint`             | ESLint for JavaScript, TypeScript, and Astro                               |
-| `npm run check`            | Strict Astro and TypeScript diagnostics                                    |
-| `npm run test:unit`        | Source unit and static-render contract tests                               |
-| `npm run test:integration` | Function authorization, validation, storage, and concurrency tests         |
-| `npm run test:checkers`    | Direct tests for repository checkers                                       |
-| `npm run build`            | Production static build                                                    |
-| `npm run check:links`      | Fresh build plus internal page, fragment, and asset validation             |
-| `npm run test:e2e`         | Chromium navigation, form, owner, 404, responsive, and focus tests         |
-| `npm run test:a11y`        | Axe WCAG checks for critical and serious findings on required public pages |
-| `npm run check:secrets`    | Credential-pattern scan with generated directories excluded                |
-| `npm run audit:prod`       | npm vulnerability audit for production dependencies only                   |
-| `npm run ci`               | Fail-fast aggregate of all automated gates above                           |
+| Command                      | Gate                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `npm run format:check`       | Prettier check for source and documentation                                |
+| `npm run lint`               | ESLint for JavaScript, TypeScript, and Astro                               |
+| `npm run check`              | Strict Astro and TypeScript diagnostics                                    |
+| `npm run test:unit`          | Source unit and static-render contract tests                               |
+| `npm run test:integration`   | Function authorization, validation, storage, and concurrency tests         |
+| `npm run test:checkers`      | Direct tests for repository checkers                                       |
+| `npm run build`              | Production static build                                                    |
+| `npm run check:links`        | Fresh build plus internal page, fragment, and asset validation             |
+| `npm run check:owner-access` | Owner dashboard route architecture and redirect-loop prevention            |
+| `npm run test:e2e`           | Chromium navigation, form, owner, 404, responsive, and focus tests         |
+| `npm run test:a11y`          | Axe WCAG checks for critical and serious findings on required public pages |
+| `npm run check:secrets`      | Credential-pattern scan with generated directories excluded                |
+| `npm run audit:prod`         | npm vulnerability audit for production dependencies only                   |
+| `npm run ci`                 | Fail-fast aggregate of all automated gates above                           |
 
 Install the project browser once before running browser tests directly:
 
@@ -64,7 +65,7 @@ After the repository is connected to the intended private Netlify project:
 
 1. Confirm the detected command is `npm run build`, publish directory is `dist`, and Functions directory is `netlify/functions`.
 2. Enable Identity, disable public registration, invite only approved owners, and assign each approved account the exact `owner` role.
-3. Confirm the role-gated exact `/owner/dashboard` route and nested `/owner/dashboard/*` route return the owner login fallback to users without that role.
+3. Confirm anonymous and non-owner visits to `/owner/dashboard` return to owner sign-in before dashboard content is revealed, and confirm the owner Functions return no private data. Keep this route free of Netlify edge redirects; `npm run check:owner-access` enforces that boundary.
 4. Enable Blobs for the project and exercise save, conflict, snapshot, and restore behavior with an approved owner account.
 5. Confirm Netlify detects the `availability-request` form, then configure its owner-approved email notification in the Netlify UI. Do not store notification credentials in the repository.
 6. Add `PUBLIC_GA4_ID` and/or `PUBLIC_CLARITY_ID` in Netlify only when analytics is approved. Leave them absent to disable analytics without affecting the site.
