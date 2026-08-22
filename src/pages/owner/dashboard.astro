@@ -362,7 +362,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
   </main>
 
   <script>
-    import { getUser, logout } from "@netlify/identity";
+    import { getUser, logout, refreshSession } from "@netlify/identity";
     import {
       fetchOwnerSettings,
       fetchOwnerSnapshots,
@@ -376,7 +376,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
       runOwnerRestore,
       runOwnerSave,
     } from "../../lib/owner/ownerDashboard";
-    import { hasOwnerRole } from "../../lib/owner/ownerAuth";
+    import { hasOwnerRole, readFreshOwnerSession } from "../../lib/owner/ownerAuth";
     import { OWNER_EDITABLE_KEYS, serializeOwnerSettings } from "../../lib/owner/ownerForm";
     import type { OwnerSettings } from "../../lib/ownerSettings";
     import { formatPublicSettings } from "../../lib/publicSettings";
@@ -591,7 +591,7 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
       }
     });
     try {
-      const user = await getUser();
+      const user = await readFreshOwnerSession({ getUser, refreshSession });
       if (!hasOwnerRole(user)) window.location.replace("/owner");
       else {
         const dashboard = await refreshDashboard();
