@@ -113,6 +113,7 @@ import "../../styles/supporting.css";
       updateUser,
     } from "@netlify/identity";
     import {
+      completeOwnerInviteSession,
       describeAuthError,
       hasOwnerRole,
       loadOwnerEntryState,
@@ -123,6 +124,7 @@ import "../../styles/supporting.css";
     const passwordForm = document.querySelector<HTMLFormElement>("[data-password-form]");
     const loginButton = document.querySelector<HTMLButtonElement>("[data-login-button]");
     const passwordButton = document.querySelector<HTMLButtonElement>("[data-password-button]");
+    const emailInput = document.querySelector<HTMLInputElement>("#owner-email");
     const passwordToggles = document.querySelectorAll<HTMLButtonElement>("[data-password-toggle]");
     const noAccess = document.querySelector<HTMLElement>("[data-owner-no-access]");
     const noAccessLogout = document.querySelector<HTMLButtonElement>("[data-no-access-logout]");
@@ -228,9 +230,25 @@ import "../../styles/supporting.css";
       showStatus("Saving your password…");
       try {
         let user: unknown;
-        if (callbackMode === "invite" && inviteToken)
-          user = await acceptInvite(inviteToken, password);
-        else if (callbackMode === "recovery") user = await updateUser({ password });
+        if (callbackMode === "invite" && inviteToken) {
+          const completion = await completeOwnerInviteSession(
+            { acceptInvite, login },
+            inviteToken,
+            password,
+          );
+          if (completion.state === "sign_in_required") {
+            callbackMode = null;
+            inviteToken = null;
+            if (emailInput) emailInput.value = completion.email;
+            passwordForm?.reset();
+            if (passwordForm) passwordForm.hidden = true;
+            if (loginForm) loginForm.hidden = false;
+            showStatus("Your password is saved. Sign in below to continue.", "success");
+            loginButton?.removeAttribute("disabled");
+            return;
+          }
+          user = completion.user;
+        } else if (callbackMode === "recovery") user = await updateUser({ password });
         else throw new Error("Invalid callback state");
         finishAuthentication(user);
       } catch {

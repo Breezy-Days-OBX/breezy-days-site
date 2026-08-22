@@ -376,7 +376,11 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
       runOwnerRestore,
       runOwnerSave,
     } from "../../lib/owner/ownerDashboard";
-    import { hasOwnerRole, readFreshOwnerSession } from "../../lib/owner/ownerAuth";
+    import {
+      clearExpiredOwnerSession,
+      hasOwnerRole,
+      readFreshOwnerSession,
+    } from "../../lib/owner/ownerAuth";
     import { OWNER_EDITABLE_KEYS, serializeOwnerSettings } from "../../lib/owner/ownerForm";
     import type { OwnerSettings } from "../../lib/ownerSettings";
     import { formatPublicSettings } from "../../lib/publicSettings";
@@ -601,11 +605,15 @@ const petOptions = Array.from({ length: 5 }, (_, index) => index);
         } else transition("recovery");
       }
     } catch (error) {
-      transition(
-        typeof error === "object" && error !== null && "kind" in error
-          ? String(error.kind)
-          : "service",
-      );
+      if (await clearExpiredOwnerSession(error, { logout })) {
+        window.location.replace("/owner?session=expired");
+      } else {
+        transition(
+          typeof error === "object" && error !== null && "kind" in error
+            ? String(error.kind)
+            : "service",
+        );
+      }
     }
   </script>
 </BaseLayout>

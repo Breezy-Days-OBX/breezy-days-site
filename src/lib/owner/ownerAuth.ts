@@ -30,6 +30,18 @@ interface OwnerSessionReader {
   refreshSession: () => Promise<unknown>;
 }
 
+interface OwnerInviteSessionWriter {
+  acceptInvite: (token: string, password: string) => Promise<unknown>;
+  login: (email: string, password: string) => Promise<unknown>;
+}
+
+interface OwnerSessionLogout {
+  logout: () => Promise<unknown>;
+}
+
+export type OwnerInviteCompletion =
+  { state: "authenticated"; user: unknown } | { state: "sign_in_required"; email: string };
+
 interface OwnerCallbackUrl {
   hash: string;
   pathname: string;
@@ -71,6 +83,33 @@ const isCallback = (value: unknown): value is OwnerCallbackResult => {
 export async function readFreshOwnerSession(identity: OwnerSessionReader): Promise<unknown> {
   await identity.refreshSession();
   return identity.getUser();
+}
+
+export async function completeOwnerInviteSession(
+  identity: OwnerInviteSessionWriter,
+  token: string,
+  password: string,
+): Promise<OwnerInviteCompletion> {
+  const invitedUser = await identity.acceptInvite(token, password);
+  if (!isUser(invitedUser) || typeof invitedUser.email !== "string" || !invitedUser.email.trim()) {
+    throw new Error("The invited owner account is missing an email address.");
+  }
+  try {
+    return { state: "authenticated", user: await identity.login(invitedUser.email, password) };
+  } catch {
+    return { state: "sign_in_required", email: invitedUser.email };
+  }
+}
+
+export async function clearExpiredOwnerSession(
+  error: unknown,
+  identity: OwnerSessionLogout,
+): Promise<boolean> {
+  if (typeof error !== "object" || error === null || !("kind" in error) || error.kind !== "auth") {
+    return false;
+  }
+  await identity.logout();
+  return true;
 }
 
 export async function loadOwnerEntryState(identity: OwnerIdentityReader): Promise<OwnerEntryState> {
