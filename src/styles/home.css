@@ -716,8 +716,8 @@
 }
 
 .home-page .owner-story {
-  grid-template-columns: minmax(150px, 0.32fr) minmax(0, 1fr);
-  gap: clamp(40px, 7vw, 112px);
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(28px, 4vw, 64px);
   margin-top: 64px;
   padding: clamp(40px, 5vw, 72px);
   border: 0;
@@ -729,6 +729,14 @@
 .home-page .review-section:not(.has-proof) .owner-story {
   margin-top: 0;
   padding: clamp(40px, 5vw, 72px);
+}
+
+.home-page .owner-story-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 24px;
+  border-radius: 16px;
 }
 
 .home-page .owner-story-copy {
