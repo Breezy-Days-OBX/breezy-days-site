@@ -13,6 +13,7 @@ import bedroom from "../assets/images/bedroom.jpeg";
 import heroDeck from "../assets/images/hero-deck.jpeg";
 import kitchen from "../assets/images/kitchen.jpeg";
 import livingDining from "../assets/images/living-dining.jpeg";
+import michelleDanny from "../assets/images/michelle-and-danny.jpg";
 import privatePool from "../assets/images/private-pool.jpeg";
 import { property } from "../content/property";
 import { derivePublicPropertyFacts } from "../content/propertyPresentation";
@@ -402,7 +403,19 @@ const structuredData = {
       <h2 class="visually-hidden" id="reviews-title">Guest reviews and hosts</h2>
       <MarketplaceProof proof={proof} />
       <div class="shell owner-story">
-        <p class="eyebrow">Meet your hosts</p>
+        <div class="owner-story-profile">
+          <p class="eyebrow">Meet your hosts</p>
+          <Image
+            class="owner-story-photo"
+            src={michelleDanny}
+            alt="Michelle and Danny Day, owners and hosts of Breezy Days"
+            widths={[480, 720, 1080]}
+            sizes="(max-width: 900px) 100vw, 32vw"
+            loading="lazy"
+            quality={84}
+            format="webp"
+          />
+        </div>
         <div class="owner-story-copy">
           <p class="owner-story-lead">{ownerStoryLead}</p>
           {ownerStoryRest && <p class="owner-story-rest">{ownerStoryRest}</p>}
