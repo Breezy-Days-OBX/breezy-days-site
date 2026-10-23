@@ -15,7 +15,7 @@ Private project for the Breezy Days OBX direct-rental website. The public site p
 
 ## Local setup
 
-1. Install Node `22.19.0` from `.nvmrc`.
+1. Install Node `22.23.4` from `.nvmrc`.
 2. Run `npm ci`.
 3. Run `npm run dev` for the Astro development server.
 

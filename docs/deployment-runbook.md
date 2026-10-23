@@ -5,7 +5,7 @@ This is a handoff guide for the client-owned Netlify project. It describes actio
 ## Ownership and contexts
 
 - Keep the Netlify team, site ownership, billing, Identity administration, Forms notification recipients, Blobs access, analytics accounts, and domain registrar under client-approved ownership.
-- Local work uses Node `22.19.0`, `npm ci`, and the repository quality commands. Local gates need no Netlify account or credentials.
+- Local work uses Node `22.23.4`, `npm ci`, and the repository quality commands. Local gates need no Netlify account or credentials.
 - Deploy previews use the same static build and must retain their preview hostname. Do not activate the prepared canonical-host redirect for previews.
 - Production is the intended Netlify site only. Record each passing smoke result in `docs/launch-gate-record.json` with the observed date, responsible owner, production URL, observed result, and evidence location after each launch decision.
 
@@ -33,7 +33,7 @@ Netlify provides deployment, Functions, Identity, Forms, and Blobs context throu
 ## Updates and troubleshooting
 
 - For dependency updates, use a separate reviewed change: `npm ci`, all quality gates, a production build, and a deploy preview before any approved production release. Review production dependency audit results rather than suppressing them.
-- For a failed build, confirm Node `22.19.0`, the locked install, build command, publish directory, and Functions directory.
+- For a failed build, confirm Node `22.23.4`, the locked install, build command, publish directory, and Functions directory.
 - For owner access issues, check Identity invite status and the exact `owner` role, then test protected Functions; client-side visibility is not authorization evidence. Keep `/owner/dashboard` free of edge redirects so browser Identity can complete its own session check.
 - For missing public settings, preserve repository defaults, check the Functions and Blobs health, and do not copy settings into a guest-data store.
 - For Form notification issues, check the Netlify Forms record before the email configuration. A delivery issue must not be described as a confirmed reservation.

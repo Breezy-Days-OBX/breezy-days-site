@@ -4,7 +4,7 @@ Use this checklist at release time. `npm run check:launch` is intentionally sepa
 
 ## Coding-stage completion
 
-- [ ] Use Node `22.19.0` and run `npm ci`.
+- [ ] Use Node `22.23.4` and run `npm ci`.
 - [ ] Run `npm run ci` and inspect the production build output.
 - [ ] Run `npm run check:launch`; a failure is expected until the external items below are complete.
 - [ ] Review `docs/pre-launch-test-record.md` and replace only coding-stage results with measured command output.
